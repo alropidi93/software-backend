@@ -12,7 +12,7 @@ abstract class BaseRepository {
     /**
      * Get number of records.
      *
-     * @return array
+     * @return int
      */
     public function cantidadElementos()
     {
@@ -61,5 +61,16 @@ abstract class BaseRepository {
      */
     public function obtenerModelo(){
         return $this->model;
+    }
+
+    /**
+     * Get all of records.
+     *
+     * @return Model array
+     */
+    public function obtenerTodos()
+    {
+        $list = $this->model->where('deleted',false)->get();
+        return $list;
     }
 }

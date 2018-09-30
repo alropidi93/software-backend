@@ -16,6 +16,15 @@ class TiendaController extends Controller {
     public function __construct(TiendaRepository $tiendaRepository){
         $this->tiendaRepository = $tiendaRepository;
     }
+
+    public function index() //Tienda $tienda
+    {
+   
+        $tiendas = $this->tiendaRepository->obtenerTodos();
+        $tienda = $this->tiendaRepository->obtenerModelo();
+        TiendaResource::withoutWrapping();
+        return response()->json(['status' => true,  'body'=> new TiendaResource($tienda)],200);
+    }
   
     public function show($tienda) //Tienda $tienda
     {
