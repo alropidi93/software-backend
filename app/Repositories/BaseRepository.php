@@ -37,9 +37,20 @@ abstract class BaseRepository {
      * @param  int  $id
      * @return App\Models\Model
      */
+    public function obtenerPorIdHard($id)
+    {
+        return $this->model->find($id);
+    }
+
+    /**
+     * Get Model by id.
+     *
+     * @param  int  $id
+     * @return App\Models\Model
+     */
     public function obtenerPorId($id)
     {
-        return $this->model->findOrFail($id);
+        return $this->model->where('id',$id)->where('deleted',false)->first();
     }
 
     /**
@@ -51,6 +62,17 @@ abstract class BaseRepository {
     public function setId($id)
     {
         return $this->model->id = $id;
+    }
+
+    /**
+     * Set a certain model to the model attribute.
+     *
+     * @param  App\Models\Model
+     * @return void
+     */
+    public function setModel($model)
+    {
+        return $this->model =  $model;
     }
   
     /**
@@ -73,4 +95,32 @@ abstract class BaseRepository {
         $list = $this->model->where('deleted',false)->get();
         return $list;
     }
+
+    /**
+     * Update a model by its id.
+     * 
+     * @param array $data 
+     * @return App\Models\Model
+     */
+    public function actualiza($data)
+    {
+       
+        $this->model->update($data);
+        $newModel = $this->obtenerPorId($this->model->id);
+        $this->setModel($newModel);
+        
+    }
+
+    public function softDelete()
+    {
+        $data= ['deleted'=>true];
+        $this->model->update($data);
+        $this->setModel(null);
+        
+        
+    }
+
+    
+
+    
 }

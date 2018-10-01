@@ -19,9 +19,10 @@ class CreateTiendaTable extends Migration
             $table->string('distrito',100);
             $table->string('ubicacion',500);
             $table->string('direccion',500);
+            $table->string('telefono',20);
             $table->boolean('deleted');
-            $table->integer('idJefeTienda');
-            $table->integer('idJefeAlmacen');
+            $table->integer('idJefeTienda')->nullable();
+            $table->integer('idJefeAlmacen')->nullable();
             
      
             $table->timestamps();

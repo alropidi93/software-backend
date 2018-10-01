@@ -15,11 +15,8 @@ class TiendasResource extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'type'          => 'tiendas',
-            'id'            => $this->id,
-            'attributes'    => [
-                'title' => $this->title,
-            ],
+            'lista' => TiendaResource::collection($this->collection->except(['status'])),
         ];
+        
     }
 }

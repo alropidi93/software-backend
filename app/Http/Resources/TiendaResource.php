@@ -6,6 +6,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class TiendaResource extends JsonResource
 {
+    protected $title;
+
+    public function title($title){
+        $this->title = $title;
+        return $this;
+    }
     /**
      * Transform the resource into an array.
      *
@@ -15,7 +21,8 @@ class TiendaResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'type'          => 'tienda',
+            
+            'type'          => 'Tienda',
             'id'            => $this->id,
             'attributes'    => [
                 'nombre' => $this->nombre,
@@ -24,6 +31,8 @@ class TiendaResource extends JsonResource
                 'direccion' => $this->direccion,
                 'telefono' => $this->telefono,
                 'deleted' => $this->deleted,
+                'created_at' => $this->created_at,
+                'updated_at' => $this->updated_at,
             ],
         ];
     }

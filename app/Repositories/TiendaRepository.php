@@ -29,8 +29,17 @@ class TiendaRepository extends BaseRepository {
         
     }
 
-    public function test(){
-        return "test";
+    /**
+     * Save data from the array
+     *
+     * @return App\Models\Model
+     */
+    public function guarda($dataArray)
+    {
+        $dataArray['deleted'] =false;
+
+        return $this->model = $this->model->create($dataArray);
+        
     }
     
 }
