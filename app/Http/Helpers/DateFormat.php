@@ -9,7 +9,7 @@ use Carbon\Carbon;
 class DateFormat
 {
 
-  public static function spanishDateToEnglishdate( $date ){
+  public static function spanishDateToEnglishDate( $date ){
     // $date es un string en el siguiente formato dd/mm/aaaa
     return date('Y-m-d',strtotime($date));
   }

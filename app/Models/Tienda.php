@@ -21,8 +21,6 @@ class Tienda extends Model
     ];
   
   
-    // public function project() {
-    //   return $this->belongsTo('App\Http\Models\Project','project_id','id');
-    // }
+    
   
 }

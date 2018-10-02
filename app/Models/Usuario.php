@@ -18,4 +18,8 @@ class Usuario extends Model
       'idTienda',
       'deleted'
     ];
+
+    public function personaNatural() {
+        return $this->belongsTo('App\Models\PersonaNatural','idPersonaNatural','id');
+    }
 }

@@ -16,8 +16,7 @@ class TiendaRepository extends BaseRepository {
      */
     protected $jefeDeAmacen;
     /**
-     * Create a new BlogRepository instance.
-     *
+     * Create a new TiendaRepository instance.
      * @param  App\Models\Tienda $tienda
      * @return void
      */

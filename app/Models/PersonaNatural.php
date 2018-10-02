@@ -20,4 +20,8 @@ class Usuario extends Model
       'direccion',
       'deleted'
     ];
+
+    public function company() {
+      return $this->hasOne('App\Models\Usuario','project_id','id');
+    }
 }
