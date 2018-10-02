@@ -19,3 +19,4 @@ use Illuminate\Http\Request;
 
 
 Route::resource('tiendas', 'TiendaController');
+Route::resource('productos', 'ProductoController');
