@@ -15,7 +15,7 @@ class TiendasResource extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'lista' => TiendaResource::collection($this->collection),
+            'listaTiendas' => TiendaResource::collection($this->collection),
         ];
         
     }

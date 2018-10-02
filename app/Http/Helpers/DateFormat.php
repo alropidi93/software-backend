@@ -11,6 +11,8 @@ class DateFormat
 
   public static function spanishDateToEnglishDate( $date ){
     // $date es un string en el siguiente formato dd/mm/aaaa
+    
+    $date = str_replace('/', '-', $date);
     return date('Y-m-d',strtotime($date));
   }
 

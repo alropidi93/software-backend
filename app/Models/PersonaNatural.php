@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Usuario extends Model
+class PersonaNatural extends Model
 {
     protected $table = 'personaNatural';
     public $timestamps = true;
@@ -21,7 +21,7 @@ class Usuario extends Model
       'deleted'
     ];
 
-    public function company() {
-      return $this->hasOne('App\Models\Usuario','project_id','id');
+    public function usuario() {
+      return $this->hasOne('App\Models\Usuario','idPersonaNatural','id');
     }
 }

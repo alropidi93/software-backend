@@ -17,7 +17,7 @@ class CreatePersonaNaturalTable extends Migration
             $table->increments('id');
             $table->string('nombre',200);
             $table->string('apellidos',300);
-            $table->string('dni',12);
+            $table->string('dni',12)->unique();
             $table->date('fechaNac');
             $table->char('genero');
             $table->string('email',100);

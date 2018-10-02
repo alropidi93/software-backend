@@ -3,11 +3,9 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\UsuarioRelationshipResource;
-class UsuarioResource extends JsonResource
-{
-   
 
+class PersonaNaturalResource extends JsonResource
+{
     /**
      * Transform the resource into an array.
      *
@@ -18,18 +16,20 @@ class UsuarioResource extends JsonResource
     {
         return [
             
-            'type'          => 'Usuario',
-            'id'            => $this->idPersonaNatural,
+            'type'          => 'Persona Natural',
+            'id'            => $this->id,
             'attributes'    => [
-                
-                'password' => $this->password,
-                'idTipoUsuario' => $this->idTipoUsuario,
-                'idTienda' => $this->idTienda,
+                'nombre' => $this->nombre,
+                'apellidos' => $this->apellidos,
+                'dni' => $this->dni,
+                'genero' => $this->genero,
+                'email' => $this->email,
+                'direccion' => $this->direccion,
+                'fechaNac' => $this->fechaNac,
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,
             ],
-            'relationships' => new UsuarioRelationshipResource($this),
         ];
     }
 }

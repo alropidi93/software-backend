@@ -10,10 +10,19 @@ use App\Http\Resources\ValidationResource;
 use App\Http\Resources\ResponseResource;
 use App\Models\Usuario;
 use App\Repositories\UsuarioRepository;
+use Illuminate\Support\Facades\DB;
+
+use App\Http\Resources\UsuarioRelationshipResource;
 
 
 class UsuarioController extends Controller
 {
+    protected $usuarioRepository;
+
+    public function __construct(UsuarioRepository $usuarioRepository){
+        UsuarioResource::withoutWrapping();
+        $this->usuarioRepository = $usuarioRepository;
+    }
 
     /**
      * Display a listing of the resource.
@@ -25,15 +34,7 @@ class UsuarioController extends Controller
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+  
 
     /**
      * Store a newly created resource in storage.
@@ -48,23 +49,28 @@ class UsuarioController extends Controller
             $validator = \Validator::make($usuarioData->all(), 
                             ['nombre' => 'required',
                             'apellidos' => 'required',
-                            'genero'=>'required', 
+                            'genero'=>  'required', 
                             'fechaNac' => 'required',
                             'email' => 'required|email',
-                            'password' => 'required|min:6|max60',
+                            'dni' => 'required|min:8|max:12|unique:personaNatural,dni',
+                            'password' => 'required|min:6|max:60',
                             'direccion' => 'required']);
 
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
             DB::beginTransaction();
-            $usuario = $this->usuarioRepository->guarda($usuarioData->all());
+            $this->usuarioRepository->guarda($usuarioData->all());
+            $usuarioCreated = $this->usuarioRepository->obtenerModelo(); 
             DB::commit();
-            $tiendaResource =  new TiendaResource($tienda);
-            $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Tienda creada exitosamente');       
-            $responseResourse->body($tiendaResource);       
-            return $responseResourse;
+            return "exito";
+            
+            // $usuarioResource =  new UsuarioResource($usuarioCreated);
+            // return $usuarioResource;
+            // $responseResourse = new ResponseResource(null);
+            // $responseResourse->title('Usuario creado exitosamente');       
+            // $responseResourse->body($usuarioResource);       
+            // return $responseResourse;
         }
         catch(\Exception $e){
             DB::rollback();

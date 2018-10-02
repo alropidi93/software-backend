@@ -1,9 +1,10 @@
 <?php
 namespace App\Repositories;
-use App\Models\Tienda;
+use App\Models\Usuario;
+use App\Models\PersonaNatural;
 use App\Http\Helpers\DateFormat;
 	
-class TiendaRepository extends BaseRepository {
+class UsuarioRepository extends BaseRepository {
     /**
      * The PersonaNatural instance.
      *
@@ -25,21 +26,38 @@ class TiendaRepository extends BaseRepository {
         
     }
 
-    protected function setPersonaNatural($dataArray)
+    protected function setPersonaNaturalData($dataPersona)
     {
-        $this->personaNatural['nombre'] =  $dataArray['nombre'];
-        $this->personaNatural['apellidos'] =  $dataArray['apellidos'];
-        $this->personaNatural['genero'] =  $dataArray['genero'];
-        $this->personaNatural['dni'] =  $dataArray['dni'];
-        $this->personaNatural['email'] =  $dataArray['email'];
-        $this->personaNatural['fechaNac'] =  DateFormat::spanishDateToEnglishDate($dataArray['fechaNac']);
-        $this->personaNatural['direccion'] =  $dataArray['direccion'];
+        $this->personaNatural['nombre'] =  $dataPersona['nombre'];
+        $this->personaNatural['apellidos'] =  $dataPersona['apellidos'];
+        $this->personaNatural['genero'] =  $dataPersona['genero'];
+        $this->personaNatural['dni'] =  $dataPersona['dni'];
+        $this->personaNatural['email'] =  $dataPersona['email'];
+        $this->personaNatural['fechaNac'] =  DateFormat::spanishDateToEnglishDate($dataPersona['fechaNac']);
+        $this->personaNatural['direccion'] =  $dataPersona['direccion'];
         $this->personaNatural['deleted'] =  false; //default value
+        
+    }
+
+    protected function setUsuarioData($dataUsuario)
+    {
+        $this->model['password'] =  bcrypt($dataUsuario['password']);
+       
+        /*nullable fields*/
+        $this->model['idTipoUsuario'] = array_key_exists('idTipoUsuario',$dataUsuario)? $dataUsuario['idTipoUsuario']:null;
+        $this->model['idTienda'] = array_key_exists('idTienda',$dataUsuario)? $dataUsuario['idTienda']:null;
+        /* end nullable fields*/
+        $this->model['deleted'] =  false; //default value
         
     }
 
     protected function savePersonaNatural(){
         $this->personaNatural->save();
+        
+    }
+
+    protected function attachUsuarioToPersonaNatural($personaNatural, $usuario){
+        return $personaNatural->usuario()->save($usuario);
     }
 
    
@@ -51,10 +69,12 @@ class TiendaRepository extends BaseRepository {
      */
     public function guarda($dataArray)
     {
-        $this->setPersonaNatural($dataArray);
-        $this->savePersonaNaural();
-
-        return $this->model = $this->model->create($dataArray);
+        
+        $this->setPersonaNaturalData($dataArray); //set data only in its PersonaNatural model
+        $this->savePersonaNatural(); //saving in database
+        $this->setUsuarioData($dataArray);// set data only in its Usuario model
+        $this->attachUsuarioToPersonaNatural($this->personaNatural,$this->model);
+       
         
     }
     

@@ -21,3 +21,4 @@ use Illuminate\Http\Request;
 Route::resource('tiendas', 'TiendaController');
 Route::resource('productos', 'ProductoController');
 Route::resource('unidades', 'UnidadMedidaController');
+Route::resource('usuarios', 'UsuarioController');

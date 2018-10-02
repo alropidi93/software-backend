@@ -15,6 +15,7 @@ class UnidadesMedidaResource extends ResourceCollection
     public function toArray($request)
     {
         return [
+            'type' => 'Lista de unidades de medida',
             'listaUnidades' => UnidadMedidaResource::collection($this->collection),
         ];
     }

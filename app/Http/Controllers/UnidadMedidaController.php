@@ -31,7 +31,7 @@ class UnidadMedidaController extends Controller
         try{
             $unidadesMedidaResource =  new UnidadesMedidaResource($this->unidadMedidaRepository->obtenerTodos());  
             $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Lista de unidades de medida');  
+            $responseResourse->title('Listar unidades de medida');  
             $responseResourse->body($unidadesMedidaResource);
             return $responseResourse;
         }

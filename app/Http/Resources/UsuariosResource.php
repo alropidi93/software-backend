@@ -15,7 +15,8 @@ class UsuariosResource extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'lista' => UsuarioResource::collection($this->collection),
+            'type' => 'Lista de usuarios',
+            'listaUsuarios' => UsuarioResource::collection($this->collection),
         ];
     }
 }
