@@ -57,7 +57,7 @@ class TiendaController extends Controller {
                 $notFoundResource->notFound(['id'=>$id]);
                 return $notFoundResource->response()->setStatusCode(404);;
             }
-            $tiendaResource =  new TiendaResource();  
+            $tiendaResource =  new TiendaResource($tienda);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Mostrar tienda');  
             $responseResourse->body($tiendaResource);
