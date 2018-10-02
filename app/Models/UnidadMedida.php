@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UnidadDeMedida extends Model
+class UnidadMedida extends Model
 {
-    protected $table = 'unidadDeMedida';
+    protected $table = 'unidadMedida';
     public $timestamps = true;
     
   

@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TiendaResource extends JsonResource
+class UnidadMedidaResource extends JsonResource
 {
     
     /**
@@ -17,14 +17,10 @@ class TiendaResource extends JsonResource
     {
         return [
             
-            'type'          => 'Tienda',
+            'type'          => 'Unidad de medida',
             'id'            => $this->id,
             'attributes'    => [
-                'nombre' => $this->nombre,
-                'distrito' => $this->distrito,
-                'ubicacion' => $this->ubicacion,
-                'direccion' => $this->direccion,
-                'telefono' => $this->telefono,
+                'unidad' => $this->unidad,
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,
