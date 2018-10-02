@@ -16,7 +16,7 @@ class Producto extends Model
       'stockMin',
       'descripcion',
       'idTipoProducto',
-      'idUnidadMedia',
+      'idUnidadMedida',
       'categoria',
       'precio',
       'deleted'
