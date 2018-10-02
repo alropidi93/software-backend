@@ -11,7 +11,7 @@ class UnidadMedidaRepository extends BaseRepository {
      */
     public function __construct(UnidadMedida $unidadMedida) 
     {
-        $this->model = $tienda;
+        $this->model = $unidadMedida;
         
     }
 
