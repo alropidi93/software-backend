@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 
 class ProductoController extends Controller
 {
+    public function __construct(ProductoRepository $productoRepository){
+        ProductoResource::withoutWrapping();
+        $this->productoRepository = $productoRepository;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -13,17 +17,20 @@ class ProductoController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        try{
+            $productoResource =  new ProductoResource($this->productoRepository->obtenerTodos());  
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Lista de productos');  
+            $responseResource->body($productoResource);
+            return $responseResource;
+        }
+        catch(\Exception $e){
+         
+            
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
     }
 
     /**
@@ -34,7 +41,7 @@ class ProductoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //TODO
     }
 
     /**
@@ -45,7 +52,28 @@ class ProductoController extends Controller
      */
     public function show($id)
     {
-        //
+        try{
+            $producto = $this->productoRepository->obtenerPorId($id);
+            
+            if (!$producto){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Producto no encontrada');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            $productoResource =  new ProductoResource($producto);  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Mostrar producto');  
+            $responseResourse->body($productoResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+            
+            
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
     }
 
     /**
@@ -57,7 +85,41 @@ class ProductoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try{
+            DB::beginTransaction();
+            $producto = $this->productoRepository->obtenerPorId($id);
+            
+            if (!$producto){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Producto no encontrada');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            
+
+            
+            
+            $this->productoRepository->setModel($producto);
+            $productoDataArray= Algorithm::quitNullValuesFromArray($productoData->all());
+            $this->productoRepository->actualiza($productoDataArray);
+            $producto = $this->productoRepository->obtenerModelo();
+            
+            DB::commit();
+            $productoRepository =  new ProductoResource($producto);
+            $responseResourse = new ResponseResource(null);
+            
+            $responseResourse->title('Producto actualizada exitosamente');       
+            $responseResourse->body($productoRepository);     
+            
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+            DB::rollback();
+            
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
     }
 
     /**
@@ -68,6 +130,33 @@ class ProductoController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try{
+            DB::beginTransaction();
+            $producto = $this->productoRepository->obtenerPorId($id);
+            
+            if (!$producto){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Producto no encontrada');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            $this->productoRepository->setModel($producto);
+            $this->productoRepository->softDelete();
+            
+
+              
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Producto eliminada');  
+            $responseResourse->body(['id' => $id]);
+            DB::commit();
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
     }
 }
