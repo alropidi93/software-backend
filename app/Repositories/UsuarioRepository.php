@@ -11,6 +11,11 @@ class UsuarioRepository extends BaseRepository {
      * @var App\Models\PersonaNatural
      */
     protected $personaNatural;
+    /**
+     * The PersonaNatural instance.
+     *
+     * @var App\Models\PersonaNatural
+     */
     protected $tipoUsuario;
 
   
@@ -101,6 +106,13 @@ class UsuarioRepository extends BaseRepository {
 
     public function loadTipoUsuarioRelationship(){
         $this->model->tipoUsuario;
+    }
+
+    public function obtenerUsuarioPorId($id)
+    {
+        $user = $this->model->where('id',$id)->where('deleted',false)->first();
+        if($user) $user->personaNatural;
+        return $user;
     }
     
 }

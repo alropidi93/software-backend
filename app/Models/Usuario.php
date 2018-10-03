@@ -22,4 +22,8 @@ class Usuario extends Model
     public function personaNatural() {
         return $this->belongsTo('App\Models\PersonaNatural','idPersonaNatural','id');
     }
+
+    public function tipoUsuario() {
+        return $this->belongsTo('App\Models\TipoUsuario','idTipoUsuario','id');
+    }
 }

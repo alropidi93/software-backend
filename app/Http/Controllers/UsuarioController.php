@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Resources\UsuarioResource;
 use App\Http\Resources\UsuariosResource;
+use App\Http\Resources\TipoUsuarioResource;
 use App\Http\Resources\ExceptionResource;
 use App\Http\Resources\ValidationResource;
 use App\Http\Resources\ResponseResource;
@@ -142,7 +143,7 @@ class UsuarioController extends Controller
         try{
             //return $this->usuarioRepository->listarUsuariosSinTipo();
             DB::beginTransaction();
-            $usuario = $this->usuarioRepository->obtenerPorId($idusuario);
+            $usuario = $this->usuarioRepository->obtenerUsuarioPorId($idusuario);
             
             if (!$usuario){
                 $notFoundResource = new NotFoundResource(null);
@@ -162,10 +163,10 @@ class UsuarioController extends Controller
             $this->usuarioRepository->setTipoUsuarioModel($tipoUsuario);
             $this->usuarioRepository->attachRolWithOwnModels($tipoUsuario);
             DB::commit();
-            $this->usuarioRepository->loadTipoUsuarioRelationship()
+            $this->usuarioRepository->loadTipoUsuarioRelationship();
             
           
-            $tiposUsuarioResource =  new UsuariosResource($this->usuarioRepository->listarUsuariosSinTipo());  
+            $tiposUsuarioResource =  new UsuarioResource($usuario);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Rol asignado satisfactoriamente');  
             $responseResourse->body($tiposUsuarioResource);
