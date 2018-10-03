@@ -29,10 +29,10 @@ class ProductoController extends Controller
     public function index()
     {
         try{
-            $productoResource =  new ProductoResource($this->productoRepository->obtenerTodos());  
+            $productosResource =  new ProductosResource($this->productoRepository->obtenerTodos());  
             $responseResource = new ResponseResource(null);
             $responseResource->title('Lista de productos');  
-            $responseResource->body($productoResource);
+            $responseResource->body($productosResource);
             return $responseResource;
         }
         catch(\Exception $e){
