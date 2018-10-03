@@ -88,9 +88,35 @@ class UsuarioRepository extends BaseRepository {
         
     }
 
+    public function actualiza($dataArray)
+    {
+        //persona natural no tiene atributos con el mismo nombre de atributos del usuario que se vayan a actualizar
+        //deleted, created_at y updated_at son comunes, pero estos jamas se actualizaran por acá
+        array_key_exists('idTipoUsuario',$dataUsuario)? $dataUsuario['idTipoUsuario']:null;
+        $this->personaNatural->update($dataArray);
+        $this->model->update($dataArray); //set data only in its PersonaNatural model
+       
+        
+       
+        
+    }
+
     public function listarUsuariosSinTipo(){
-        $list = $this->model->whereNull('idTipoUsuario')->where('deleted',false)->get();
-        return $list;
+        $lista = $this->model->whereNull('idTipoUsuario')->where('deleted',false)->get();
+        foreach ($lista as $key => $usuario) {
+            $usuario->personaNatural;
+            $usuario->tipoUsuario;
+        }
+        return $lista;
+    }
+
+    public function listarUsuarios(){
+        $lista = $this->model->where('deleted',false)->get();
+        foreach ($lista as $key => $usuario) {
+            $usuario->personaNatural;
+            $usuario->tipoUsuario;
+        }
+        return $lista;
     }
 
     protected function attachRol($personaNatural, $usuario){
@@ -125,10 +151,14 @@ class UsuarioRepository extends BaseRepository {
     public function obtenerUsuarioPorEmail($email)
     {
         $personaNatural = $this->personaNatural->where('email',$email)->where('deleted',false)->first();
-        $this->setPersonaNaturalModel($personaNatural);
-        $usuario = $personaNatural->usuario;
-        $usuario->personaNatural;
-        return $usuario;
+        if($personaNatural){
+            $this->setPersonaNaturalModel($personaNatural);
+            $usuario = $personaNatural->usuario;
+            $usuario->personaNatural;
+            return $usuario;
+        }
+        return null;
+        
     }
 
     protected function setPersonaNaturalModel($personaNatural){
@@ -141,6 +171,14 @@ class UsuarioRepository extends BaseRepository {
 
     public function getPassword(){
         return $this->model->password;
+    }
+
+    public function setModelUsuario($usuario){
+        $this->model =  $usuario;
+        $personaNatural =  $usuario->personaNatural;
+        if($usuario->personaNatural)
+            $this->personaNatural =  $personaNatural;
+
     }
     
 }

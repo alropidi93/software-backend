@@ -16,7 +16,7 @@ use App\Models\Usuario;
 use App\Repositories\UsuarioRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-
+use App\Http\Helpers\Algorithm;
 
 
 class UsuarioController extends Controller
@@ -35,7 +35,21 @@ class UsuarioController extends Controller
      */
     public function index()
     {
-        //
+        try{
+            //return $this->usuarioRepository->listarUsuariosSinTipo();
+            
+            $tiposUsuarioResource =  new UsuariosResource($this->usuarioRepository->listarUsuarios()); 
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de usuarios');  
+            $responseResourse->body($tiposUsuarioResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
     }
 
   
@@ -116,9 +130,43 @@ class UsuarioController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update($id,Request $usuarioData)
     {
-        //
+        try{
+            
+            
+            DB::beginTransaction();
+            $usuario= $this->usuarioRepository->obtenerUsuarioPorId($id);
+            if (!$usuario){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Usuario no encontrado');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            
+            $this->usuarioRepository->setModelUsuario($usuario);
+            $usuarioDataArray= Algorithm::quitNullValuesFromArray($usuarioData->all());
+            $this->usuarioRepository->actualiza($usuarioDataArray);
+            $usuario = $this->usuarioRepository->obtenerModelo();
+            DB::commit();
+
+            $usuarioResource =  new UsuarioResource($usuario);
+            $responseResourse = new ResponseResource(null);
+            
+            $responseResourse->title('Usuario actualizado exitosamente');       
+            $responseResourse->body($usuarioResource);     
+            
+            return $responseResourse;
+
+
+            
+        }
+        catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+        
     }
 
     /**
@@ -136,9 +184,10 @@ class UsuarioController extends Controller
 
         try{
             //return $this->usuarioRepository->listarUsuariosSinTipo();
-            $tiposUsuarioResource =  new UsuariosResource($this->usuarioRepository->listarUsuariosSinTipo());  
+            
+            $tiposUsuarioResource =  new UsuariosResource($this->usuarioRepository->listarUsuariosSinTipo()); 
             $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Listar tipos de usuario sin rol asignado');  
+            $responseResourse->title('Lista de usuarios sin rol asignado');  
             $responseResourse->body($tiposUsuarioResource);
             return $responseResourse;
         }
@@ -172,7 +221,7 @@ class UsuarioController extends Controller
                 return $notFoundResource->response()->setStatusCode(404);
             }
 
-            $this->usuarioRepository->setModel($usuario);
+            $this->usuarioRepository->setUsuarioModel($usuario);
             $this->usuarioRepository->setTipoUsuarioModel($tipoUsuario);
 
             
@@ -212,18 +261,22 @@ class UsuarioController extends Controller
             
           }
           $usuario= $this->usuarioRepository->obtenerUsuarioPorEmail($request['email']);
-          $this->usuarioRepository->setModel($usuario);
-          $password = $this->usuarioRepository->getPassword();
-          Log::info(json_encode($usuario));
-          Log::info($password);
-          if ($usuario != null && (Hash::check($request['password'], $password))) {
-            Log:info("paso el login");
-            $this->usuarioRepository->loadTipoUsuarioRelationship();
-            $usuarioResource =  new UsuarioResource($usuario);
-            $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Usuario logueado exitosamente');       
-            $responseResourse->body($usuarioResource);       
-            return $responseResourse;
+          
+          
+       
+          if ($usuario != null ) {
+                $this->usuarioRepository->setModel($usuario);
+                $password = $this->usuarioRepository->getPassword();
+                if (Hash::check($request['password'], $password)){
+                    Log:info("paso el login");
+                    $this->usuarioRepository->loadTipoUsuarioRelationship();
+                    $usuarioResource =  new UsuarioResource($usuario);
+                    $responseResourse = new ResponseResource(null);
+                    $responseResourse->title('Usuario logueado exitosamente');       
+                    $responseResourse->body($usuarioResource);       
+                    return $responseResourse;
+                } 
+            
             
           }
           else {
@@ -231,7 +284,7 @@ class UsuarioController extends Controller
             $errorResource =  new ErrorResource(null);
             
             $errorResource->title('Error de logueo');       
-            $errorResource->message('Credenciales no validas');       
+            $errorResource->message('Credenciales no válidas');       
             return $errorResource->response()->setStatusCode(400);
             
           }
