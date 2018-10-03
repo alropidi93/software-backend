@@ -26,8 +26,6 @@ class TiendaController extends Controller {
 
     public function index() 
     {
-              
- 
         try{
             $tiendasResource =  new TiendasResource($this->tiendaRepository->obtenerTodos());  
             $responseResourse = new ResponseResource(null);
@@ -55,7 +53,7 @@ class TiendaController extends Controller {
                 $notFoundResource = new NotFoundResource(null);
                 $notFoundResource->title('Tienda no encontrada');
                 $notFoundResource->notFound(['id'=>$id]);
-                return $notFoundResource->response()->setStatusCode(404);;
+                return $notFoundResource->response()->setStatusCode(404);
             }
             $tiendaResource =  new TiendaResource($tienda);  
             $responseResourse = new ResponseResource(null);

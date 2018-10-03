@@ -22,3 +22,8 @@ Route::resource('tiendas', 'TiendaController');
 Route::resource('productos', 'ProductoController');
 Route::resource('unidades', 'UnidadMedidaController');
 Route::resource('usuarios', 'UsuarioController');
+
+Route::get('usuariosSinTipo', 'UsuarioController@listarUsuariosSinTipo');
+Route::post('asignarTipoUsuario/{idUsuario}', 'UsuarioController@asignarRol');
+
+Route::resource('tipoUsuarios', 'TipoUsuarioController');

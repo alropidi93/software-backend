@@ -11,18 +11,21 @@ class UsuarioRepository extends BaseRepository {
      * @var App\Models\PersonaNatural
      */
     protected $personaNatural;
+    protected $tipoUsuario;
 
   
     /**
      * Create a new UsuarioRepository instance.
      * @param  App\Models\Usuario $usuario
      * @param  App\Models\PersonaNatural $personaNatural
+     * @param  App\Models\TipoUsuario $tipoUsuario
      * @return void
      */
-    public function __construct(Usuario $usuario, PersonaNatural $personaNatural) 
+    public function __construct(Usuario $usuario, PersonaNatural $personaNatural, TipoUsuario $tipoUsuario) 
     {
         $this->model = $usuario;
         $this->personaNatural = $personaNatural;
+        $this->tipoUsuario = $tipoUsuario;
         
     }
 
@@ -74,8 +77,30 @@ class UsuarioRepository extends BaseRepository {
         $this->savePersonaNatural(); //saving in database
         $this->setUsuarioData($dataArray);// set data only in its Usuario model
         $this->attachUsuarioToPersonaNatural($this->personaNatural,$this->model);
+        $this->model->personaNatural;//loading personaNatural
        
         
+    }
+
+    public function listarUsuariosSinTipo(){
+        $list = $this->model->whereNull('idTipoUsuario')->where('deleted',false)->get();
+        return $list;
+    }
+
+    protected function attachRol($personaNatural, $usuario){
+        return $personaNatural->usuario()->save($usuario);
+    }
+
+    protected function attachRolWithOwnModels(){
+        return $this->model->tipoUsuario()->save($this->tipoUsuario);
+    }
+
+    public function obtenerRolPorId($tipoUsuarioId){
+        return $this->tipoUsuario->where('id',$tipoUsuarioId)->where('deleted',0)->first();
+    }
+
+    public function loadTipoUsuarioRelationship(){
+        $this->model->tipoUsuario;
     }
     
 }

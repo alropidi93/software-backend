@@ -12,7 +12,7 @@ use App\Models\Usuario;
 use App\Repositories\UsuarioRepository;
 use Illuminate\Support\Facades\DB;
 
-use App\Http\Resources\UsuarioRelationshipResource;
+
 
 
 class UsuarioController extends Controller
@@ -49,33 +49,34 @@ class UsuarioController extends Controller
             $validator = \Validator::make($usuarioData->all(), 
                             ['nombre' => 'required',
                             'apellidos' => 'required',
-                            'genero'=>  'required', 
+                            'genero'=>  'required',
                             'fechaNac' => 'required',
                             'email' => 'required|email',
                             'dni' => 'required|min:8|max:12|unique:personaNatural,dni',
                             'password' => 'required|min:6|max:60',
-                            'direccion' => 'required']);
+                            'direccion' => 'required',
+                            'idTipoUsuario' => 'required'
+                            ]);
 
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
             DB::beginTransaction();
             $this->usuarioRepository->guarda($usuarioData->all());
-            $usuarioCreated = $this->usuarioRepository->obtenerModelo(); 
-            DB::commit();
-            return "exito";
+            $usuarioCreated = $this->usuarioRepository->obtenerModelo();
             
-            // $usuarioResource =  new UsuarioResource($usuarioCreated);
-            // return $usuarioResource;
-            // $responseResourse = new ResponseResource(null);
-            // $responseResourse->title('Usuario creado exitosamente');       
-            // $responseResourse->body($usuarioResource);       
-            // return $responseResourse;
+             
+            DB::commit();
+            
+            
+            $usuarioResource =  new UsuarioResource($usuarioCreated);
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Usuario creado exitosamente');       
+            $responseResourse->body($usuarioResource);       
+            return $responseResourse;
         }
         catch(\Exception $e){
             DB::rollback();
-            
-            
             return (new ExceptionResource($e))->response()->setStatusCode(500);
             
         }
@@ -116,5 +117,66 @@ class UsuarioController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function listarUsuariosSinTipo(){
+
+        try{
+            //return $this->usuarioRepository->listarUsuariosSinTipo();
+            $tiposUsuarioResource =  new UsuariosResource($this->usuarioRepository->listarUsuariosSinTipo());  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Listar tipos de usuario sin rol asignado');  
+            $responseResourse->body($tiposUsuarioResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+        
+    }
+
+    public function asignarRol($idUsuario, Request $data){
+        try{
+            //return $this->usuarioRepository->listarUsuariosSinTipo();
+            DB::beginTransaction();
+            $usuario = $this->usuarioRepository->obtenerPorId($idusuario);
+            
+            if (!$usuario){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Usuario no encontrado');
+                $notFoundResource->notFound(['id'=>$idUsuario]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+
+            $tipoUsuario =  $this->usuarioRepository->obtenerRolPorId($data['idTipoUsuario']);
+            if (!$tipoUsuario){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Tipo usuario no encontrado');
+                $notFoundResource->notFound(['id'=>$data['idTipoUsuario']]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+
+            $this->usuarioRepository->setTipoUsuarioModel($tipoUsuario);
+            $this->usuarioRepository->attachRolWithOwnModels($tipoUsuario);
+            DB::commit();
+            $this->usuarioRepository->loadTipoUsuarioRelationship()
+            
+          
+            $tiposUsuarioResource =  new UsuariosResource($this->usuarioRepository->listarUsuariosSinTipo());  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Rol asignado satisfactoriamente');  
+            $responseResourse->body($tiposUsuarioResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+
     }
 }
