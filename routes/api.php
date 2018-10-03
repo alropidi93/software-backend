@@ -25,5 +25,6 @@ Route::resource('usuarios', 'UsuarioController');
 
 Route::get('usuariosSinTipo', 'UsuarioController@listarUsuariosSinTipo');
 Route::post('asignarTipoUsuario/{idUsuario}', 'UsuarioController@asignarRol');
+Route::post('login', 'UsuarioController@login');
 
 Route::resource('tipoUsuarios', 'TipoUsuarioController');

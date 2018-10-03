@@ -1,6 +1,7 @@
 <?php
 namespace App\Repositories;
 use App\Models\Usuario;
+use App\Models\TipoUsuario;
 use App\Models\PersonaNatural;
 use App\Http\Helpers\DateFormat;
 	
@@ -96,12 +97,18 @@ class UsuarioRepository extends BaseRepository {
         return $personaNatural->usuario()->save($usuario);
     }
 
-    protected function attachRolWithOwnModels(){
-        return $this->model->tipoUsuario()->save($this->tipoUsuario);
+    public function attachRolWithOwnModels(){
+          
+        $this->tipoUsuario->usuarios()->save($this->model);
+        //$this->model->tipoUsuario()->save($this->tipoUsuario);
     }
 
     public function obtenerRolPorId($tipoUsuarioId){
         return $this->tipoUsuario->where('id',$tipoUsuarioId)->where('deleted',0)->first();
+    }
+
+    public function obtenerRolPorKey($key){
+        return $this->tipoUsuario->where('key',$key)->where('deleted',0)->first();
     }
 
     public function loadTipoUsuarioRelationship(){
@@ -110,9 +117,30 @@ class UsuarioRepository extends BaseRepository {
 
     public function obtenerUsuarioPorId($id)
     {
-        $user = $this->model->where('id',$id)->where('deleted',false)->first();
+        $user = $this->model->where('idPersonaNatural',$id)->where('deleted',false)->first();
         if($user) $user->personaNatural;
         return $user;
+    }
+
+    public function obtenerUsuarioPorEmail($email)
+    {
+        $personaNatural = $this->personaNatural->where('email',$email)->where('deleted',false)->first();
+        $this->setPersonaNaturalModel($personaNatural);
+        $usuario = $personaNatural->usuario;
+        $usuario->personaNatural;
+        return $usuario;
+    }
+
+    protected function setPersonaNaturalModel($personaNatural){
+        $this->personaNatural = $personaNatural;
+    }
+
+    public function setTipoUsuarioModel($tipoUsuario){
+        $this->tipoUsuario =  $tipoUsuario;
+    }
+
+    public function getPassword(){
+        return $this->model->password;
     }
     
 }

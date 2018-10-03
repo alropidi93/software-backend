@@ -21,6 +21,7 @@ class TipoUsuarioResource extends JsonResource
             'id'            => $this->id,
             'attributes'    => [
                 'nombre' => $this->nombre,
+                'key' => $this->key,
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,
