@@ -65,6 +65,7 @@ class ProductoController extends Controller
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
             DB::beginTransaction();
+            
             $producto = $this->productoRepository->guarda($productoData->all());
             DB::commit();
             $productoResource =  new ProductoResource($producto);

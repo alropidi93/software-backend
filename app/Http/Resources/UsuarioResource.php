@@ -27,7 +27,7 @@ class UsuarioResource extends JsonResource
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,
-                //'tipoUsuario' => new TipoUsuarioResource($this->whenLoaded('tipoUsuario')),
+                'tipoUsuario' => new TipoUsuarioResource($this->whenLoaded('tipoUsuario')),
                 'personaNatural' => new PersonaNaturalResource($this->whenLoaded('personaNatural'))
                  
             ]
