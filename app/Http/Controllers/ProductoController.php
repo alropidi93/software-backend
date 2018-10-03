@@ -3,6 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Producto;
+use App\Repositories\ProductoRepository;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductoResource;
+use App\Http\Resources\ProductosResource;
+use App\Http\Resources\ExceptionResource;
+use App\Http\Resources\ValidationResource;
+use App\Http\Resources\ResponseResource;
+use App\Http\Resources\NotFoundResource;
+use Illuminate\Support\Facades\DB;
+use App\Http\Helpers\Algorithm;
 
 class ProductoController extends Controller
 {
@@ -39,9 +50,36 @@ class ProductoController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $productoData)
     {
-        //TODO
+        try{
+            
+            $validator = \Validator::make($productoData->all(), 
+                            ['nombre' => 'required',
+                            'stockMin' => 'required',
+                            'descripcion'=>'required',
+                            'categoria' => 'required',
+                            'precio' => 'required']);
+
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
+            DB::beginTransaction();
+            $producto = $this->productoRepository->guarda($productoData->all());
+            DB::commit();
+            $productoResource =  new ProductoResource($producto);
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Producto creada exitosamente');       
+            $responseResourse->body($productoResource);       
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+            DB::rollback();
+            
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
     }
 
     /**
@@ -83,7 +121,7 @@ class ProductoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update($id, Request $productoData)
     {
         try{
             DB::beginTransaction();
