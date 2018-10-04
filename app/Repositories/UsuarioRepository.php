@@ -92,7 +92,8 @@ class UsuarioRepository extends BaseRepository {
     {
         //persona natural no tiene atributos con el mismo nombre de atributos del usuario que se vayan a actualizar
         //deleted, created_at y updated_at son comunes, pero estos jamas se actualizaran por acá
-        array_key_exists('idTipoUsuario',$dataUsuario)? $dataUsuario['idTipoUsuario']:null;
+        if (array_key_exists('fechaNac',$dataArray))
+            $dataArray['fechaNac'] = DateFormat::spanishDateToEnglishDate($dataArray['fechaNac']);
         $this->personaNatural->update($dataArray);
         $this->model->update($dataArray); //set data only in its PersonaNatural model
        
@@ -178,6 +179,15 @@ class UsuarioRepository extends BaseRepository {
         $personaNatural =  $usuario->personaNatural;
         if($usuario->personaNatural)
             $this->personaNatural =  $personaNatural;
+
+    }
+
+    public function softDelete(){
+        $this->personaNatural->deleted = true;
+        $this->personaNatural->save();
+        $this->model->deleted = true;
+        $this->model->save();
+       
 
     }
     

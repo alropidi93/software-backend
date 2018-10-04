@@ -118,7 +118,30 @@ class UsuarioController extends Controller
      */
     public function show($id)
     {
-        //
+        try{
+            $usuario = $this->usuarioRepository->obtenerUsuarioPorId($id);
+            
+            if (!$usuario){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Usuario no encontrada');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            $this->usuarioRepository->setModelUsuario($usuario);
+            $this->usuarioRepository->loadTipoUsuarioRelationship();
+            $usuarioResource =  new UsuarioResource($usuario);  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Mostrar usuario');  
+            $responseResourse->body($usuarioResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+            
+            
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
     }
 
     
@@ -149,6 +172,7 @@ class UsuarioController extends Controller
             $this->usuarioRepository->actualiza($usuarioDataArray);
             $usuario = $this->usuarioRepository->obtenerModelo();
             DB::commit();
+            $this->usuarioRepository->loadTipoUsuarioRelationship();
 
             $usuarioResource =  new UsuarioResource($usuario);
             $responseResourse = new ResponseResource(null);
@@ -177,7 +201,34 @@ class UsuarioController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try{
+            DB::beginTransaction();
+            $usuario = $this->usuarioRepository->obtenerUsuarioPorId($id);
+            
+            if (!$usuario){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Usuario no encontrada');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            $this->usuarioRepository->setModelUsuario($usuario);
+            $this->usuarioRepository->softDelete();
+            
+
+              
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Usuario eliminado');  
+            $responseResourse->body(['id' => $id]);
+            DB::commit();
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
     }
 
     public function listarUsuariosSinTipo(){

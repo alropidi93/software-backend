@@ -172,7 +172,7 @@ class TiendaController extends Controller {
         }
         catch(\Exception $e){
          
-            
+            DB::rollback();
             
             return (new ExceptionResource($e))->response()->setStatusCode(500);
             
