@@ -272,7 +272,7 @@ class UsuarioController extends Controller
                 return $notFoundResource->response()->setStatusCode(404);
             }
 
-            $this->usuarioRepository->setUsuarioModel($usuario);
+            $this->usuarioRepository->setModelUsuario($usuario);
             $this->usuarioRepository->setTipoUsuarioModel($tipoUsuario);
 
             
