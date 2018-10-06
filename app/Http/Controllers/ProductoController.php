@@ -29,7 +29,15 @@ class ProductoController extends Controller
     public function index()
     {
         try{
-            $productosResource =  new ProductosResource($this->productoRepository->obtenerTodos());  
+            $productos = $this->productoRepository->obtenerTodos();
+            
+            foreach ($productos as $key => $producto) {
+                $this->productoRepository->loadTipoProductoModel($producto);
+                
+                
+            }
+
+            $productosResource =  new ProductosResource($productos);  
             $responseResource = new ResponseResource(null);
             $responseResource->title('Lista de productos');  
             $responseResource->body($productosResource);
@@ -125,12 +133,19 @@ class ProductoController extends Controller
     public function update($id, Request $productoData)
     {
         try{
+            $validator = \Validator::make($productoData->all(), 
+                            ['idTipoProducto' => 'exists:tipoProducto,id']
+                        );
+
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
             DB::beginTransaction();
             $producto = $this->productoRepository->obtenerPorId($id);
             
             if (!$producto){
                 $notFoundResource = new NotFoundResource(null);
-                $notFoundResource->title('Producto no encontrada');
+                $notFoundResource->title('Producto no encontrado');
                 $notFoundResource->notFound(['id'=>$id]);
                 return $notFoundResource->response()->setStatusCode(404);;
             }
@@ -141,6 +156,7 @@ class ProductoController extends Controller
             $this->productoRepository->setModel($producto);
             $productoDataArray= Algorithm::quitNullValuesFromArray($productoData->all());
             $this->productoRepository->actualiza($productoDataArray);
+            $this->productoRepository->loadTipoProductoModel();
             $producto = $this->productoRepository->obtenerModelo();
             
             DB::commit();

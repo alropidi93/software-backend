@@ -21,4 +21,8 @@ class Producto extends Model
       'precio',
       'deleted'
     ];
+
+    public function tipoProducto() {
+        return $this->belongsTo('App\Models\TipoProducto','idTipoProducto','id');
+    }
 }

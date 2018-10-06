@@ -28,3 +28,4 @@ Route::post('asignarTipoUsuario/{idUsuario}', 'UsuarioController@asignarRol');
 Route::post('login', 'UsuarioController@login');
 
 Route::resource('tipoUsuarios', 'TipoUsuarioController');
+Route::resource('tipoProductos', 'TipoProductoController');
