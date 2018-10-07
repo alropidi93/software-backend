@@ -108,6 +108,7 @@ class ProductoController extends Controller
                 $notFoundResource->notFound(['id'=>$id]);
                 return $notFoundResource->response()->setStatusCode(404);;
             }
+            $this->productoRepository->loadTipoProductoModel($producto);
             $productoResource =  new ProductoResource($producto);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Mostrar producto');  
@@ -136,7 +137,7 @@ class ProductoController extends Controller
             $validator = \Validator::make($productoData->all(), 
                             ['idTipoProducto' => 'exists:tipoProducto,id']
                         );
-
+            return response()->json(['customForLucas' ,$productoData['idTipoProducto']]);
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
@@ -163,7 +164,7 @@ class ProductoController extends Controller
             $productoRepository =  new ProductoResource($producto);
             $responseResourse = new ResponseResource(null);
             
-            $responseResourse->title('Producto actualizada exitosamente');       
+            $responseResourse->title('Producto actualizado exitosamente');       
             $responseResourse->body($productoRepository);     
             
             return $responseResourse;
@@ -213,5 +214,10 @@ class ProductoController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);
             
         }
+    }
+
+    public function busquedaPorFiltro()
+    {
+
     }
 }

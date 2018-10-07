@@ -24,6 +24,7 @@ Route::resource('unidades', 'UnidadMedidaController');
 Route::resource('usuarios', 'UsuarioController');
 
 Route::get('usuariosSinTipo', 'UsuarioController@listarUsuariosSinTipo');
+Route::get('productos/busqueda', 'ProductoController@busquedaPorFiltro');
 Route::post('asignarTipoUsuario/{idUsuario}', 'UsuarioController@asignarRol');
 Route::post('login', 'UsuarioController@login');
 
