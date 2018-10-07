@@ -137,7 +137,7 @@ class ProductoController extends Controller
             $validator = \Validator::make($productoData->all(), 
                             ['idTipoProducto' => 'exists:tipoProducto,id']
                         );
-            return response()->json(['customForLucas' ,$productoData['idTipoProducto']]);
+            
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
