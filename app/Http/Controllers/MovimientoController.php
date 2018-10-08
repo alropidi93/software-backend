@@ -36,12 +36,13 @@ class MovimientoController extends Controller
     {
         try{
             $movimientos = $this->movimientoRepository->obtenerTodos();
-
+            /*PARTE DE TUTORIAL PARA RELATIONSHIPS */
             //a continuacion, cargamos la relacion de usuario a cada movimiento
             foreach ($movimientos as $key => $movimiento) {
                 $this->movimientoRepository->loadMovimientoRelationship($movimiento);
             }
-            
+            /*FIN DE PARTE DE TUTORIAL PARA RELATIONSHIPS */
+
             $movimientoResource =  new MovimientoResource($movimientos);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de movimientos');  

@@ -17,7 +17,7 @@ class Movimiento extends Model
       'idUsuario',
       'deleted'
     ];
-
+    /*PARTE DE TUTORIAL PARA RELATIONSHIPS */
     //un movimiento esta asociado a un usuario por medio del campo idUsuario, belongsTo es lo que se usa para representar "Esta asociado a", "Pertenece a"
     public function usuario(){
       /*
@@ -26,4 +26,5 @@ class Movimiento extends Model
       */
       return $this->belongsTo('App\Models\Usuario','idUsuario','id');
     }
+    /*FIN DE PARTE DE TUTORIAL PARA RELATIONSHIPS */
 }

@@ -24,7 +24,7 @@ class MovimientoRepository extends BaseRepository{
         return $this->model = $this->model->create($dataArray);
         
     }
-
+    /*PARTE DE TUTORIAL PARA RELATIONSHIPS */
     public function loadMovimientoRelationship($movimento=null){
         if (!$movimiento){
         
@@ -41,4 +41,5 @@ class MovimientoRepository extends BaseRepository{
             }]);
         }
     }
+    /*FIN DE PARTE DE TUTORIAL PARA RELATIONSHIPS */
 }
