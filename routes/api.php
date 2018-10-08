@@ -24,8 +24,12 @@ Route::resource('unidades', 'UnidadMedidaController');
 Route::resource('usuarios', 'UsuarioController');
 
 Route::get('usuariosSinTipo', 'UsuarioController@listarUsuariosSinTipo');
-Route::get('productos/busqueda', 'ProductoController@busquedaPorFiltro');
+Route::get('busqueda/productos', 'ProductoController@busquedaPorFiltro');
 Route::post('asignarTipoUsuario/{idUsuario}', 'UsuarioController@asignarRol');
+
+Route::post('tienda/asignarJefeAlmacen/{idTienda}', 'TiendaController@asignarJefeDeAlmacen');
+Route::post('tienda/asignarJefeTienda/{idTienda}' , 'TiendaController@asignarJefeDeTienda');
+
 Route::post('login', 'UsuarioController@login');
 
 Route::resource('tipoUsuarios', 'TipoUsuarioController');

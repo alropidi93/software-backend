@@ -26,4 +26,14 @@ class Usuario extends Model
     public function tipoUsuario() {
         return $this->belongsTo('App\Models\TipoUsuario','idTipoUsuario','id');
     }
+
+    public function esJefeDeTienda(){
+        
+        return $this->tipoUsuario()->where('key',1)->where('deleted',false)->exists();
+    }
+
+    public function esJefeDeAlmacen(){
+        
+        return $this->tipoUsuario()->where('key',3)->where('deleted',false)->exists();
+    }
 }

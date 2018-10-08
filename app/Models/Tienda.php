@@ -17,8 +17,20 @@ class Tienda extends Model
       'ubicacion',
       'direccion',
       'telefono',
-      'deleted'
+      'deleted',
+      'idJefeTienda',
+      'idJefeAlmacen'
     ];
+
+    public function jefeDeTienda() {
+      return $this->belongsTo('App\Models\Usuario','idJefeTienda','idPersonaNatural');
+    }
+
+    public function jefeDeAlmacen() {
+      return $this->belongsTo('App\Models\Usuario','idJefeAlmacen','idPersonaNatural');
+    }
+
+  
   
   
     

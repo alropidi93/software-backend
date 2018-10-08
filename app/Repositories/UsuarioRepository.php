@@ -27,7 +27,7 @@ class UsuarioRepository extends BaseRepository {
      * @param  App\Models\TipoUsuario $tipoUsuario
      * @return void
      */
-    public function __construct(Usuario $usuario, PersonaNatural $personaNatural, TipoUsuario $tipoUsuario) 
+    public function __construct(Usuario $usuario=null, PersonaNatural $personaNatural=null, TipoUsuario $tipoUsuario=null) 
     {
         $this->model = $usuario;
         $this->personaNatural = $personaNatural;
@@ -139,7 +139,7 @@ class UsuarioRepository extends BaseRepository {
     }
 
     public function loadTipoUsuarioRelationship(){
-        $this->model->tipoUsuario;
+        $this->model->load('tipoUsuario');
     }
 
     public function obtenerUsuarioPorId($id)
@@ -190,5 +190,7 @@ class UsuarioRepository extends BaseRepository {
        
 
     }
+
+  
     
 }

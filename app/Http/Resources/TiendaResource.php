@@ -26,6 +26,8 @@ class TiendaResource extends JsonResource
                 'direccion' => $this->direccion,
                 'telefono' => $this->telefono,
                 'deleted' => $this->deleted,
+                'jefeTienda' =>  new UsuarioResource($this->whenLoaded('jefeDeTienda')),
+                'jefeAlmacen' =>  new UsuarioResource($this->whenLoaded('jefeDeAlmacen')),
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,
             ],

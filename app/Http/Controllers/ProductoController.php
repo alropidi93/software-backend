@@ -9,11 +9,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductoResource;
 use App\Http\Resources\ProductosResource;
 use App\Http\Resources\ExceptionResource;
+use App\Http\Resources\ErrorResource;
 use App\Http\Resources\ValidationResource;
 use App\Http\Resources\ResponseResource;
 use App\Http\Resources\NotFoundResource;
 use Illuminate\Support\Facades\DB;
 use App\Http\Helpers\Algorithm;
+use Illuminate\Support\Facades\Input;
 
 class ProductoController extends Controller
 {
@@ -77,10 +79,10 @@ class ProductoController extends Controller
             $producto = $this->productoRepository->guarda($productoData->all());
             DB::commit();
             $productoResource =  new ProductoResource($producto);
-            $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Producto creada exitosamente');       
-            $responseResourse->body($productoResource);       
-            return $responseResourse;
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Producto creada exitosamente');       
+            $responseResource->body($productoResource);       
+            return $responseResource;
         }
         catch(\Exception $e){
             DB::rollback();
@@ -110,10 +112,10 @@ class ProductoController extends Controller
             }
             $this->productoRepository->loadTipoProductoModel($producto);
             $productoResource =  new ProductoResource($producto);  
-            $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Mostrar producto');  
-            $responseResourse->body($productoResource);
-            return $responseResourse;
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Mostrar producto');  
+            $responseResource->body($productoResource);
+            return $responseResource;
         }
         catch(\Exception $e){
             
@@ -161,13 +163,13 @@ class ProductoController extends Controller
             $producto = $this->productoRepository->obtenerModelo();
             
             DB::commit();
-            $productoRepository =  new ProductoResource($producto);
-            $responseResourse = new ResponseResource(null);
+            $productoResource =  new ProductoResource($producto);
+            $responseResource = new ResponseResource(null);
             
-            $responseResourse->title('Producto actualizado exitosamente');       
-            $responseResourse->body($productoRepository);     
+            $responseResource->title('Producto actualizado exitosamente');       
+            $responseResource->body($productoResource);     
             
-            return $responseResourse;
+            return $responseResource;
         }
         catch(\Exception $e){
             DB::rollback();
@@ -201,11 +203,11 @@ class ProductoController extends Controller
             
 
               
-            $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Producto eliminada');  
-            $responseResourse->body(['id' => $id]);
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Producto eliminada');  
+            $responseResource->body(['id' => $id]);
             DB::commit();
-            return $responseResourse;
+            return $responseResource;
         }
         catch(\Exception $e){
          
@@ -218,6 +220,50 @@ class ProductoController extends Controller
 
     public function busquedaPorFiltro()
     {
+        try{
+            $producto = $this->productoRepository->obtenerModelo();
+            $filter = Input::get('filterBy');
+            $value = Input::get('value');
+            $responseResource = new ResponseResource(null);
+            if (!$filter || !$value){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de búsqueda');
+                $errorResource->message('Parámetros inválidos para la búsqueda');
+                return $errorResource->response()->setStatusCode(400);
 
+            }
+          
+            switch ($filter) {
+                case 'nombre':
+                    $productos = $this->productoRepository->buscarPorFiltro($filter, $value);
+                    
+                    $productosResource =  new ProductosResource($productos);
+                    $responseResource->title('Lista de productos filtrados por nombre');       
+                    $responseResource->body($productosResource);
+                    break;
+
+                case 'categoria':
+                    $productos = $this->productoRepository->buscarPorFiltro($filter, $value);
+                    $productosResource =  new ProductosResource($productos);
+                    $responseResource->title('Lista de productos filtrados por categoria');       
+                    $responseResource->body($productosResource);
+                    break;
+
+                default:
+                    $errorResource = new ErrorResource(null);
+                    $errorResource->title('Error de búsqueda');
+                    $errorResource->message('Valor de filtro inválido');
+                    return $errorResource->response()->setStatusCode(400);
+                    
+            }
+            
+            return $responseResource; 
+        }
+        catch(\Exception $e){
+                  
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+    
     }
 }

@@ -120,6 +120,12 @@ abstract class BaseRepository {
         
     }
 
+    public function buscarPorFiltro($key, $value){
+        return $this->model->where($key,'like','%'.$value.'%')->where('deleted',false)->get();
+    }
+
+    
+
     
 
     
