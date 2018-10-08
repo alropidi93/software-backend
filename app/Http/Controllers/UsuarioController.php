@@ -273,6 +273,19 @@ class UsuarioController extends Controller
                 return $notFoundResource->response()->setStatusCode(404);
             }
 
+            if ($usuario->esJefeDeTiendaAsignado()){
+                $errorResource =  new ErrorResource (null);
+                $errorResource->title("Error de asignación de rol");
+                $errorResource->message("Debe desasignar al jefe de tienda, de la tienda que tiene a su cargo");
+                return $errorResource;
+            }
+            if ($usuario->esJefeDeAlmacenAsignado() ){
+                $errorResource =  new ErrorResource (null);
+                $errorResource->title("Error de asignación de rol");
+                $errorResource->message("Debe desasignar al jefe de almacen, de la tienda cuyo almacen tiene a su cargo");
+                return $errorResource;
+            }
+            
             $this->usuarioRepository->setModelUsuario($usuario);
             $this->usuarioRepository->setTipoUsuarioModel($tipoUsuario);
 

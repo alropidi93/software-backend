@@ -45,19 +45,32 @@ class TiendaRepository extends BaseRepository {
     public function attachJefeTienda(){
            
         $this->model->jefeDeTienda()->associate($this->jefeDeTienda);
+        $this->model->save();
     }
 
     public function attachJefeAlmacen(){
            
         $this->model->jefeDeAlmacen()->associate($this->jefeDeAlmacen);
+        $this->model->save();
     }
 
-    public function loadJefeDeTiendaRelationship(){
-        $this->model->load('jefeDeTienda');
+    public function loadJefeDeTiendaRelationship($tienda=null){
+        if (!$tienda){
+            $this->model->load('jefeDeTienda');
+        }
+        else{
+            $tienda->load('jefeDeTienda');
+        }
+        
     }
 
-    public function loadJefeDeAlmacenRelationship(){
-        $this->model->load('jefeDeAlmacen');
+    public function loadJefeDeAlmacenRelationship($tienda=null){
+        if (!$tienda){
+            $this->model->load('jefeDeAlmacen');
+        }
+        else{
+            $tienda->load('jefeDeAlmacen');
+        }
     }
 
     public function setJefeDeTiendaModel($usuario){

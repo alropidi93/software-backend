@@ -29,7 +29,12 @@ class TiendaController extends Controller {
     public function index() 
     {
         try{
-            $tiendasResource =  new TiendasResource($this->tiendaRepository->obtenerTodos());  
+            $tiendas = $this->tiendaRepository->obtenerTodos();
+            foreach ($tiendas as $key => $tienda) {
+                $this->tiendaRepository->loadJefeDeTiendaRelationship($tienda);
+                $this->tiendaRepository->loadJefeDeAlmacenRelationship($tienda);
+            }
+            $tiendasResource =  new TiendasResource($tiendas);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de tiendas');  
             $responseResourse->body($tiendasResource);
@@ -217,11 +222,13 @@ class TiendaController extends Controller {
             }
             
             $this->tiendaRepository->setModel($tienda);
+            $this->tiendaRepository->setJefeDeTiendaModel($usuario);
             $this->tiendaRepository->loadJefeDeAlmacenRelationship();
-            $this->tiendaRepository->loadJefeDeTiendaRelationship();
-                
+            
+            
+
             $this->tiendaRepository->attachJefeTienda();
-        
+           
             DB::commit();
             $this->tiendaRepository->loadJefeDeTiendaRelationship();
             $tienda =  $this->tiendaRepository->obtenerModelo();
@@ -274,12 +281,12 @@ class TiendaController extends Controller {
             
             $this->tiendaRepository->setModel($tienda);
             $this->tiendaRepository->setJefeDeAlmacenModel($usuario);
-                
+            $this->tiendaRepository->loadJefeDeTiendaRelationship();    
             $this->tiendaRepository->attachJefeAlmacen();
         
             DB::commit();
             $this->tiendaRepository->loadJefeDeAlmacenRelationship();
-            $this->tiendaRepository->loadJefeDeTiendaRelationship();
+            
             $tienda =  $this->tiendaRepository->obtenerModelo();
           
             $tiendaResource =  new TiendaResource($tienda);  
