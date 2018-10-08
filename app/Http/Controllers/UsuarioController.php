@@ -38,8 +38,12 @@ class UsuarioController extends Controller
     {
         try{
             //return $this->usuarioRepository->listarUsuariosSinTipo();
-            
-            $tiposUsuarioResource =  new UsuariosResource($this->usuarioRepository->listarUsuarios()); 
+            $usuarios = $this->usuarioRepository->listarUsuarios();
+            foreach ($usuarios as $key => $usuario) {
+                $this->usuarioRepository->loadTipoUsuarioRelationShip($usuario);
+            }
+            return $usuarios;
+            $tiposUsuarioResource =  new UsuariosResource(); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de usuarios');  
             $responseResourse->body($tiposUsuarioResource);
@@ -382,6 +386,23 @@ class UsuarioController extends Controller
                     
                   
                     break;
+                case 1:
+                    $usuarios = $this->usuarioRepository->listarJefesTienda();
+                
+                
+                break;
+
+                case 2:
+                    $usuarios = $this->usuarioRepository->listarCompradores();
+                
+                
+                    break;
+
+                case 3:
+                    $usuarios = $this->usuarioRepository->listarJefesAlmacen();
+                
+                
+                    break;
 
                 case 4:
                     $usuarios = $this->usuarioRepository->listarCajerosVentas();
@@ -417,5 +438,84 @@ class UsuarioController extends Controller
             
         }
     
+    }
+
+    public function listarJefesDeTiendaSinTienda(){
+        try{
+                        
+            $usuarios = $this->usuarioRepository->listarJefesTiendaSinTienda();
+            foreach ($usuarios as $key => $usuario) {
+                $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                //$this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship($usuario);
+                
+                
+            }
+            
+            $tiposUsuarioResource =  new UsuariosResource($usuarios); 
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de jefes de tienda no asignados a tiendas');  
+            $responseResourse->body($tiposUsuarioResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+
+    }
+
+
+    public function listarJefesDeAlmacenSinTienda(){
+        try{
+                        
+            $usuarios = $this->usuarioRepository->listarJefesAlmacenSinTienda();
+            foreach ($usuarios as $key => $usuario) {
+                $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                //$this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship($usuario);
+                
+                
+            }
+            
+            $tiposUsuarioResource =  new UsuariosResource($usuarios); 
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de jefes de almacens no asignados a tiendas');  
+            $responseResourse->body($tiposUsuarioResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+
+    }
+
+    public function listarCajeros(){
+        try{
+                        
+            $usuarios = $this->usuarioRepository->listarCajeros();
+            foreach ($usuarios as $key => $usuario) {
+                $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                //$this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship($usuario);
+                
+                
+            }
+            
+            $tiposUsuarioResource =  new UsuariosResource($usuarios); 
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de jefes de cajeros en total');  
+            $responseResourse->body($tiposUsuarioResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+
     }
 }

@@ -27,11 +27,11 @@ class Usuario extends Model
         return $this->belongsTo('App\Models\TipoUsuario','idTipoUsuario','id');
     }
 
-    public function tiendaCargoJefeTienda() {
+    public function tiendasCargoJefeTienda() {
         return $this->hasMany('App\Models\Tienda','idJefeTienda','idPersonaNatural');
-      }
+    }
   
-    public function tiendaCargoJefeAlmacen() {
+    public function tiendasCargoJefeAlmacen() {
         return $this->hasMany('App\Models\Tienda','idJefeAlmacen','idPersonaNatural');
     }
 
@@ -42,7 +42,7 @@ class Usuario extends Model
 
     public function esJefeDeTiendaAsignado(){
         if ($this->esJefeDeTienda() ){
-            return $this->tiendaCargoJefeTienda()->exists();
+            return $this->tiendasCargoJefeTienda()->exists();
         }
         return false;
     }
@@ -55,7 +55,7 @@ class Usuario extends Model
     public function esJefeDeAlmacenAsignado(){
         
         if ($this->esJefeDeAlmacen()){
-            return $this->tiendaCargoJefeAlmacen()->exists();
+            return $this->tiendasCargoJefeAlmacen()->exists();
         }
         return false;
     }
