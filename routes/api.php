@@ -34,3 +34,5 @@ Route::post('login', 'UsuarioController@login');
 
 Route::resource('tipoUsuarios', 'TipoUsuarioController');
 Route::resource('tipoProductos', 'TipoProductoController');
+
+Route::get('roles/usuarios', 'UsuarioController@listarPorRol');

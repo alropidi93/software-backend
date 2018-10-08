@@ -17,6 +17,7 @@ use App\Repositories\UsuarioRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Helpers\Algorithm;
+use Illuminate\Support\Facades\Input;
 
 
 class UsuarioController extends Controller
@@ -347,12 +348,12 @@ class UsuarioController extends Controller
         }
     }
 
-    public function listarPorRole()
+    public function listarPorRol()
     {
         try{
            
             $rol = Input::get('rol');
-            $value = Input::get('value');
+           
             $responseResource = new ResponseResource(null);
             if (!$rol){
                 $errorResource = new ErrorResource(null);
@@ -366,18 +367,14 @@ class UsuarioController extends Controller
                 case 0:
                     $usuarios = $this->usuarioRepository->listarAdmin();
                     
-                    $productosResource =  new ProductosResource($productos);
-                    $responseResource->title('Lista de productos filtrados por nombre');       
-                    $responseResource->body($productosResource);
+                  
                     break;
 
                 case 4:
                     $usuarios = $this->usuarioRepository->listarCajerosVentas();
-                    $productosResource =  new ProductosResource($productos);
-                    $responseResource->title('Lista de productos filtrados por categoria');       
-                    $responseResource->body($productosResource);
+                  
                     break;
-                case 4:
+                case 5:
                     $usuarios = $this->usuarioRepository->listarCajerosDevoluciones();
                    
                     

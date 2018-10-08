@@ -235,8 +235,9 @@ class ProductoController extends Controller
           
             switch ($filter) {
                 case 'nombre':
+                                  
                     $productos = $this->productoRepository->buscarPorFiltro($filter, $value);
-                    
+                    return $productos;  
                     $productosResource =  new ProductosResource($productos);
                     $responseResource->title('Lista de productos filtrados por nombre');       
                     $responseResource->body($productosResource);
