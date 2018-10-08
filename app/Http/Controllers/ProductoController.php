@@ -237,7 +237,9 @@ class ProductoController extends Controller
                 case 'nombre':
                                   
                     $productos = $this->productoRepository->buscarPorFiltro($filter, $value);
-                    return $productos;  
+                    foreach ($productos as $key => $producto) {
+                        $this->productoRepository->loadTipoProductoModel($producto);
+                    }
                     $productosResource =  new ProductosResource($productos);
                     $responseResource->title('Lista de productos filtrados por nombre');       
                     $responseResource->body($productosResource);
@@ -245,6 +247,9 @@ class ProductoController extends Controller
 
                 case 'categoria':
                     $productos = $this->productoRepository->buscarPorFiltro($filter, $value);
+                    foreach ($productos as $key => $producto) {
+                        $this->productoRepository->loadTipoProductoModel($producto);
+                    }
                     $productosResource =  new ProductosResource($productos);
                     $responseResource->title('Lista de productos filtrados por categoria');       
                     $responseResource->body($productosResource);
