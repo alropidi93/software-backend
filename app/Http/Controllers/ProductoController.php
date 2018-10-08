@@ -222,8 +222,8 @@ class ProductoController extends Controller
     {
         try{
             $producto = $this->productoRepository->obtenerModelo();
-            $filter = Input::get('filterBy');
-            $value = Input::get('value');
+            $filter = strtolower(Input::get('filterBy'));
+            $value = strtolower(Input::get('value'));
             $responseResource = new ResponseResource(null);
             if (!$filter || !$value){
                 $errorResource = new ErrorResource(null);

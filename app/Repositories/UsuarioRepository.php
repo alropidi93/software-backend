@@ -138,8 +138,14 @@ class UsuarioRepository extends BaseRepository {
         return $this->tipoUsuario->where('key',$key)->where('deleted',0)->first();
     }
 
-    public function loadTipoUsuarioRelationship(){
-        $this->model->load('tipoUsuario');
+    public function loadTipoUsuarioRelationship($usuario=null){
+        if (!$usuario){
+            $this->model->load('tipoUsuario');
+        }
+        else{
+            $usuario->load('tipoUsuario');
+        }
+        
     }
 
     public function obtenerUsuarioPorId($id)
@@ -190,6 +196,47 @@ class UsuarioRepository extends BaseRepository {
        
 
     }
+
+    public function listarAdmins(){
+        
+        $admins = $this->model->whereHas('tipoUsuario', function ($query) {
+                $query->where('key', 3);
+        })->get();
+        return $admins;
+    }
+
+    public function listarCajeros(){
+        
+        $cajeros = $this->model->whereHas('tipoUsuario', function ($query) {
+                $query->where('key', 4)->orWhere('key',5);
+        })->get();
+        return $cajeros;
+
+        
+    }
+
+    public function listarCajerosVentas(){
+        
+        $cajerosVentas = $this->model->whereHas('tipoUsuario', function ($query) {
+                $query->where('key', 4);
+        })->get();
+        return $cajerosVentas;
+
+        
+    }
+
+    public function listarCajerosDevoluciones(){
+        
+        $cajerosDevoluciones = $this->model->whereHas('tipoUsuario', function ($query) {
+                $query->where('key', 4);
+        })->get();
+        return $cajerosDevoluciones;
+
+        
+    }
+
+  
+  
 
   
     

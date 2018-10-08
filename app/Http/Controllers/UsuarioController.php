@@ -345,5 +345,67 @@ class UsuarioController extends Controller
         } catch(\Exception $e) {
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
-      }
+    }
+
+    public function listarPorRole()
+    {
+        try{
+           
+            $rol = Input::get('rol');
+            $value = Input::get('value');
+            $responseResource = new ResponseResource(null);
+            if (!$rol){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de búsqueda');
+                $errorResource->message('Parámetro inválido para la búsqueda');
+                return $errorResource->response()->setStatusCode(400);
+
+            }
+        
+            switch ($rol) {
+                case 0:
+                    $usuarios = $this->usuarioRepository->listarAdmin();
+                    
+                    $productosResource =  new ProductosResource($productos);
+                    $responseResource->title('Lista de productos filtrados por nombre');       
+                    $responseResource->body($productosResource);
+                    break;
+
+                case 4:
+                    $usuarios = $this->usuarioRepository->listarCajerosVentas();
+                    $productosResource =  new ProductosResource($productos);
+                    $responseResource->title('Lista de productos filtrados por categoria');       
+                    $responseResource->body($productosResource);
+                    break;
+                case 4:
+                    $usuarios = $this->usuarioRepository->listarCajerosDevoluciones();
+                   
+                    
+                    break;
+
+                default:
+                    $errorResource = new ErrorResource(null);
+                    $errorResource->title('Error de búsqueda');
+                    $errorResource->message('Valor de rol inválido');
+                    return $errorResource->response()->setStatusCode(400);
+                    
+            }
+            foreach ($usuarios as $key => $usuario) {
+                $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                
+                
+            }
+            $usuariosResource =  new UsuariosResource($usuarios);
+            $responseResource->title('Lista de usuarios por rol');       
+            $responseResource->body($usuariosResource);
+            
+            return $responseResource; 
+        }
+        catch(\Exception $e){
+                
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+    
+    }
 }
