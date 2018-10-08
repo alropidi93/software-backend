@@ -35,7 +35,7 @@ class MovimientoController extends Controller
     public function index() 
     {
         try{
-            $movimientoResource =  new MovimientoResource($this->movimientoRepository->obtenerTodos());  
+            $movimientoResource =  new MovimientosResource($this->movimientoRepository->obtenerTodos());  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de movimientos');  
             $responseResourse->body($movimientoResource);

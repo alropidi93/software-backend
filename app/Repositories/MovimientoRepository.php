@@ -8,7 +8,7 @@ class MovimientoRepository extends BaseRepository{
      * @param  App\Models\Movimiento $movimiento
      * @return void
      */
-    public function __construct(Tienda $movimiento) 
+    public function __construct(Movimiento $movimiento) 
     {
         $this->model = $movimiento;
     }
