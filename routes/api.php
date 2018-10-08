@@ -23,6 +23,7 @@ Route::resource('productos', 'ProductoController');
 Route::resource('unidades', 'UnidadMedidaController');
 Route::resource('usuarios', 'UsuarioController');
 Route::resource('movimientos', 'MovimientoController');
+Route::resource('proveedores', 'ProveedorController');
 
 Route::get('usuariosSinTipo', 'UsuarioController@listarUsuariosSinTipo');
 Route::get('busqueda/productos', 'ProductoController@busquedaPorFiltro');
