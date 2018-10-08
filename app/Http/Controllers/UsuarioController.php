@@ -43,7 +43,7 @@ class UsuarioController extends Controller
                 $this->usuarioRepository->loadTipoUsuarioRelationShip($usuario);
             }
            
-            $tiposUsuarioResource =  new UsuariosResource(); 
+            $tiposUsuarioResource =  new UsuariosResource($usuarios); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de usuarios');  
             $responseResourse->body($tiposUsuarioResource);
