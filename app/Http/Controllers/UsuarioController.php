@@ -42,8 +42,8 @@ class UsuarioController extends Controller
             foreach ($usuarios as $key => $usuario) {
                 $this->usuarioRepository->loadTipoUsuarioRelationShip($usuario);
             }
-            return $usuarios;
-            $tiposUsuarioResource =  new UsuariosResource(); 
+           
+            $tiposUsuarioResource =  new UsuariosResource($usuarios); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de usuarios');  
             $responseResourse->body($tiposUsuarioResource);
@@ -480,7 +480,7 @@ class UsuarioController extends Controller
             
             $tiposUsuarioResource =  new UsuariosResource($usuarios); 
             $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Lista de jefes de almacens no asignados a tiendas');  
+            $responseResourse->title('Lista de jefes de almacenes no asignados a tiendas');  
             $responseResourse->body($tiposUsuarioResource);
             return $responseResourse;
         }
