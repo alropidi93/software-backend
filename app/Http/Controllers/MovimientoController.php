@@ -35,7 +35,14 @@ class MovimientoController extends Controller
     public function index() 
     {
         try{
-            $movimientoResource =  new MovimientoResource($this->movimientoRepository->obtenerTodos());  
+            $movimientos = $this->movimientoRepository->obtenerTodos();
+
+            //a continuacion, cargamos la relacion de usuario a cada movimiento
+            foreach ($movimientos as $key => $movimiento) {
+                $this->movimientoRepository->loadMovimientoRelationship($movimiento);
+            }
+            
+            $movimientoResource =  new MovimientoResource($movimientos);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de movimientos');  
             $responseResourse->body($movimientoResource);
