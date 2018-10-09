@@ -13,6 +13,7 @@ use App\Http\Resources\ValidationResource;
 use App\Http\Resources\ResponseResource;
 use App\Models\Usuario;
 use App\Repositories\MovimientoRepository;
+use App\Repositories\UsuarioRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Helpers\Algorithm;
@@ -36,14 +37,22 @@ class MovimientoController extends Controller
     {
         try{
             $movimientos = $this->movimientoRepository->obtenerTodos();
+            
             /*PARTE DE TUTORIAL PARA RELATIONSHIPS */
             //a continuacion, cargamos la relacion de usuario a cada movimiento
+            $usuarioRepository =  new UsuarioRepository(new Usuario);
             foreach ($movimientos as $key => $movimiento) {
-                $this->movimientoRepository->loadMovimientoRelationship($movimiento);
+               
+                $this->movimientoRepository->loadUsuarioRelationship($movimiento);
+                $usuario = $this->movimientoRepository->obtenerUsuarioModel();
+                
+                $usuarioRepository->loadTipoUsuarioRelationship($usuario);
+       
             }
+           
             /*FIN DE PARTE DE TUTORIAL PARA RELATIONSHIPS */
 
-            $movimientoResource =  new MovimientoResource($movimientos);  
+            $movimientoResource =  new MovimientosResource($movimientos);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de movimientos');  
             $responseResourse->body($movimientoResource);
