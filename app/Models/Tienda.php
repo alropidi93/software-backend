@@ -30,6 +30,10 @@ class Tienda extends Model
       return $this->belongsTo('App\Models\Usuario','idJefeAlmacen','idPersonaNatural');
     }
 
+    public function trabajadores(){
+      return $this->hasMany('App\Models\Usuario','idTienda','id');
+    }
+
   
   
   

@@ -16,6 +16,7 @@ use App\Http\Resources\ResponseResource;
 use App\Http\Resources\NotFoundResource;
 use Illuminate\Support\Facades\DB;
 use App\Http\Helpers\Algorithm;
+use Illuminate\Support\Facades\Input;
 
 class TiendaController extends Controller {
 
@@ -304,8 +305,120 @@ class TiendaController extends Controller {
 
     }
 
-  
+    public function asignarTrabajador($idTienda, Request $data){
+        try{
+           
+            DB::beginTransaction();
+            $tienda = $this->tiendaRepository->obtenerPorId($idTienda);
+         
+            $idUsuario = $data['idUsuario'];
+            if (!$tienda){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Tienda no encontrada');
+                $notFoundResource->notFound(['id' => $idTienda]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            $usuarioRepository =  new UsuarioRepository(new Usuario);
+            $usuario =  $usuarioRepository->obtenerUsuarioPorId($idUsuario);
+            
+            if (!$usuario){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Usuario no encontrado');
+                $notFoundResource->notFound(['idUsuario' => $idUsuario]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            
+            $usuarioEsJefeDeTienda = $usuario->esJefeDeTienda();
+            $usuarioEsJefeDeAlmacen = $usuario->esJefeDeAlmacen();
+            $usuarioEsAdmin = $usuario->esAdmin();
+            if ($usuarioEsJefeDeTienda || $usuarioEsJefeDeAlmacen || $usuarioEsAdmin){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Usuario trabajador no encontrado');
+                $notFoundResource->notFound(['idUsuario'=>$idUsuario]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            
+            $this->tiendaRepository->setModel($tienda);
+            $this->tiendaRepository->attachTrabajador($usuario);
+         
+            
+            
 
+           
+           
+            DB::commit();
+            $this->tiendaRepository->loadTrabajadoresRelationship();
+            $tienda =  $this->tiendaRepository->obtenerModelo();
+          
+            $tiendaResource =  new TiendaResource($tienda);  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Trabajador agregado a tienda satisfactoriamente');  
+            $responseResourse->body($tiendaResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+
+    }
+
+  
+    public function busquedaPorFiltro()
+    {
+        try{
+            $tienda = $this->tiendaRepository->obtenerModelo();
+            $filter = Input::get('filterBy');
+            $value = strtolower(Input::get('value'));
+            $responseResource = new ResponseResource(null);
+            if (!$filter || !$value){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de búsqueda');
+                $errorResource->message('Parámetros inválidos para la búsqueda');
+                return $errorResource->response()->setStatusCode(400);
+
+            }
+          
+            switch ($filter) {
+                case 'nombre':
+                                  
+                    $tiendas = $this->tiendaRepository->buscarPorFiltro($filter, $value);
+                    
+                    $tiendasResource =  new TiendasResource($tiendas);
+                    $responseResource->title('Lista de tiendas filtradas por nombre');       
+                    $responseResource->body($tiendasResource);
+                    break;
+
+                case 'distrito':
+                    $tiendas = $this->tiendaRepository->buscarPorFiltro($filter, $value);
+                    
+                    $tiendasResource =  new TiendasResource($tiendas);
+                    $responseResource->title('Lista de tiendas filtradas por distrito');       
+                    $responseResource->body($tiendasResource);
+                    break;
+                
+
+               
+
+                default:
+                    $errorResource = new ErrorResource(null);
+                    $errorResource->title('Error de búsqueda');
+                    $errorResource->message('Valor de filtro inválido');
+                    return $errorResource->response()->setStatusCode(400);
+                    
+            }
+            
+            return $responseResource; 
+        }
+        catch(\Exception $e){
+                  
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+    
+    }
 
 
  

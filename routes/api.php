@@ -27,19 +27,23 @@ Route::resource('proveedores', 'ProveedorController');
 
 Route::get('usuariosSinTipo', 'UsuarioController@listarUsuariosSinTipo');
 Route::get('busqueda/productos', 'ProductoController@busquedaPorFiltro');
+Route::get('busqueda/tiendas', 'TiendaController@busquedaPorFiltro');
 Route::post('asignarTipoUsuario/{idUsuario}', 'UsuarioController@asignarRol');
 
 Route::post('tienda/asignarJefeAlmacen/{idTienda}', 'TiendaController@asignarJefeDeAlmacen');
 Route::post('tienda/asignarJefeTienda/{idTienda}' , 'TiendaController@asignarJefeDeTienda');
+Route::post('tienda/asignarTrabajador/{idTienda}' , 'TiendaController@asignarTrabajador');
 
 Route::post('login', 'UsuarioController@login');
 
 Route::resource('tipoUsuarios', 'TipoUsuarioController');
 Route::resource('tipoProductos', 'TipoProductoController');
 
-Route::get('roles/usuarios', 'UsuarioController@listarPorRol');
+
 
 Route::get('usuario/jefesTiendaNoAsignados', 'UsuarioController@listarJefesDeTiendaSinTienda');
 Route::get('usuario/jefesAlmacenNoAsignados', 'UsuarioController@listarJefesDeAlmacenSinTienda');
 Route::get('usuario/cajeros', 'UsuarioController@listarCajeros');
 Route::get('usuario/listarPorRol', 'UsuarioController@listarPorRol');
+Route::get('usuario/listarPorRolSinTienda', 'UsuarioController@listarPorRolSinTiendaAsignada');
+

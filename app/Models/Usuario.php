@@ -35,9 +35,19 @@ class Usuario extends Model
         return $this->hasMany('App\Models\Tienda','idJefeAlmacen','idPersonaNatural');
     }
 
+    public function tienda() {
+        return $this->belongsTo('App\Models\Tienda','idTienda','id');
+        
+    }
+
     public function esJefeDeTienda(){
         
         return $this->tipoUsuario()->where('key',1)->where('deleted',false)->exists();
+    }
+
+    public function esAdmin(){
+        
+        return $this->tipoUsuario()->where('key',0)->where('deleted',false)->exists();
     }
 
     public function esJefeDeTiendaAsignado(){
