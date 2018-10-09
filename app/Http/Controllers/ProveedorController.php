@@ -99,4 +99,72 @@ class ProveedorController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
     }
+
+    public function show($id)
+    {
+        try{
+            $proveedor = $this->proveedorRepository->obtenerPorId($id);
+            if (!$proveedor){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Proveedor no encontrado');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            $this->proveedorRepository->setModel($proveedor);
+            $proveedorResource =  new ProveedorResource($proveedor);  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Mostrar proveedor');  
+            $responseResourse->body($usuarioResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+
+    public function busquedaPorFiltro()
+    {
+        try{
+            $proveedor = $this->proveedorRepository->obtenerModelo();
+            $filter = Input::get('filterBy');
+            $value = strtolower(Input::get('value'));
+            $responseResource = new ResponseResource(null);
+            if (!$filter || !$value){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de búsqueda');
+                $errorResource->message('Parámetros inválidos para la búsqueda');
+                return $errorResource->response()->setStatusCode(400);
+            }
+            switch ($filter) {
+                case 'ruc':      
+                    $proveedores = $this->proveedorRepository->buscarPorFiltro($filter, $value);
+                    $proveedoresResource =  new ProveedoresResource($proveedores);
+                    $responseResource->title('Lista de proveedores filtrados por RUC');       
+                    $responseResource->body($proveedoresResource);
+                    break;
+                case 'razonSocial':
+                    $proveedores = $this->proveedorRepository->buscarPorFiltro2($filter, $value);
+                    $proveedoresResource =  new ProveedoresResource($proveedores);
+                    $responseResource->title('Lista de proveedores filtrados por razón social');       
+                    $responseResource->body($proveedoresResource);
+                    break;
+                case 'contacto':      
+                    $proveedores = $this->proveedorRepository->buscarPorFiltro($filter, $value);
+                    $proveedoresResource =  new ProveedoresResource($proveedores);
+                    $responseResource->title('Lista de proveedores filtrados por contacto');       
+                    $responseResource->body($proveedoresResource);
+                    break;
+                default:
+                    $errorResource = new ErrorResource(null);
+                    $errorResource->title('Error de búsqueda');
+                    $errorResource->message('Valor de filtro inválido');
+                    return $errorResource->response()->setStatusCode(400);
+            }
+            return $responseResource; 
+        }
+        catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    
+    }
 }

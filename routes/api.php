@@ -25,6 +25,7 @@ Route::resource('usuarios', 'UsuarioController');
 Route::resource('movimientos', 'MovimientoController');
 Route::resource('proveedores', 'ProveedorController');
 
+Route::get('busqueda/proveedores','ProveedorController@busquedaPorFiltro');
 Route::get('usuariosSinTipo', 'UsuarioController@listarUsuariosSinTipo');
 Route::get('busqueda/productos', 'ProductoController@busquedaPorFiltro');
 Route::get('busqueda/tiendas', 'TiendaController@busquedaPorFiltro');

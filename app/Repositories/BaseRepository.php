@@ -125,6 +125,12 @@ abstract class BaseRepository {
         return $this->model->whereRaw("lower({$key}) like ? ",'%'.$value.'%')->where('deleted',false)->get();
     }
 
+    //se usa al buscar proveedor por razonSocial
+    public function buscarPorFiltro2($key, $value){
+        
+        return $this->model->where($key,$value)->where('deleted',false)->get();
+    }
+
     public function buscarPorFiltroNum($key, $value){
         
         return $this->model->where($key,$value)->where('deleted',false)->get();
