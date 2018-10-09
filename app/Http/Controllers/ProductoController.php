@@ -35,6 +35,7 @@ class ProductoController extends Controller
             
             foreach ($productos as $key => $producto) {
                 $this->productoRepository->loadTipoProductoModel($producto);
+                $this->productoRepository->loadUnidadMedidaModel($producto);
                 
                 
             }
@@ -222,7 +223,7 @@ class ProductoController extends Controller
     {
         try{
             $producto = $this->productoRepository->obtenerModelo();
-            $filter = strtolower(Input::get('filterBy'));
+            $filter = Input::get('filterBy');
             $value = strtolower(Input::get('value'));
             $responseResource = new ResponseResource(null);
             if (!$filter || !$value){
@@ -239,6 +240,7 @@ class ProductoController extends Controller
                     $productos = $this->productoRepository->buscarPorFiltro($filter, $value);
                     foreach ($productos as $key => $producto) {
                         $this->productoRepository->loadTipoProductoModel($producto);
+                        $this->productoRepository->loadUnidadMedidaModel($producto);
                     }
                     $productosResource =  new ProductosResource($productos);
                     $responseResource->title('Lista de productos filtrados por nombre');       
@@ -249,6 +251,29 @@ class ProductoController extends Controller
                     $productos = $this->productoRepository->buscarPorFiltro($filter, $value);
                     foreach ($productos as $key => $producto) {
                         $this->productoRepository->loadTipoProductoModel($producto);
+                        $this->productoRepository->loadUnidadMedidaModel($producto);
+                    }
+                    $productosResource =  new ProductosResource($productos);
+                    $responseResource->title('Lista de productos filtrados por categoria');       
+                    $responseResource->body($productosResource);
+                    break;
+                
+
+                case 'tipo':
+                    $productos = $this->productoRepository->buscarPorTipo($value);
+                    foreach ($productos as $key => $producto) {
+                        $this->productoRepository->loadTipoProductoModel($producto);
+                        $this->productoRepository->loadUnidadMedidaModel($producto);
+                    }
+                    $productosResource =  new ProductosResource($productos);
+                    $responseResource->title('Lista de productos filtrados por categoria');       
+                    $responseResource->body($productosResource);
+                    break;
+                case 'stockMin':
+                    $productos = $this->productoRepository->buscarPorFiltroNum($filter,$value);
+                    foreach ($productos as $key => $producto) {
+                        $this->productoRepository->loadTipoProductoModel($producto);
+                        $this->productoRepository->loadUnidadMedidaModel($producto);
                     }
                     $productosResource =  new ProductosResource($productos);
                     $responseResource->title('Lista de productos filtrados por categoria');       

@@ -25,4 +25,8 @@ class Producto extends Model
     public function tipoProducto() {
         return $this->belongsTo('App\Models\TipoProducto','idTipoProducto','id');
     }
+
+    public function unidadMedida() {
+        return $this->belongsTo('App\Models\UnidadMedida','idUnidadMedida','id');
+    }
 }

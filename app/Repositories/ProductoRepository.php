@@ -2,6 +2,7 @@
 namespace App\Repositories;
 use App\Models\Producto;
 use App\Models\TipoProducto;
+use App\Models\UnidadMedida;
 	
 class ProductoRepository extends BaseRepository {
     protected $tipoProducto;
@@ -11,10 +12,11 @@ class ProductoRepository extends BaseRepository {
      * @param  App\Models\TipoProducto $tipoProducto
      * @return void
      */
-    public function __construct(Producto $producto, TipoProducto $tipoProducto) 
+    public function __construct(Producto $producto, TipoProducto $tipoProducto, UnidadMedida $unidadMedida) 
     {
         $this->model = $producto;
         $this->tipoProducto = $tipoProducto;
+        $this->unidadMedida = $unidadMedida;
         
     }
 
@@ -31,13 +33,65 @@ class ProductoRepository extends BaseRepository {
         
     }
 
-    public function loadTipoProductoModel($producto=null){
-        if ($producto){
-            $producto->load('tipoProducto');
+    public function loadUnidadMedidaModel($producto=null){
+      
+
+
+        if (!$producto){
+        
+            
+
+            $this->model = $this->model->load([
+                'unidadMedida'=>function($query){
+                    $query->where('deleted', false); 
+                }
+            ]);
         }
         else{
-            $this->model->load('tipoProducto');
+            
+            $this->model =$producto->load([
+                'unidadMedida'=>function($query){
+                    $query->where('deleted', false); 
+                }
+            ]);
+        }
+        if ($this->model->unidadMedida){
+            $this->unidadMedida = $this->model->unidadMedida;
         }
     }
+
+    public function loadTipoProductoModel($producto=null){
+      
+
+
+        if (!$producto){
+        
+            
+
+            $this->model = $this->model->load([
+                'tipoProducto'=>function($query){
+                    $query->where('deleted', false); 
+                }
+            ]);
+        }
+        else{
+            
+            $this->model =$producto->load([
+                'tipoProducto'=>function($query){
+                    $query->where('deleted', false); 
+                }
+            ]);
+        }
+        if ($this->model->tipoProducto){
+            $this->tipoProducto = $this->model->tipoProducto;
+        }
+    }
+
+    public function buscarPorTipo($value){
+        
+               
+        return $this->model->join('tipoProducto', 'tipoProducto.id', '=', 'producto.idTipoProducto')
+            ->whereRaw("lower(tipo) like ? ",'%'.$value.'%')->where('tipoProducto.deleted','=',false)->get();
+        }
     
 }

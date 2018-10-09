@@ -23,6 +23,7 @@ class ProductoResource extends JsonResource
                 'stockMin' => $this->stockMin,
                 'descripcion' => $this->descripcion,
                 'tipoProducto' => new TipoProductoResource($this->whenLoaded('tipoProducto')),
+                'unidadMedida' => new UnidadMedidaResource($this->whenLoaded('unidadMedida')),
                 'categoria' => $this->categoria,
                 'precio' => $this->precio,
                 'deleted' => $this->deleted,
