@@ -18,7 +18,8 @@ class PersonaNatural extends Model
       'email',
       'fechaNac',
       'direccion',
-      'deleted'
+      'deleted',
+      'dni'
     ];
 
     public function usuario() {
