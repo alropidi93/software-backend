@@ -35,6 +35,7 @@ class ProductoController extends Controller
             
             foreach ($productos as $key => $producto) {
                 $this->productoRepository->loadTipoProductoModel($producto);
+                $this->productoRepository->loadUnidadMedidaModel($producto);
                 
                 
             }
@@ -239,6 +240,7 @@ class ProductoController extends Controller
                     $productos = $this->productoRepository->buscarPorFiltro($filter, $value);
                     foreach ($productos as $key => $producto) {
                         $this->productoRepository->loadTipoProductoModel($producto);
+                        $this->productoRepository->loadUnidadMedidaModel($producto);
                     }
                     $productosResource =  new ProductosResource($productos);
                     $responseResource->title('Lista de productos filtrados por nombre');       
@@ -249,6 +251,7 @@ class ProductoController extends Controller
                     $productos = $this->productoRepository->buscarPorFiltro($filter, $value);
                     foreach ($productos as $key => $producto) {
                         $this->productoRepository->loadTipoProductoModel($producto);
+                        $this->productoRepository->loadUnidadMedidaModel($producto);
                     }
                     $productosResource =  new ProductosResource($productos);
                     $responseResource->title('Lista de productos filtrados por categoria');       
