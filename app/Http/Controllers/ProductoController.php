@@ -139,7 +139,9 @@ class ProductoController extends Controller
     public function update($id, Request $productoData)
     {
         try{
-            $validator = \Validator::make($productoData->all(), 
+        
+            $productoDataArray= Algorithm::quitNullValuesFromArray($productoData->all());
+            $validator = \Validator::make($productoDataArray, 
                             ['idTipoProducto' => 'exists:tipoProducto,id']
                         );
             

@@ -102,7 +102,7 @@ class ProductoRepository extends BaseRepository {
 
             $this->model = $this->model->load([
                 'proveedores'=>function($query){
-                    $query->where('proveedor.deleted', false); 
+                    $query->where('proveedor.deleted', false)->wherePivot('deleted',false); 
                 }
             ]);
         }
