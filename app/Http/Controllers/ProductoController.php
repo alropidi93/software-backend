@@ -162,9 +162,10 @@ class ProductoController extends Controller
             
             
             $this->productoRepository->setModel($producto);
-            $productoDataArray= Algorithm::quitNullValuesFromArray($productoData->all());
+            
             $this->productoRepository->actualiza($productoDataArray);
             $this->productoRepository->loadTipoProductoRelationship();
+            $this->productoRepository->loadUnidadMedidaRelationship();
             $producto = $this->productoRepository->obtenerModelo();
             
             DB::commit();
