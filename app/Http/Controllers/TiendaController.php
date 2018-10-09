@@ -16,6 +16,7 @@ use App\Http\Resources\ResponseResource;
 use App\Http\Resources\NotFoundResource;
 use Illuminate\Support\Facades\DB;
 use App\Http\Helpers\Algorithm;
+use Illuminate\Support\Facades\Input;
 
 class TiendaController extends Controller {
 
@@ -305,7 +306,59 @@ class TiendaController extends Controller {
     }
 
   
+    public function busquedaPorFiltro()
+    {
+        try{
+            $tienda = $this->tiendaRepository->obtenerModelo();
+            $filter = Input::get('filterBy');
+            $value = strtolower(Input::get('value'));
+            $responseResource = new ResponseResource(null);
+            if (!$filter || !$value){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de búsqueda');
+                $errorResource->message('Parámetros inválidos para la búsqueda');
+                return $errorResource->response()->setStatusCode(400);
 
+            }
+          
+            switch ($filter) {
+                case 'nombre':
+                                  
+                    $tiendas = $this->tiendaRepository->buscarPorFiltro($filter, $value);
+                    
+                    $tiendasResource =  new TiendasResource($tiendas);
+                    $responseResource->title('Lista de tiendas filtradas por nombre');       
+                    $responseResource->body($tiendasResource);
+                    break;
+
+                case 'distrito':
+                    $tiendas = $this->tiendaRepository->buscarPorFiltro($filter, $value);
+                    
+                    $tiendasResource =  new TiendasResource($tiendas);
+                    $responseResource->title('Lista de tiendas filtradas por distrito');       
+                    $responseResource->body($tiendasResource);
+                    break;
+                
+
+               
+
+                default:
+                    $errorResource = new ErrorResource(null);
+                    $errorResource->title('Error de búsqueda');
+                    $errorResource->message('Valor de filtro inválido');
+                    return $errorResource->response()->setStatusCode(400);
+                    
+            }
+            
+            return $responseResource; 
+        }
+        catch(\Exception $e){
+                  
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+    
+    }
 
 
  

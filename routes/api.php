@@ -27,6 +27,7 @@ Route::resource('proveedores', 'ProveedorController');
 
 Route::get('usuariosSinTipo', 'UsuarioController@listarUsuariosSinTipo');
 Route::get('busqueda/productos', 'ProductoController@busquedaPorFiltro');
+Route::get('busqueda/tiendas', 'TiendaController@busquedaPorFiltro');
 Route::post('asignarTipoUsuario/{idUsuario}', 'UsuarioController@asignarRol');
 
 Route::post('tienda/asignarJefeAlmacen/{idTienda}', 'TiendaController@asignarJefeDeAlmacen');
