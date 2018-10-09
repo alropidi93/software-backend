@@ -372,17 +372,11 @@ class UsuarioController extends Controller
             $rol = Input::get('rol');
            
             $responseResource = new ResponseResource(null);
-            if (!$rol){
-                $errorResource = new ErrorResource(null);
-                $errorResource->title('Error de búsqueda');
-                $errorResource->message('Parámetro inválido para la búsqueda');
-                return $errorResource->response()->setStatusCode(400);
-
-            }
+            
         
             switch ($rol) {
                 case 0:
-                    $usuarios = $this->usuarioRepository->listarAdmin();
+                    $usuarios = $this->usuarioRepository->listarAdmins();
                     $responseResource->title('Listado por rol - Admins');
                   
                     break;
@@ -449,6 +443,86 @@ class UsuarioController extends Controller
         }
     
     }
+
+    public function listarPorRolSinTiendaAsignada()
+    {
+        try{
+           
+            $rol = Input::get('rol');
+           
+            $responseResource = new ResponseResource(null);
+            
+        
+            switch ($rol) {
+                case 0:
+                    $usuarios = $this->usuarioRepository->listarAdminSinTienda();
+                    $responseResource->title('Listado por rol sin tienda asignada - Admins');
+                  
+                    break;
+                case 1:
+                    $usuarios = $this->usuarioRepository->listarJefesTiendaSinTienda();
+                    $responseResource->title('Listado por rol sin tienda asignada - Jefes de tienda');
+                
+                
+                break;
+
+                case 2:
+                    $usuarios = $this->usuarioRepository->listarCompradoresSinTienda();
+                    $responseResource->title('Listado por rol sin tienda asignada - Compradores');
+                
+                
+                    break;
+
+                case 3:
+                    $usuarios = $this->usuarioRepository->listarJefesAlmacenSinTienda();
+                    $responseResource->title('Listado por rol sin tienda asignada - Jefes de almacén');
+                
+                
+                    break;
+
+                case 4:
+                    $usuarios = $this->usuarioRepository->listarCajerosVentasSinTienda();
+                    $responseResource->title('Listado por rol sin tienda asignada - Cajeros de ventas');
+                  
+                    break;
+                case 5:
+                    $usuarios = $this->usuarioRepository->listarCajerosDevolucionesSinTienda();
+                    $responseResource->title('Listado por rol sin tienda asignada - Cajeros de devoluciones');
+                   
+                    
+                    break;
+                case 6:
+                    $usuarios = $this->usuarioRepository->listarAlmacenerosSinTienda();
+                    $responseResource->title('Listado por rol sin tienda asignada - Almaceneros');
+                    
+                    break;
+
+                default:
+                    $errorResource = new ErrorResource(null);
+                    $errorResource->title('Error de búsqueda');
+                    $errorResource->message('Valor de rol inválido');
+                    return $errorResource->response()->setStatusCode(400);
+                    
+            }
+            foreach ($usuarios as $key => $usuario) {
+                $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                
+                
+            }
+            $usuariosResource =  new UsuariosResource($usuarios);
+                
+            $responseResource->body($usuariosResource);
+            
+            return $responseResource; 
+        }
+        catch(\Exception $e){
+                
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+    
+    }
+
 
     public function listarJefesDeTiendaSinTienda(){
         try{

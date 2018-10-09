@@ -305,6 +305,66 @@ class TiendaController extends Controller {
 
     }
 
+    public function asignarTrabajador($idTienda, Request $data){
+        try{
+           
+            DB::beginTransaction();
+            $tienda = $this->tiendaRepository->obtenerPorId($idTienda);
+         
+            $idUsuario = $data['idUsuario'];
+            if (!$tienda){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Tienda no encontrada');
+                $notFoundResource->notFound(['id' => $idTienda]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            $usuarioRepository =  new UsuarioRepository(new Usuario);
+            $usuario =  $usuarioRepository->obtenerUsuarioPorId($idUsuario);
+            
+            if (!$usuario){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Usuario no encontrado');
+                $notFoundResource->notFound(['idUsuario' => $idUsuario]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            
+            $usuarioEsJefeDeTienda = $usuario->esJefeDeTienda();
+            $usuarioEsJefeDeAlmacen = $usuario->esJefeDeAlmacen();
+            $usuarioEsAdmin = $usuario->esAdmin();
+            if ($usuarioEsJefeDeTienda || $usuarioEsJefeDeAlmacen || $usuarioEsAdmin){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Usuario trabajador no encontrado');
+                $notFoundResource->notFound(['idUsuario'=>$idUsuario]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            
+            $this->tiendaRepository->setModel($tienda);
+            $this->tiendaRepository->attachTrabajador($usuario);
+         
+            
+            
+
+           
+           
+            DB::commit();
+            $this->tiendaRepository->loadTrabajadoresRelationship();
+            $tienda =  $this->tiendaRepository->obtenerModelo();
+          
+            $tiendaResource =  new TiendaResource($tienda);  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Trabajador agregado a tienda satisfactoriamente');  
+            $responseResourse->body($tiendaResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+
+    }
+
   
     public function busquedaPorFiltro()
     {

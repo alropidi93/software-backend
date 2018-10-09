@@ -16,6 +16,9 @@ class TiendaRepository extends BaseRepository {
      * @var App\Models\Usuario
      */
     protected $jefeDeAmacen;
+  
+    protected $trabajadores;
+
     /**
      * Create a new TiendaRepository instance.
      * @param  App\Models\Tienda $tienda
@@ -54,6 +57,12 @@ class TiendaRepository extends BaseRepository {
         $this->model->save();
     }
 
+    public function attachTrabajador($trabajador){
+           
+        $this->model->trabajadores()->save($trabajador);
+        $this->model->save();
+    }
+
     public function loadJefeDeTiendaRelationship($tienda=null){
         if (!$tienda){
             $this->model->load('jefeDeTienda');
@@ -80,6 +89,39 @@ class TiendaRepository extends BaseRepository {
     public function setJefeDeAlmacenModel($usuario){
         $this->jefeDeAlmacen = $usuario;       
     }
+
+    public function loadTrabajadoresRelationship($tienda=null){
+      
+
+
+        if (!$tienda){
+                  
+
+            $this->model = $this->model->load([
+                'trabajadores'=>function($query){
+                    $query->where('usuario.deleted', false); 
+                },
+                'trabajadores.personaNatural'=>function($query){
+                    $query->where('personaNatural.deleted', false); 
+                }
+            ]);
+        }
+        else{
+            
+            $this->model =$tienda->load([
+                'trabajadores'=>function($query){
+                    $query->where('usuario.deleted', false); 
+                },
+                'trabajadores.personaNatural'=>function($query){
+                    $query->where('personaNatural.deleted', false); 
+                }
+            ]);
+        }
+        if ($this->model->trabajadores){
+            $this->trabajadores = $this->model->trabajadores;
+        }
+    }
+
 
 
 }
