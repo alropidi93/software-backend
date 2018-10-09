@@ -125,6 +125,11 @@ abstract class BaseRepository {
         return $this->model->whereRaw("lower({$key}) like ? ",'%'.$value.'%')->where('deleted',false)->get();
     }
 
+    public function buscarPorFiltroNum($key, $value){
+        
+        return $this->model->where($key,$value)->where('deleted',false)->get();
+    }
+
     
 
     

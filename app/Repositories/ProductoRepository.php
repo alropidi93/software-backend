@@ -86,5 +86,12 @@ class ProductoRepository extends BaseRepository {
             $this->tipoProducto = $this->model->tipoProducto;
         }
     }
+
+    public function buscarPorTipo($value){
+        
+               
+        return $this->model->join('tipoProducto', 'tipoProducto.id', '=', 'producto.idTipoProducto')
+            ->whereRaw("lower(tipo) like ? ",'%'.$value.'%')->where('tipoProducto.deleted','=',false)->get();
+        }
     
 }
