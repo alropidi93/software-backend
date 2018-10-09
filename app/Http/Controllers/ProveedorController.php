@@ -70,4 +70,33 @@ class ProveedorController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
     }
+
+    public function update($id,Request $proveedorData){
+        try{
+            DB::beginTransaction();
+            $proveedor = $this->proveedorRepository->obtenerPorId($id);
+            if (!$proveedor){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Proveedor no encontrado');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            $this->proveedorRepository->setModel($proveedor);
+            $proveedorDataArray= Algorithm::quitNullValuesFromArray($proveedorData->all());
+            $this->proveedorRepository->actualiza($proveedorDataArray);
+            $proveedor = $this->proveedorRepository->obtenerModelo();
+            
+            DB::commit();
+            $proveedorResource =  new ProveedorResource($proveedor);
+            $responseResourse = new ResponseResource(null);
+            
+            $responseResourse->title('Proveedor actualizado exitosamente');       
+            $responseResourse->body($proveedorResource);     
+            
+            return $responseResourse;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
 }
