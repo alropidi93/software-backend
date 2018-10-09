@@ -17,6 +17,7 @@ class CreateTipoUsuarioTable extends Migration
             $table->increments('id');
             $table->string('nombre',200);
             $table->boolean('deleted');
+            $table->integer('key')->unique();
             $table->timestamps();
 
 

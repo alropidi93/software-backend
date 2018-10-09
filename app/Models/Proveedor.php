@@ -20,4 +20,9 @@ class Proveedor extends Model
       'deleted'
     ];
 
+    public function productos(){
+      return $this->belongsToMany('App\Models\Producto','productoxproveedor',
+      'idProveedor','idProducto')->withPivot('deleted','created_at','updated_at');
+  }
+
 }

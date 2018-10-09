@@ -34,8 +34,9 @@ class ProductoController extends Controller
             $productos = $this->productoRepository->obtenerTodos();
             
             foreach ($productos as $key => $producto) {
-                $this->productoRepository->loadTipoProductoModel($producto);
-                $this->productoRepository->loadUnidadMedidaModel($producto);
+                $this->productoRepository->loadTipoProductoRelationship($producto);
+                $this->productoRepository->loadUnidadMedidaRelationship($producto);
+                $this->productoRepository->loadProveedoresRelationship($producto);
                 
                 
             }
@@ -239,8 +240,8 @@ class ProductoController extends Controller
                                   
                     $productos = $this->productoRepository->buscarPorFiltro($filter, $value);
                     foreach ($productos as $key => $producto) {
-                        $this->productoRepository->loadTipoProductoModel($producto);
-                        $this->productoRepository->loadUnidadMedidaModel($producto);
+                        $this->productoRepository->loadTipoProductoRelationship($producto);
+                        $this->productoRepository->loadUnidadMedidaRelationship($producto);
                     }
                     $productosResource =  new ProductosResource($productos);
                     $responseResource->title('Lista de productos filtrados por nombre');       
@@ -250,8 +251,8 @@ class ProductoController extends Controller
                 case 'categoria':
                     $productos = $this->productoRepository->buscarPorFiltro($filter, $value);
                     foreach ($productos as $key => $producto) {
-                        $this->productoRepository->loadTipoProductoModel($producto);
-                        $this->productoRepository->loadUnidadMedidaModel($producto);
+                        $this->productoRepository->loadTipoProductoRelationship($producto);
+                        $this->productoRepository->loadUnidadMedidaRelationship($producto);
                     }
                     $productosResource =  new ProductosResource($productos);
                     $responseResource->title('Lista de productos filtrados por categoria');       
@@ -262,8 +263,8 @@ class ProductoController extends Controller
                 case 'tipo':
                     $productos = $this->productoRepository->buscarPorTipo($value);
                     foreach ($productos as $key => $producto) {
-                        $this->productoRepository->loadTipoProductoModel($producto);
-                        $this->productoRepository->loadUnidadMedidaModel($producto);
+                        $this->productoRepository->loadTipoProductoRelationship($producto);
+                        $this->productoRepository->loadUnidadMedidaRelationship($producto);
                     }
                     $productosResource =  new ProductosResource($productos);
                     $responseResource->title('Lista de productos filtrados por categoria');       
@@ -272,8 +273,8 @@ class ProductoController extends Controller
                 case 'stockMin':
                     $productos = $this->productoRepository->buscarPorFiltroNum($filter,$value);
                     foreach ($productos as $key => $producto) {
-                        $this->productoRepository->loadTipoProductoModel($producto);
-                        $this->productoRepository->loadUnidadMedidaModel($producto);
+                        $this->productoRepository->loadTipoProductoRelationship($producto);
+                        $this->productoRepository->loadUnidadMedidaRelationship($producto);
                     }
                     $productosResource =  new ProductosResource($productos);
                     $responseResource->title('Lista de productos filtrados por categoria');       

@@ -29,4 +29,9 @@ class Producto extends Model
     public function unidadMedida() {
         return $this->belongsTo('App\Models\UnidadMedida','idUnidadMedida','id');
     }
+
+    public function proveedores(){
+        return $this->belongsToMany('App\Models\Proveedor','productoxproveedor',
+        'idProducto','idProveedor')->withPivot('deleted','created_at','updated_at');
+    }
 }
