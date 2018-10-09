@@ -112,7 +112,7 @@ class ProductoController extends Controller
                 $notFoundResource->notFound(['id'=>$id]);
                 return $notFoundResource->response()->setStatusCode(404);;
             }
-            $this->productoRepository->loadTipoProductoModel($producto);
+            $this->productoRepository->loadTipoProductoRelationship($producto);
             $productoResource =  new ProductoResource($producto);  
             $responseResource = new ResponseResource(null);
             $responseResource->title('Mostrar producto');  
@@ -161,7 +161,7 @@ class ProductoController extends Controller
             $this->productoRepository->setModel($producto);
             $productoDataArray= Algorithm::quitNullValuesFromArray($productoData->all());
             $this->productoRepository->actualiza($productoDataArray);
-            $this->productoRepository->loadTipoProductoModel();
+            $this->productoRepository->loadTipoProductoRelationship();
             $producto = $this->productoRepository->obtenerModelo();
             
             DB::commit();
