@@ -315,6 +315,18 @@ class UsuarioRepository extends BaseRepository {
         return $compradores;
     }
 
+    public function listarAlmaceneros(){
+        
+        $almaceneros = $this->model->whereHas('tipoUsuario', function ($query) {
+                $query->where('key', 6)->where('deleted',false);
+        })->where('deleted',false)->get();
+        foreach ($almaceneros as $key => $usuario) {
+            $usuario->personaNatural;
+            
+        } 
+        return $almaceneros;
+    }
+
     public function listarJefesAlmacen(){
         
         $jefesAlmacen = $this->model->whereHas('tipoUsuario', function ($query) {

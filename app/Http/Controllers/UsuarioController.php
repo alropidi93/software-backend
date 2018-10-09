@@ -383,34 +383,44 @@ class UsuarioController extends Controller
             switch ($rol) {
                 case 0:
                     $usuarios = $this->usuarioRepository->listarAdmin();
-                    
+                    $responseResource->title('Lista de administradores');
                   
                     break;
                 case 1:
                     $usuarios = $this->usuarioRepository->listarJefesTienda();
+                    $responseResource->title('Lista de jefes de tienda');
                 
                 
                 break;
 
                 case 2:
                     $usuarios = $this->usuarioRepository->listarCompradores();
+                    $responseResource->title('Lista de compradores');
                 
                 
                     break;
 
                 case 3:
                     $usuarios = $this->usuarioRepository->listarJefesAlmacen();
+                    $responseResource->title('Lista de jefes de almacen');
                 
                 
                     break;
 
                 case 4:
                     $usuarios = $this->usuarioRepository->listarCajerosVentas();
+                    $responseResource->title('Lista de cajeros de ventas');
                   
                     break;
                 case 5:
                     $usuarios = $this->usuarioRepository->listarCajerosDevoluciones();
+                    $responseResource->title('Lista de cajeros de devoluciones');
                    
+                    
+                    break;
+                case 6:
+                    $usuarios = $this->usuarioRepository->listarAlmaceneros();
+                    $responseResource->title('Lista de cajeros de almaceneros');
                     
                     break;
 
@@ -506,7 +516,7 @@ class UsuarioController extends Controller
             
             $tiposUsuarioResource =  new UsuariosResource($usuarios); 
             $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Lista de jefes de cajeros en total');  
+            $responseResourse->title('Lista de cajeros (de ventas y de devoluciones');  
             $responseResourse->body($tiposUsuarioResource);
             return $responseResourse;
         }
