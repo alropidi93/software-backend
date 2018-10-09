@@ -94,5 +94,27 @@ class MovimientoController extends Controller
 
     public function destroy($id) {
         //no se debe eliminar un movimiento
+        try{
+            DB::beginTransaction();
+            $movimiento = $this->movimientoRepository->obtenerPorId($id);
+            
+            if (!$movimiento){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Movimiento no encontrado');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            $this->movimientoRepository->setModel($movimiento);
+            $this->movimientoRepository->softDelete();
+            
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Movimiento eliminado');  
+            $responseResource->body(['id' => $id]);
+            DB::commit();
+            return $responseResource;
+        }
+        catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
     }
 }
