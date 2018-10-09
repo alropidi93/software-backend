@@ -383,44 +383,44 @@ class UsuarioController extends Controller
             switch ($rol) {
                 case 0:
                     $usuarios = $this->usuarioRepository->listarAdmin();
-                    $responseResource->title('Lista de administradores');
+                    $responseResource->title('Listado por rol - Admins');
                   
                     break;
                 case 1:
                     $usuarios = $this->usuarioRepository->listarJefesTienda();
-                    $responseResource->title('Lista de jefes de tienda');
+                    $responseResource->title('Listado por rol - Jefes de tienda');
                 
                 
                 break;
 
                 case 2:
                     $usuarios = $this->usuarioRepository->listarCompradores();
-                    $responseResource->title('Lista de compradores');
+                    $responseResource->title('Listado por rol - Compradores');
                 
                 
                     break;
 
                 case 3:
                     $usuarios = $this->usuarioRepository->listarJefesAlmacen();
-                    $responseResource->title('Lista de jefes de almacen');
+                    $responseResource->title('Listado por rol - Jefes de almacén');
                 
                 
                     break;
 
                 case 4:
                     $usuarios = $this->usuarioRepository->listarCajerosVentas();
-                    $responseResource->title('Lista de cajeros de ventas');
+                    $responseResource->title('Listado por rol - Cajeros de ventas');
                   
                     break;
                 case 5:
                     $usuarios = $this->usuarioRepository->listarCajerosDevoluciones();
-                    $responseResource->title('Lista de cajeros de devoluciones');
+                    $responseResource->title('Listado por rol - Cajeros de devoluciones');
                    
                     
                     break;
                 case 6:
                     $usuarios = $this->usuarioRepository->listarAlmaceneros();
-                    $responseResource->title('Lista de cajeros de almaceneros');
+                    $responseResource->title('Listado por rol - Almaceneros');
                     
                     break;
 
@@ -437,7 +437,7 @@ class UsuarioController extends Controller
                 
             }
             $usuariosResource =  new UsuariosResource($usuarios);
-            $responseResource->title('Lista de usuarios por rol');       
+                
             $responseResource->body($usuariosResource);
             
             return $responseResource; 
