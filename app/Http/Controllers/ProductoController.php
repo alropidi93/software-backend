@@ -113,6 +113,7 @@ class ProductoController extends Controller
                 return $notFoundResource->response()->setStatusCode(404);;
             }
             $this->productoRepository->loadTipoProductoRelationship($producto);
+            $this->productoRepository->loadUnidadMedidaRelationship($producto);
             $this->productoRepository->loadProveedoresRelationship($producto);
             $productoResource =  new ProductoResource($producto);  
             $responseResource = new ResponseResource(null);
