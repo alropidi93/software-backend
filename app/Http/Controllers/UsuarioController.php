@@ -590,7 +590,220 @@ class UsuarioController extends Controller
             
             $tiposUsuarioResource =  new UsuariosResource($usuarios); 
             $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Lista de cajeros (de ventas y de devoluciones');  
+            $responseResourse->title('Lista de cajeros (de ventas y de devoluciones)');  
+            $responseResourse->body($tiposUsuarioResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+
+    }
+
+    public function obtenerPorRolPorTienda($idTienda)
+    {
+        try{
+            $tienda = $this->usuarioRepository->obtenerTiendaPorId($idTienda);
+         
+            
+            if (!$tienda){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Tienda no encontrada');
+                $notFoundResource->notFound(['id' => $idTienda]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            $rol = Input::get('rol');
+           
+            $responseResource = new ResponseResource(null);
+            
+            
+            switch ($rol) {
+                case 0:
+                    $usuarios = $this->usuarioRepository->listarAdminsPorTienda($idTienda);
+                    if (!$usuarios || count($usuarios)==0){
+                        $notFoundResource = new NotFoundResource(null);
+                        $notFoundResource->title('Admins de la tienda no encontrados');
+                        $notFoundResource->notFound(['idTienda' => $idTienda]);
+                        return $notFoundResource->response()->setStatusCode(404);
+                    }
+                    $responseResource->title('Listado de admins por tienda');
+                    foreach ($usuarios as $key => $usuario) {
+                        $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                                 
+                    }
+                    $usuariosResource =  new UsuariosResource($usuarios);
+                
+                    $responseResource->body($usuariosResource);
+                  
+                    break;
+                case 1:
+                    
+                    $usuario = $this->usuarioRepository->obtenerJefeTiendaPorTienda($idTienda);
+                    if (!$usuario){
+                        $notFoundResource = new NotFoundResource(null);
+                        $notFoundResource->title('Jefe de tienda de la tienda no encontrado');
+                        $notFoundResource->notFound(['idTienda' => $idTienda]);
+                        return $notFoundResource->response()->setStatusCode(404);
+                    }
+                    
+                    $responseResource->title('Jefe de tienda de determinada tienda');
+                    
+                    $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                    $usuarioResource =  new UsuarioResource($usuario);
+                
+                    $responseResource->body($usuarioResource);
+                                 
+                    
+                
+                
+                break;
+
+                case 2:
+                    $usuarios = $this->usuarioRepository->listarCompradoresPorTienda($idTienda);
+                    if (!$usuarios || count($usuarios)==0){
+                        $notFoundResource = new NotFoundResource(null);
+                        $notFoundResource->title('Compradores de la tienda no encontrados');
+                        $notFoundResource->notFound(['idTienda' => $idTienda]);
+                        return $notFoundResource->response()->setStatusCode(404);
+                    }
+                    $responseResource->title('Listado de compradores por tienda');
+                    foreach ($usuarios as $key => $usuario) {
+                        $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                                 
+                    }
+                    $usuariosResource =  new UsuariosResource($usuarios);
+                
+                    $responseResource->body($usuariosResource);
+                
+                
+                    break;
+
+                case 3:
+                    $usuario = $this->usuarioRepository->obtenerJefeAlmacenPorTienda($idTienda);
+                    if (!$usuario ){
+                        $notFoundResource = new NotFoundResource(null);
+                        $notFoundResource->title('Jefe de almacen de la tienda no encontrado');
+                        $notFoundResource->notFound(['idTienda' => $idTienda]);
+                        return $notFoundResource->response()->setStatusCode(404);
+                    }
+                    $responseResource->title('Jefes de almacén de determinada tienda');
+                    $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                    $usuarioResource =  new UsuarioResource($usuario);
+                
+                    $responseResource->body($usuarioResource);
+                
+                
+                    break;
+
+                case 4:
+                    $usuarios = $this->usuarioRepository->listarCajerosVentasPorTienda($idTienda);
+                    if (!$usuarios || count($usuarios)==0){
+                        $notFoundResource = new NotFoundResource(null);
+                        $notFoundResource->title('Cajeros de ventas de la tienda no encontrados');
+                        $notFoundResource->notFound(['idTienda' => $idTienda]);
+                        return $notFoundResource->response()->setStatusCode(404);
+                    }
+                    $responseResource->title('Listado cajeros de ventas por tienda');
+                    foreach ($usuarios as $key => $usuario) {
+                        $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                                 
+                    }
+                    $usuariosResource =  new UsuariosResource($usuarios);
+                
+                    $responseResource->body($usuariosResource);
+                  
+                    break;
+                case 5:
+                    $usuarios = $this->usuarioRepository->listarCajerosDevolucionesPorTienda($idTienda);
+                    if (!$usuarios || count($usuarios)==0){
+                        $notFoundResource = new NotFoundResource(null);
+                        $notFoundResource->title('Cajeros de devoluciones de la tienda no encontrados');
+                        $notFoundResource->notFound(['idTienda' => $idTienda]);
+                        return $notFoundResource->response()->setStatusCode(404);
+                    }
+                    $responseResource->title('Listado cajeros de devoluciones por tienda');
+                    foreach ($usuarios as $key => $usuario) {
+                        $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                                 
+                    }
+                    $usuariosResource =  new UsuariosResource($usuarios);
+                
+                    $responseResource->body($usuariosResource);
+                   
+                    
+                    break;
+                case 6:
+                    $usuarios = $this->usuarioRepository->listarAlmacenerosPorTienda($idTienda);
+                    if (!$usuarios || count($usuarios)==0){
+                        $notFoundResource = new NotFoundResource(null);
+                        $notFoundResource->title('Almaceneros de la tienda no encontrados');
+                        $notFoundResource->notFound(['idTienda' => $idTienda]);
+                        return $notFoundResource->response()->setStatusCode(404);
+                    }
+                    $responseResource->title('Listado de almaceneros por tienda');
+                    foreach ($usuarios as $key => $usuario) {
+                        $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                                 
+                    }
+                    $usuariosResource =  new UsuariosResource($usuarios);
+                
+                    $responseResource->body($usuariosResource);
+                    
+                    break;
+
+                default:
+                    $errorResource = new ErrorResource(null);
+                    $errorResource->title('Error de búsqueda');
+                    $errorResource->message('Valor de rol inválido');
+                    return $errorResource->response()->setStatusCode(400);
+                    
+            }
+            
+            
+            
+            return $responseResource; 
+        }
+        catch(\Exception $e){
+                
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+    
+    }
+
+
+    public function obtenerCajerosPorTienda($idTienda){
+        try{
+            $tienda = $this->usuarioRepository->obtenerTiendaPorId($idTienda);
+         
+            
+            if (!$tienda){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Tienda no encontrada');
+                $notFoundResource->notFound(['id' => $idTienda]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+
+            $usuarios = $this->usuarioRepository->listarCajerosPorTienda($idTienda);
+            if (!$usuarios){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Cajeros de la tienda no encontrados');
+                $notFoundResource->notFound(['idTienda' => $idTienda]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            foreach ($usuarios as $key => $usuario) {
+                $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                //$this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship($usuario);
+                
+                
+            }
+            
+            $tiposUsuarioResource =  new UsuariosResource($usuarios); 
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Listado de cajeros (de ventas y de devoluciones) de determinada tienda');  
             $responseResourse->body($tiposUsuarioResource);
             return $responseResourse;
         }

@@ -50,3 +50,8 @@ Route::get('usuario/cajeros', 'UsuarioController@listarCajeros');
 Route::get('usuario/listarPorRol', 'UsuarioController@listarPorRol');
 Route::get('usuario/listarPorRolSinTienda', 'UsuarioController@listarPorRolSinTiendaAsignada');
 
+
+Route::get('usuario/obtenerPorRolPorTienda/{idTienda}','UsuarioController@obtenerPorRolPorTienda');
+Route::get('usuario/cajerosPorTienda/{idTienda}','UsuarioController@obtenerCajerosPorTienda');
+
+
