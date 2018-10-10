@@ -250,7 +250,7 @@ class TiendaController extends Controller {
 
     }
 
-    public function desasignarJefeDeTienda($idTienda, Request $data){
+    public function desasignarJefeDeTienda($idTienda){
         try{
            
             DB::beginTransaction();
@@ -263,15 +263,7 @@ class TiendaController extends Controller {
                 $notFoundResource->notFound(['id' => $idTienda]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
-            $usuarioRepository =  new UsuarioRepository(new Usuario);
-            $usuario =  $usuarioRepository->obtenerUsuarioPorId($idUsuario);
-            
-            if (!$usuario){
-                $notFoundResource = new NotFoundResource(null);
-                $notFoundResource->title('Usuario no encontrado');
-                $notFoundResource->notFound(['idUsuario' => $idUsuario]);
-                return $notFoundResource->response()->setStatusCode(404);
-            }
+          
             
             $usuarioEsJefeDeTienda = $usuario->esJefeDeTienda();
             if (!$usuarioEsJefeDeTienda){

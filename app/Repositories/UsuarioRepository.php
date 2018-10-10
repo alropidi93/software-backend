@@ -213,6 +213,19 @@ class UsuarioRepository extends BaseRepository {
         
     }
 
+    public function obtenerUsuarioPorDni($dni)
+    {
+        $personaNatural = $this->personaNatural->where('dni',$dni)->where('deleted',false)->first();
+        if($personaNatural){
+            $this->setPersonaNaturalModel($personaNatural);
+            $usuario = $personaNatural->usuario;
+            $usuario->personaNatural;
+            return $usuario;
+        }
+        return null;
+        
+    }
+
     protected function setPersonaNaturalModel($personaNatural){
         $this->personaNatural = $personaNatural;
     }

@@ -163,15 +163,15 @@ class UsuarioController extends Controller
     {
         try{
             $usuarioDataArray= Algorithm::quitNullValuesFromArray($usuarioData->all());
-            $validator = \Validator::make($usuarioDataArray, 
-                            [
-                            'dni' => 'min:8|max:12|unique:personaNatural,dni',
-                            ]);
-
-            if ($validator->fails()) {
-                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            if (array_key_exists('dni',$usuarioData)){
+                $usuarioAux= $this->usuarioRepository->obtenerUsuarioPorDni($usuarioData['dni']);
+                if ($id != $usuarioDataAux->id){
+                    $validator = ['dni'=>'El dni ya está siendo usado por otro usuario'];
+                    return (new ValidationResource($validator))->response()->setStatusCode(422);
+                }
             }
-            
+    
+         
             DB::beginTransaction();
             $usuario= $this->usuarioRepository->obtenerUsuarioPorId($id);
             if (!$usuario){
@@ -360,7 +360,6 @@ class UsuarioController extends Controller
           
             Log::info("No paso el login");
             $errorResource =  new ErrorResource(null);
-            
             $errorResource->title('Error de logueo');       
             $errorResource->message('Credenciales no válidas');       
             return $errorResource->response()->setStatusCode(400);
