@@ -284,6 +284,25 @@ class UsuarioRepository extends BaseRepository {
         
     }
 
+    public function listarCajerosSinTienda(){
+        
+        $cajeros = $this->model->whereHas('tipoUsuario', function ($query) {
+            $query->where(function($q2){
+                return $q2->where('key',4)->orWhere('key',5);
+            })->where('deleted',false);
+        })->whereDoesntHave('tienda', function ($query2) {
+            $query2->where('deleted', false);
+        })->where('deleted',false)->get();
+        
+        foreach ($cajeros as $key => $usuario) {
+            $usuario->personaNatural;
+            
+        } 
+        return $cajeros;
+
+        
+    }
+
     public function listarCajerosPorTienda($idTienda){
         
         $cajeros = $this->model->whereHas('tipoUsuario', function ($query) {

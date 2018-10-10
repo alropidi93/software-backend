@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Services\UsuarioService; 
 use App\Http\Resources\UsuarioResource;
 use App\Http\Resources\UsuariosResource;
 use App\Http\Resources\TipoUsuarioResource;
@@ -43,10 +44,10 @@ class UsuarioController extends Controller
                 $this->usuarioRepository->loadTipoUsuarioRelationShip($usuario);
             }
            
-            $tiposUsuarioResource =  new UsuariosResource($usuarios); 
+            $usuariosResource =  new UsuariosResource($usuarios); 
             $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Lista de usuarios');  
-            $responseResourse->body($tiposUsuarioResource);
+            $responseResourse->title('Listado de usuarios');  
+            $responseResourse->body($usuariosResource);
             return $responseResourse;
         }
         catch(\Exception $e){
@@ -241,10 +242,10 @@ class UsuarioController extends Controller
         try{
             //return $this->usuarioRepository->listarUsuariosSinTipo();
             
-            $tiposUsuarioResource =  new UsuariosResource($this->usuarioRepository->listarUsuariosSinTipo()); 
+            $usuariosResource =  new UsuariosResource($this->usuarioRepository->listarUsuariosSinTipo()); 
             $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Lista de usuarios sin rol asignado');  
-            $responseResourse->body($tiposUsuarioResource);
+            $responseResourse->title('Listado de usuarios sin rol asignado');  
+            $responseResourse->body($usuariosResource);
             return $responseResourse;
         }
         catch(\Exception $e){
@@ -302,10 +303,10 @@ class UsuarioController extends Controller
             $this->usuarioRepository->loadTipoUsuarioRelationship();
             
           
-            $tiposUsuarioResource =  new UsuarioResource($usuario);  
+            $usuarioResource =  new UsuarioResource($usuario);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Rol asignado satisfactoriamente');  
-            $responseResourse->body($tiposUsuarioResource);
+            $responseResourse->body($usuarioResource);
             return $responseResourse;
         }
         catch(\Exception $e){
@@ -447,53 +448,169 @@ class UsuarioController extends Controller
     public function listarPorRolSinTiendaAsignada()
     {
         try{
-           
+            
             $rol = Input::get('rol');
+            
+            if (!$rol ){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de búsqueda');
+                $errorResource->message('Parámetros inválidos para la búsqueda');
+                return $errorResource->response()->setStatusCode(400);
+
+            }
+            $filter = Input::get('filterBy');
+            $value = strtolower(Input::get('value'));
+            
            
             $responseResource = new ResponseResource(null);
-            
+            $usuarioService = new UsuarioService;
         
             switch ($rol) {
                 case 0:
+                    $title = 'Listado por rol sin tienda asignada - Admins';
                     $usuarios = $this->usuarioRepository->listarAdminSinTienda();
-                    $responseResource->title('Listado por rol sin tienda asignada - Admins');
+                    if ($filter && $value){
+                        
+                        switch ($filter) {
+                            case 'nombre':
+                                $title .= ' (filtrada por nombre)';
+                                $usuarios = $usuarioService->filterUsuarioCollectionByName($usuarios, $value);
+                                
+                                break;
+                            case 'apellidos':
+                                $title .= ' (filtrada por apellido)';
+                                $usuarios = $usuarioService->filterUsuarioCollectionByApellido($usuarios, $value);
+                                break;
+                        }
+                    }
+                    $responseResource->title($title);
                   
                     break;
                 case 1:
+                    $title = 'Listado por rol sin tienda asignada - Jefes de tienda';
                     $usuarios = $this->usuarioRepository->listarJefesTiendaSinTienda();
-                    $responseResource->title('Listado por rol sin tienda asignada - Jefes de tienda');
+                    if ($filter && $value){
+                        
+                        switch ($filter) {
+                            case 'nombre':
+                                $title .= ' (filtrada por nombre)';
+                                $usuarios = $usuarioService->filterUsuarioCollectionByName($usuarios, $value);
+                                
+                                break;
+                            case 'apellidos':
+                                $title .= ' (filtrada por apellido)';
+                                $usuarios = $usuarioService->filterUsuarioCollectionByApellido($usuarios, $value);
+                                break;
+                        }
+                    }
+                    $responseResource->title($title);
                 
                 
-                break;
+                    break;
 
                 case 2:
+                    $title = 'Listado por rol sin tienda asignada - Compradores';
                     $usuarios = $this->usuarioRepository->listarCompradoresSinTienda();
-                    $responseResource->title('Listado por rol sin tienda asignada - Compradores');
+                    if ($filter && $value){
+                        
+                        switch ($filter) {
+                            case 'nombre':
+                                $title .= ' (filtrada por nombre)';
+                                $usuarios = $usuarioService->filterUsuarioCollectionByName($usuarios, $value);
+                                
+                                break;
+                            case 'apellidos':
+                                $title .= ' (filtrada por apellido)';
+                                $usuarios = $usuarioService->filterUsuarioCollectionByApellido($usuarios, $value);
+                                break;
+                        }
+                    }
+                    $responseResource->title($title);
                 
                 
                     break;
 
                 case 3:
+                $title = 'Listado por rol sin tienda asignada - Jefes de almacén';
                     $usuarios = $this->usuarioRepository->listarJefesAlmacenSinTienda();
-                    $responseResource->title('Listado por rol sin tienda asignada - Jefes de almacén');
+                    if ($filter && $value){
+                        
+                        switch ($filter) {
+                            case 'nombre':
+                                $title .= ' (filtrada por nombre)';
+                                $usuarios = $usuarioService->filterUsuarioCollectionByName($usuarios, $value);
+                                
+                                break;
+                            case 'apellidos':
+                                $title .= ' (filtrada por apellido)';
+                                $usuarios = $usuarioService->filterUsuarioCollectionByApellido($usuarios, $value);
+                                break;
+                        }
+                    }
+                    $responseResource->title($title);
                 
                 
                     break;
 
                 case 4:
+                    $title = 'Listado por rol sin tienda asignada - Cajeros de ventas';
                     $usuarios = $this->usuarioRepository->listarCajerosVentasSinTienda();
-                    $responseResource->title('Listado por rol sin tienda asignada - Cajeros de ventas');
+                    if ($filter && $value){
+                        
+                        switch ($filter) {
+                            case 'nombre':
+                                $title .= ' (filtrada por nombre)';
+                                $usuarios = $usuarioService->filterUsuarioCollectionByName($usuarios, $value);
+                                
+                                break;
+                            case 'apellidos':
+                                $title .= ' (filtrada por apellido)';
+                                $usuarios = $usuarioService->filterUsuarioCollectionByApellido($usuarios, $value);
+                                break;
+                        }
+                    }
+                    $responseResource->title($title);
                   
                     break;
                 case 5:
+                    $title = 'Listado por rol sin tienda asignada - Cajeros de devoluciones';
                     $usuarios = $this->usuarioRepository->listarCajerosDevolucionesSinTienda();
-                    $responseResource->title('Listado por rol sin tienda asignada - Cajeros de devoluciones');
+                    if ($filter && $value){
+                        
+                        switch ($filter) {
+                            case 'nombre':
+                                $title .= ' (filtrada por nombre)';
+                                $usuarios = $usuarioService->filterUsuarioCollectionByName($usuarios, $value);
+                                
+                                break;
+                            case 'apellidos':
+                                $title .= ' (filtrada por apellido)';
+                                $usuarios = $usuarioService->filterUsuarioCollectionByApellido($usuarios, $value);
+                                break;
+                        }
+                    }
+                    $responseResource->title($title);
                    
                     
                     break;
                 case 6:
+                    $title = 'Listado por rol sin tienda asignada - Almaceneros';
                     $usuarios = $this->usuarioRepository->listarAlmacenerosSinTienda();
-                    $responseResource->title('Listado por rol sin tienda asignada - Almaceneros');
+                    if ($filter && $value){
+                        
+                        switch ($filter) {
+                            case 'nombre':
+                                $title .= ' (filtrada por nombre)';
+                                $usuarios = $usuarioService->filterUsuarioCollectionByName($usuarios, $value);
+                                
+                                break;
+                            case 'apellidos':
+                                $title .= ' (filtrada por apellido)';
+                                $usuarios = $usuarioService->filterUsuarioCollectionByApellido($usuarios, $value);
+                                break;
+                        }
+                    }
+                    $responseResource->title($title);
                     
                     break;
 
@@ -535,10 +652,10 @@ class UsuarioController extends Controller
                 
             }
             
-            $tiposUsuarioResource =  new UsuariosResource($usuarios); 
+            $usuariosResource =  new UsuariosResource($usuarios); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de jefes de tienda no asignados a tiendas');  
-            $responseResourse->body($tiposUsuarioResource);
+            $responseResourse->body($usuariosResource);
             return $responseResourse;
         }
         catch(\Exception $e){
@@ -562,10 +679,10 @@ class UsuarioController extends Controller
                 
             }
             
-            $tiposUsuarioResource =  new UsuariosResource($usuarios); 
+            $usuariosResource =  new UsuariosResource($usuarios); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de jefes de almacenes no asignados a tiendas');  
-            $responseResourse->body($tiposUsuarioResource);
+            $responseResourse->body($usuariosResource);
             return $responseResourse;
         }
         catch(\Exception $e){
@@ -588,10 +705,60 @@ class UsuarioController extends Controller
                 
             }
             
-            $tiposUsuarioResource =  new UsuariosResource($usuarios); 
+            $usuariosResource =  new UsuariosResource($usuarios); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de cajeros (de ventas y de devoluciones)');  
-            $responseResourse->body($tiposUsuarioResource);
+            $responseResourse->body($usuariosResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+
+    }
+
+    public function listarCajerosSinTiendaAsignada(){
+        try{
+            $filter = Input::get('filterBy');
+            $value = strtolower(Input::get('value'));
+            
+           
+            
+            $usuarioService = new UsuarioService;
+            $title = 'Listado de cajeros sin tienda asignada (de ventas y de devoluciones)';         
+            $usuarios = $this->usuarioRepository->listarCajerosSinTienda();
+            if ($filter && $value){
+                        
+                switch ($filter) {
+                    case 'nombre':
+                        $title .= ' (filtrada por nombre)';
+                        //$usuario = $usuarios[0];
+                        //return $usuario->personaNatural;
+                        //$name = $usuario->personaNatual->name;
+
+                        $usuarios = $usuarioService->filterUsuarioCollectionByName($usuarios, $value);
+                        
+                        break;
+                    case 'apellidos':
+                        $title .= ' (filtrada por apellido)';
+                        $usuarios = $usuarioService->filterUsuarioCollectionByApellido($usuarios, $value);
+                        break;
+                }
+            }
+            foreach ($usuarios as $key => $usuario) {
+                $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                //$this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship($usuario);
+                
+                
+            }
+            
+            $usuariosResource =  new UsuariosResource($usuarios); 
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title($title);  
+            $responseResourse->body($usuariosResource);
             return $responseResourse;
         }
         catch(\Exception $e){
@@ -775,7 +942,8 @@ class UsuarioController extends Controller
     }
 
 
-    public function obtenerCajerosPorTienda($idTienda){
+    public function obtenerCajerosPorTienda($idTienda)
+    {
         try{
             $tienda = $this->usuarioRepository->obtenerTiendaPorId($idTienda);
          
@@ -801,10 +969,10 @@ class UsuarioController extends Controller
                 
             }
             
-            $tiposUsuarioResource =  new UsuariosResource($usuarios); 
+            $usuariosResource =  new UsuariosResource($usuarios); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Listado de cajeros (de ventas y de devoluciones) de determinada tienda');  
-            $responseResourse->body($tiposUsuarioResource);
+            $responseResourse->body($usuariosResource);
             return $responseResourse;
         }
         catch(\Exception $e){

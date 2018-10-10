@@ -47,6 +47,7 @@ Route::resource('tipoProductos', 'TipoProductoController');
 Route::get('usuario/jefesTiendaNoAsignados', 'UsuarioController@listarJefesDeTiendaSinTienda');
 Route::get('usuario/jefesAlmacenNoAsignados', 'UsuarioController@listarJefesDeAlmacenSinTienda');
 Route::get('usuario/cajeros', 'UsuarioController@listarCajeros');
+Route::get('usuario/cajerosSinTiendaAsignada', 'UsuarioController@listarCajerosSinTiendaAsignada');
 Route::get('usuario/listarPorRol', 'UsuarioController@listarPorRol');
 Route::get('usuario/listarPorRolSinTienda', 'UsuarioController@listarPorRolSinTiendaAsignada');
 

@@ -65,6 +65,7 @@ class TiendaController extends Controller {
             }
             $this->tiendaRepository->setModel($tienda);
             $this->tiendaRepository->loadJefeDeTiendaRelationship();
+            $this->tiendaRepository->loadJefeDeAlmacenRelationship();
             $tiendaResource =  new TiendaResource($tienda);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Mostrar tienda');  
