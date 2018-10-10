@@ -31,7 +31,7 @@ class UsuarioRepository extends BaseRepository {
      * @param  App\Models\Tienda $tienda
      * @return void
      */
-    public function __construct(Usuario $usuario=null, PersonaNatural $personaNatural=null, TipoUsuario $tipoUsuario=null,Tienda $tienda) 
+    public function __construct(Usuario $usuario=null, PersonaNatural $personaNatural=null, TipoUsuario $tipoUsuario=null,Tienda $tienda=null) 
     {
         $this->model = $usuario;
         $this->personaNatural = $personaNatural;
