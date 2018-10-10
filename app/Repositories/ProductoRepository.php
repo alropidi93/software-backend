@@ -141,5 +141,10 @@ class ProductoRepository extends BaseRepository {
         $this->model->proveedores()->save($proveedor , ['deleted'=>false] );
         $this->model->save();
     }
+
+    public function checkProductoProveedorOwnModelsRelationship(){
+        return $this->model->proveedores()->where('id',$this->proveedor->id)->where('proveedor.deleted' , false)->exists();
+
+    }
     
 }

@@ -327,11 +327,19 @@ class ProductoController extends Controller
                 $notFoundResource->notFound(['idProveedor' => $idProveedor]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
+
+            
             
            
             $this->productoRepository->setModel($producto);
              
             $this->productoRepository->setProveedorModel($proveedor);
+            if ($this->productoRepository->checkProductoProveedorOwnModelsRelationship()){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de integridad');
+                $errorResource->message('Proveedor ya fue asignado a producto');
+                return $errorResource->response()->setStatusCode(400);
+            }
             
             $this->productoRepository->attachProveedor($proveedor);
                   
