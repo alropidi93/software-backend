@@ -250,6 +250,64 @@ class TiendaController extends Controller {
 
     }
 
+    public function desasignarJefeDeTienda($idTienda, Request $data){
+        try{
+           
+            DB::beginTransaction();
+            $tienda = $this->tiendaRepository->obtenerPorId($idTienda);
+         
+            $idUsuario = $data['idUsuario'];
+            if (!$tienda){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Tienda no encontrada');
+                $notFoundResource->notFound(['id' => $idTienda]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            $usuarioRepository =  new UsuarioRepository(new Usuario);
+            $usuario =  $usuarioRepository->obtenerUsuarioPorId($idUsuario);
+            
+            if (!$usuario){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Usuario no encontrado');
+                $notFoundResource->notFound(['idUsuario' => $idUsuario]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            
+            $usuarioEsJefeDeTienda = $usuario->esJefeDeTienda();
+            if (!$usuarioEsJefeDeTienda){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Jefe de tienda no encontrado');
+                $notFoundResource->notFound(['idJefeTienda'=>$idUsuario]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            
+            $this->tiendaRepository->setModel($tienda);
+            $this->tiendaRepository->setJefeDeTiendaModel($usuario);
+            $this->tiendaRepository->loadJefeDeAlmacenRelationship();
+            
+            
+
+            $this->tiendaRepository->attachJefeTienda();
+           
+            DB::commit();
+            $this->tiendaRepository->loadJefeDeTiendaRelationship();
+            $tienda =  $this->tiendaRepository->obtenerModelo();
+          
+            $tiendaResource =  new TiendaResource($tienda);  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Jefe de tienda asignado satisfactoriamente');  
+            $responseResourse->body($tiendaResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+
+    }
+
     public function asignarJefeDeAlmacen($idTienda, Request $data){
         try{
            

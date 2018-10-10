@@ -162,7 +162,15 @@ class UsuarioController extends Controller
     public function update($id,Request $usuarioData)
     {
         try{
-            
+            $usuarioDataArray= Algorithm::quitNullValuesFromArray($usuarioData->all());
+            $validator = \Validator::make($usuarioDataArray, 
+                            [
+                            'dni' => 'min:8|max:12|unique:personaNatural,dni',
+                            ]);
+
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
             
             DB::beginTransaction();
             $usuario= $this->usuarioRepository->obtenerUsuarioPorId($id);
@@ -174,7 +182,7 @@ class UsuarioController extends Controller
             }
             
             $this->usuarioRepository->setModelUsuario($usuario);
-            $usuarioDataArray= Algorithm::quitNullValuesFromArray($usuarioData->all());
+            
             $this->usuarioRepository->actualiza($usuarioDataArray);
             $usuario = $this->usuarioRepository->obtenerModelo();
             DB::commit();
@@ -322,19 +330,19 @@ class UsuarioController extends Controller
     
 
         try {
-          $validator = \Validator::make($request->all(),
-                 ['email' => 'required|email',
-                  'password' =>'required|min:6|max:60']);
+            $validator = \Validator::make($request->all(),
+                    ['email' => 'required|email',
+                    'password' =>'required|min:6|max:60']);
     
-          if ($validator->fails()) {
-            return (new ValidationResource($validator))->response()->setStatusCode(422);
-            
-          }
-          $usuario= $this->usuarioRepository->obtenerUsuarioPorEmail($request['email']);
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+                
+            }
+            $usuario= $this->usuarioRepository->obtenerUsuarioPorEmail($request['email']);
           
           
        
-          if ($usuario != null ) {
+            if ($usuario != null ) {
                 $this->usuarioRepository->setModel($usuario);
                 $password = $this->usuarioRepository->getPassword();
                 if (Hash::check($request['password'], $password)){
@@ -346,18 +354,18 @@ class UsuarioController extends Controller
                     $responseResourse->body($usuarioResource);       
                     return $responseResourse;
                 } 
-            
-            
-          }
-          else {
-            Log::info("no paso el login");
+                
+                
+            }
+          
+            Log::info("No paso el login");
             $errorResource =  new ErrorResource(null);
             
             $errorResource->title('Error de logueo');       
             $errorResource->message('Credenciales no válidas');       
             return $errorResource->response()->setStatusCode(400);
-            
-          }
+                
+          
     
           
        
