@@ -95,6 +95,7 @@ class UsuarioRepository extends BaseRepository {
 
     public function actualiza($dataArray)
     {
+        return $this->model;
         //persona natural no tiene atributos con el mismo nombre de atributos del usuario que se vayan a actualizar
         //deleted, created_at y updated_at son comunes, pero estos jamas se actualizaran por acá
         if (array_key_exists('fechaNac',$dataArray))
@@ -102,6 +103,22 @@ class UsuarioRepository extends BaseRepository {
         if (array_key_exists('password',$dataArray))
             $dataArray['password'] = bcrypt($dataArray['password']);
         $this->personaNatural->update($dataArray);
+        $this->model->update($dataArray); //set data only in its PersonaNatural model
+       
+        
+       
+        
+    }
+
+    public function actualizaSoloUsuario($dataArray)
+    {
+        
+        //persona natural no tiene atributos con el mismo nombre de atributos del usuario que se vayan a actualizar
+        //deleted, created_at y updated_at son comunes, pero estos jamas se actualizaran por acá
+        
+        if (array_key_exists('password',$dataArray))
+            $dataArray['password'] = bcrypt($dataArray['password']);
+        
         $this->model->update($dataArray); //set data only in its PersonaNatural model
        
         

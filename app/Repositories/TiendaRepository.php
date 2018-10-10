@@ -122,6 +122,32 @@ class TiendaRepository extends BaseRepository {
         }
     }
 
+    public function checkIfOwnModelTiendaHasJefeTienda(){
+        return strval($this->model->jefeDeTienda()->where('usuario.deleted',false)
+                ->whereHas('personaNatural', function ($query){
+                    $query->where('personaNatural.deleted',false);
+                })->exists());
+    
+    }
+
+    public function checkIfOwnModelTiendaHasJefeAlmacen(){
+        return strval($this->model->jefeDeAlmacen()->where('usuario.deleted',false)
+                ->whereHas('personaNatural', function ($query){
+                    $query->where('personaNatural.deleted',false);
+                })->exists());
+    
+    }
+
+    public function checkIfOwnModelTiendaHasTrabajadoPorId($id){
+        return strval($this->model->trabajadores()->where('usuario.idPersonaNatural',$id)->where('usuario.deleted',false)
+                ->whereHas('personaNatural', function ($query){
+                    $query->where('personaNatural.deleted',false);
+                })->exists());
+    
+    }
+
+    
+
 
 
 }
