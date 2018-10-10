@@ -124,6 +124,22 @@ class ProductoRepository extends BaseRepository {
                
         return $this->model->join('tipoProducto', 'tipoProducto.id', '=', 'producto.idTipoProducto')
             ->whereRaw("lower(tipo) like ? ",'%'.$value.'%')->where('tipoProducto.deleted','=',false)->get();
-        }
+    }
+
+
+    public function obtenerProveedorPorId($idProveedor){
+        return $this->proveedor->where('id',$idProveedor)->where('deleted',false)->first();
+
+    }
+
+    public function setProveedorModel($proveedor){
+        $this->proveedor = $proveedor;
+    }
+
+    public function attachProveedor($proveedor){
+           
+        $this->model->proveedores()->save($proveedor , ['deleted'=>false] );
+        $this->model->save();
+    }
     
 }

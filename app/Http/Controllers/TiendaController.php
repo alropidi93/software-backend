@@ -340,12 +340,7 @@ class TiendaController extends Controller {
             
             $this->tiendaRepository->setModel($tienda);
             $this->tiendaRepository->attachTrabajador($usuario);
-         
-            
-            
-
-           
-           
+                    
             DB::commit();
             $this->tiendaRepository->loadTrabajadoresRelationship();
             $tienda =  $this->tiendaRepository->obtenerModelo();

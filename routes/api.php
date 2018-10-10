@@ -35,6 +35,8 @@ Route::post('tienda/asignarJefeAlmacen/{idTienda}', 'TiendaController@asignarJef
 Route::post('tienda/asignarJefeTienda/{idTienda}' , 'TiendaController@asignarJefeDeTienda');
 Route::post('tienda/asignarTrabajador/{idTienda}' , 'TiendaController@asignarTrabajador');
 
+Route::post('producto/asignarProveedor/{idProducto}' , 'ProductoController@asignarProveedor');
+
 Route::post('login', 'UsuarioController@login');
 
 Route::resource('tipoUsuarios', 'TipoUsuarioController');

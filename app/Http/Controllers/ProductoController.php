@@ -303,4 +303,54 @@ class ProductoController extends Controller
         }
     
     }
+
+
+    public function asignarProveedor($idProducto, Request $data){
+        try{
+           
+            DB::beginTransaction();
+            $producto = $this->productoRepository->obtenerPorId($idProducto);
+         
+            $idProveedor = $data['idProveedor'];
+            if (!$producto){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Producto no encontrado');
+                $notFoundResource->notFound(['id' => $idProducto]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            
+            $proveedor =  $this->productoRepository->obtenerProveedorPorId($idProveedor);
+            
+            if (!$proveedor){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Proveedor no encontrado');
+                $notFoundResource->notFound(['idProveedor' => $idProveedor]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            
+           
+            $this->productoRepository->setModel($producto);
+             
+            $this->productoRepository->setProveedorModel($proveedor);
+            
+            $this->productoRepository->attachProveedor($proveedor);
+                  
+            DB::commit();
+            $this->productoRepository->loadProveedoresRelationship();
+            $producto =  $this->productoRepository->obtenerModelo();
+          
+            $productoResource =  new ProductoResource($producto);  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Proveedor agregado a producto como uno de sus proveedores');  
+            $responseResourse->body($productoResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+
+    }
 }
