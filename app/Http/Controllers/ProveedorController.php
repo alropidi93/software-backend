@@ -143,7 +143,7 @@ class ProveedorController extends Controller
                     $responseResource->body($proveedoresResource);
                     break;
                 case 'razonSocial':
-                    $proveedores = $this->proveedorRepository->buscarPorFiltro2($filter, $value);
+                    $proveedores = $this->proveedorRepository->buscarPorFiltroRs($filter, $value);
                     $proveedoresResource =  new ProveedoresResource($proveedores);
                     $responseResource->title('Lista de proveedores filtrados por razón social');       
                     $responseResource->body($proveedoresResource);

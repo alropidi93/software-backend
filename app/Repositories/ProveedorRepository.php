@@ -13,4 +13,8 @@ class ProveedorRepository extends BaseRepository{
         $dataArray['deleted'] =false;
         return $this->model = $this->model->create($dataArray);
     }
+
+    public function buscarPorFiltroRs($key, $value){
+        return $this->model->whereRaw("\"{$key}\" like ? ",'%'.$value.'%')->where('deleted',false)->get();
+    }
 }
