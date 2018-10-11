@@ -184,6 +184,7 @@ class UsuarioController extends Controller
             $this->usuarioRepository->setModelUsuario($usuario);
             
             $this->usuarioRepository->actualiza($usuarioDataArray);
+            
             $usuario = $this->usuarioRepository->obtenerModelo();
             DB::commit();
             $this->usuarioRepository->loadTipoUsuarioRelationship();
