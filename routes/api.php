@@ -32,8 +32,11 @@ Route::get('busqueda/tiendas', 'TiendaController@busquedaPorFiltro');
 Route::post('asignarTipoUsuario/{idUsuario}', 'UsuarioController@asignarRol');
 
 Route::post('tienda/asignarJefeAlmacen/{idTienda}', 'TiendaController@asignarJefeDeAlmacen');
+Route::post('tienda/desasignarJefeAlmacen/{idTienda}' , 'TiendaController@desasignarJefeDeAlmacen');
 Route::post('tienda/asignarJefeTienda/{idTienda}' , 'TiendaController@asignarJefeDeTienda');
+Route::post('tienda/desasignarJefeTienda/{idTienda}' , 'TiendaController@desasignarJefeDeTienda');
 Route::post('tienda/asignarTrabajador/{idTienda}' , 'TiendaController@asignarTrabajador');
+Route::post('tienda/desasignarTrabajador/{idTienda}' , 'TiendaController@desasignarTrabajador');
 
 Route::post('producto/asignarProveedor/{idProducto}' , 'ProductoController@asignarProveedor');
 
