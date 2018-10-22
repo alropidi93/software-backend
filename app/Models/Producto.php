@@ -18,6 +18,7 @@ class Producto extends Model
       'idTipoProducto',
       'idUnidadMedida',
       'categoria',
+      'idCategoria',
       'precio',
       'deleted'
     ];
@@ -28,6 +29,9 @@ class Producto extends Model
 
     public function unidadMedida() {
         return $this->belongsTo('App\Models\UnidadMedida','idUnidadMedida','id');
+    }
+    public function categoria() {
+        return $this->belongsTo('App\Models\Categoria','idCategoria','id');
     }
 
     public function proveedores(){

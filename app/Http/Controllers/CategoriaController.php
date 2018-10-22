@@ -69,18 +69,18 @@ class CategoriaController extends Controller
     public function show($id)
     {
         try{
-            $proveedor = $this->categoriaRepository->obtenerPorId($id);
-            if (!$proveedor){
+            $categoria = $this->categoriaRepository->obtenerPorId($id);
+            if (!$categoria){
                 $notFoundResource = new NotFoundResource(null);
-                $notFoundResource->title('Proveedor no encontrado');
+                $notFoundResource->title('Categoria no encontrada');
                 $notFoundResource->notFound(['id'=>$id]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
-            $this->proveedorRepository->setModel($proveedor);
-            $proveedorResource =  new ProveedorResource($proveedor);  
+            $this->categoriaRepository->setModel($categoria);
+            $categoriaResource =  new CategoriaResource($categoria);  
             $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Mostrar proveedor');  
-            $responseResourse->body($usuarioResource);
+            $responseResourse->title('Mostrar categoria');  
+            $responseResourse->body($categoriaResource);
             return $responseResourse;
         }
         catch(\Exception $e){
@@ -99,7 +99,50 @@ class CategoriaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try{
+        
+            $categoriaDataArray= Algorithm::quitNullValuesFromArray($categoriaData->all());
+            $validator = \Validator::make($categoriaDataArray, 
+                            ['id' => 'exists:categoria,id']
+                        );
+            
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
+            DB::beginTransaction();
+            $categoria = $this->categoriaRepository->obtenerPorId($id);
+            
+            if (!$categoria){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Categoria no encontrada');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            
+
+            
+            
+            $this->categoriaRepository->setModel($categoria);
+            
+            $this->categoriaRepository->actualiza($categoriaDataArray);
+            $categoria = $this->categoriaRepository->obtenerModelo();
+            
+            DB::commit();
+            $categoriaResource =  new ProductoResource($categoria);
+            $responseResource = new ResponseResource(null);
+            
+            $responseResource->title('Categoria actualizada exitosamente');       
+            $responseResource->body($categoriaResource);     
+            
+            return $responseResource;
+        }
+        catch(\Exception $e){
+            DB::rollback();
+            
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
     }
 
     /**
@@ -110,6 +153,33 @@ class CategoriaController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try{
+            DB::beginTransaction();
+            $categoria = $this->categoriaRepository->obtenerPorId($id);
+            
+            if (!$categoria){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Categoria no encontrada');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            $this->categoriaRepository->setModel($categoria);
+            $this->categoriaRepository->softDelete();
+            
+
+              
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Categoria eliminada');  
+            $responseResource->body(['id' => $id]);
+            DB::commit();
+            return $responseResource;
+        }
+        catch(\Exception $e){
+         
+            
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
     }
 }
