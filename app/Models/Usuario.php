@@ -35,9 +35,14 @@ class Usuario extends Model
         return $this->hasMany('App\Models\Tienda','idJefeAlmacen','idPersonaNatural');
     }
 
-    public function tienda() {
-        return $this->belongsTo('App\Models\Tienda','idTienda','id');
+    // public function tienda() {
+    //     return $this->belongsTo('App\Models\Tienda','idTienda','id');
         
+    // }
+
+    public function tiendas(){
+        return $this->belongsToMany('App\Models\Tienda','usuarioxtienda',
+          'idUsuario','idTienda')->withPivot('deleted','miembroPrincipal','created_at','updated_at');
     }
 
     public function esJefeDeTienda(){
