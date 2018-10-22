@@ -41,7 +41,7 @@ class CategoriaController extends Controller
             $categoriaResource =  new CategoriasResource($categorias);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de categorias');  
-            $responseResourse->body($movimientoResource);
+            $responseResourse->body($categoriaResource);
             return $responseResourse;
         }
         catch(\Exception $e){
@@ -149,7 +149,7 @@ class CategoriaController extends Controller
             $categoria = $this->categoriaRepository->obtenerModelo();
             
             DB::commit();
-            $categoriaResource =  new ProductoResource($categoria);
+            $categoriaResource =  new CategoriaResource($categoria);
             $responseResource = new ResponseResource(null);
             
             $responseResource->title('Categoria actualizada exitosamente');       
