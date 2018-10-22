@@ -178,12 +178,13 @@ class UsuarioController extends Controller
                 $notFoundResource = new NotFoundResource(null);
                 $notFoundResource->title('Usuario no encontrado');
                 $notFoundResource->notFound(['id'=>$id]);
-                return $notFoundResource->response()->setStatusCode(404);;
+                return $notFoundResource->response()->setStatusCode(404);
             }
             
             $this->usuarioRepository->setModelUsuario($usuario);
             
             $this->usuarioRepository->actualiza($usuarioDataArray);
+            
             $usuario = $this->usuarioRepository->obtenerModelo();
             DB::commit();
             $this->usuarioRepository->loadTipoUsuarioRelationship();

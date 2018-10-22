@@ -95,7 +95,7 @@ class UsuarioRepository extends BaseRepository {
 
     public function actualiza($dataArray)
     {
-        return $this->model;
+        
         //persona natural no tiene atributos con el mismo nombre de atributos del usuario que se vayan a actualizar
         //deleted, created_at y updated_at son comunes, pero estos jamas se actualizaran por acá
         if (array_key_exists('fechaNac',$dataArray))
