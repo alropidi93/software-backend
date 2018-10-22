@@ -21,4 +21,5 @@ class CategoriaRepository extends BaseRepository{
         
     }
     
+    
 }

@@ -28,6 +28,11 @@ class CategoriaController extends Controller
      */
 
     protected $categoriaRepository;
+
+    public function __construct(CategoriaRepository $categoriaRepository){
+        CategoriaResource::withoutWrapping();
+        $this->categoriaRepository = $categoriaRepository;
+    }
     public function index()
     {
         try{
