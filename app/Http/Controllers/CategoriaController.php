@@ -3,6 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Categoria;
+use App\Models\Producto;
+use App\Repositories\CategoriaRepository;
+use App\Repositories\ProductoRepository;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\CategoriaResource;
+use App\Http\Resources\CategoriasResource;
+use App\Http\Resources\ExceptionResource;
+use App\Http\Resources\ErrorResource;
+use App\Http\Resources\ValidationResource;
+use App\Http\Resources\ResponseResource;
+use App\Http\Resources\NotFoundResource;
+use Illuminate\Support\Facades\DB;
+use App\Http\Helpers\Algorithm;
+use Illuminate\Support\Facades\Input;
 
 class CategoriaController extends Controller
 {
@@ -11,12 +26,13 @@ class CategoriaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    protected $categoriaRepository;
     public function index()
     {
         try{
             $categorias = $this->categoriaRepository->obtenerTodos();
-            
-            
+                      
             $categoriaResource =  new CategoriasResource($categorias);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de categorias');  
@@ -36,7 +52,7 @@ class CategoriaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $categoriaData)
     {
         try{
             $validator = \Validator::make($categoriaData->all(), 
@@ -97,7 +113,7 @@ class CategoriaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $categoriaData, $id)
     {
         try{
         

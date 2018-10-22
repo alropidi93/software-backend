@@ -13,11 +13,7 @@ class CategoriaRepository extends BaseRepository{
         
     }
 
-    /**
-     * Save data from the array
-     *
-     * @return App\Models\Movimiento
-     */
+   
     public function guarda($dataArray)
     {
         $dataArray['deleted'] =false;
