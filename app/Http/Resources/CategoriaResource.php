@@ -21,7 +21,7 @@ class CategoriaResource extends JsonResource
             'attributes'    => [
                 'nombre' => $this->nombre,
                 'descripcion' => $this->descripcion,
-                'producto' => new ProductoResource($this->whenLoaded('producto')),
+                //'producto' => new ProductoResource($this->whenLoaded('producto')),
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,
