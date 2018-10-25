@@ -616,6 +616,13 @@ class UsuarioRepository extends BaseRepository {
     public function obtenerTiendaPorId($idTienda){
         return $this->tienda->where('id',$idTienda)->where('deleted',false)->first();
     }
+
+    public function checkIfIsPrincipalWorkerInSomeTienda(){
+        if ($this->model){
+            return $this->model->tiendas()->wherePivot('miembroPrincipal',true)->exists();
+        }
+        return false;
+    }
     
 
     

@@ -17,7 +17,7 @@ class CreateUsuarioTable extends Migration
             $table->integer('idPersonaNatural')->primary();
             $table->string('password',60);
             $table->integer('idTipoUsuario');
-            $table->integer('idTienda')->nullable();
+            //$table->integer('idTienda')->nullable();
             $table->boolean('deleted');
             
             

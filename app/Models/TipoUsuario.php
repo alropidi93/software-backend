@@ -20,4 +20,14 @@ class TipoUsuario extends Model
     public function usuarios(){
       return $this->hasMany('App\Models\Usuario','idTipoUsuario','id');
     }
+
+    public function esJefeDeTienda(){
+        
+      return $this->key==1;
+    }
+
+    public function esJefeDeAlmacen(){
+        
+      return $this->key==3;
+    }
 }

@@ -408,6 +408,8 @@ class TiendaController extends Controller {
     }
 
     public function asignarTrabajador($idTienda, Request $data){
+        ini_set('max_execution_time', 180);
+        
         try{
            
             DB::beginTransaction();
@@ -429,28 +431,62 @@ class TiendaController extends Controller {
                 $notFoundResource->notFound(['idUsuario' => $idUsuario]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
-            $tiendasCargoJefeTienda= $tiendasCargoJedeAlmacen=0;
-            if ($usuario->tiendasCargoJefeTienda){
-                $tiendasCargoJefeTienda = count($usuario->tiendasCargoJefeTienda);
-            }
-            if ($usuario->tiendasCargoJefeAlmacen){
-                $tiendasCargoJefeAlmacen = count($usuario->tiendasCargoJefeAlmacen);
-            }
+            // $tiendasCargoJefeTienda = $tiendasCargoJedeAlmacen = 0;
+            // if ($usuario->tiendasCargoJefeTienda){ //check if is in charge in some 'tiendas' as 'jefe de tienda'
+            //     $tiendasCargoJefeTienda = count($usuario->tiendasCargoJefeTienda);
+            // }
+            // if ($usuario->tiendasCargoJefeAlmacen){//check if is in charge in some 'tiendas' as 'jefe de almacen'
+            //     $tiendasCargoJefeAlmacen = count($usuario->tiendasCargoJefeAlmacen);
+            // }
               
-            $usuarioEsAdmin = $usuario->esAdmin();
-            if ($tiendasCargoJedeAlmacen>0 || $tiendasCargoJefeTienda>0 || $usuarioEsAdmin){
-                $notFoundResource = new NotFoundResource(null);
-                $notFoundResource->title('Usuario no autorizado para ser trabajador de una tienda');
-                $notFoundResource->notFound(['idUsuario'=>$idUsuario]);
-                return $notFoundResource->response()->setStatusCode(404);
-            }
+            $miembroPrincipalFlag = strval(Input::get('miembroPrincipal'));
+
             
+            // return $miembroPrincipalFlag;
+            // return intval( $miembroPrincipalFlag==false|| $miembroPrincipalFlag==null);
+            //return json_encode($miembroPrincipalFlag);
+            if (!($miembroPrincipalFlag == "true"  || $miembroPrincipalFlag=="false"|| $miembroPrincipalFlag==null)){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de filtro');
+                $errorResource->message('El valor del filtro no es el adecuado');
+                return $errorResource->response()->setStatusCode(400);
+            }
+            if ($miembroPrincipalFlag == "true")
+                $miembroPrincipalFlag = true;
+            else if ($miembroPrincipalFlag=="false")
+                $miembroPrincipalFlag= false;
+            else{
+                $miembroPrincipalFlag="null";
+            }
+          
+            if ( $usuario->esAdmin() ||  ( $miembroPrincipalFlag == "true" &&  ($usuario->esJefeDeTienda()|| $usuario->esJefeDeAlmacen()) )){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de seguridad');
+                $errorResource->message('Usuario con rol no permitido para esta acción');
+                return $errorResource->response()->setStatusCode(422);
+            }
+            // return json_encode($miembroPrincipalFlag == null);
+            //return json_encode($miembroPrincipalFlag);
+            
+            //return  json_encode($usuario->esJefeDeTienda()|| $usuario->esJefeDeAlmacen());     
+            $data['miembroPrincipal']= ($usuario->esJefeDeTienda()|| $usuario->esJefeDeAlmacen()) ? false: ($miembroPrincipalFlag == "null" ? true:$miembroPrincipalFlag);
+            //$data['miembroPrincipal']=false;
+            //return json_encode($data['miembroPrincipal']);
+                      
             $this->tiendaRepository->setModel($tienda);
-            $this->tiendaRepository->attachTrabajador($usuario);
+            if ($this->tiendaRepository->checkIfUsuarioAttachedBefore($usuario)){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de integridad');
+                $errorResource->message('Ya existe un usuario-trabajador con el id solicitado, asociado a la tienda');
+                return $errorResource->response()->setStatusCode(400);
+            }
+            $this->tiendaRepository->attachTrabajador($usuario,$data);
                     
             DB::commit();
+            
             $this->tiendaRepository->loadTrabajadoresRelationship();
             $tienda =  $this->tiendaRepository->obtenerModelo();
+           
           
             $tiendaResource =  new TiendaResource($tienda);  
             $responseResourse = new ResponseResource(null);
@@ -468,6 +504,7 @@ class TiendaController extends Controller {
     }
 
     public function desasignarTrabajador($idTienda,Request $data){
+        ini_set('max_execution_time', 180);
         try{
            
             DB::beginTransaction();
@@ -493,34 +530,37 @@ class TiendaController extends Controller {
             
             //return $tienda->trabajadores()->where('usuario.idPersonaNatural',$id)->first();
 
-            if(!$this->tiendaRepository->checkIfOwnModelTiendaHasTrabajadoPorId($usuario->idPersonaNatural)){
+            if(!$this->tiendaRepository->checkIfUsuarioAttachedBefore($usuario)){
 
                 $errorResource = new ErrorResource(null);
                 $errorResource->title('Error de integridad');
                 $errorResource->message('La tienda no cuenta con este trabajador asociado');
                 return $errorResource->response()->setStatusCode(400);
             }
-            $usuarioRepository->setModel($usuario);
+            //$usuarioRepository->setModel($usuario);
             
-            $usuarioRepository->actualizaSoloUsuario(['idTienda'=>null]);          
+            //$usuarioRepository->actualizaSoloUsuario(['idTienda'=>null]);          
+            $status = $this->tiendaRepository->deleteUsuarioRelationship($usuario);          
+            
+            if ($status || !$status){
+                DB::commit();
+                $this->tiendaRepository->loadJefeDeAlmacenRelationship();
+                $this->tiendaRepository->loadJefeDeTiendaRelationship();
+                $this->tiendaRepository->loadTrabajadoresRelationship();
+                $tienda = $this->tiendaRepository->obtenerModelo();
+                
             
             
+                $tiendaResource =  new TiendaResource($tienda);  
+                $responseResourse = new ResponseResource(null);
+                $responseResourse->title('Trabajador desasignado satisfactoriamente de la tienda');  
+                $responseResourse->body($tiendaResource);
+                return $responseResourse;
+            }
 
           
            
-            DB::commit();
-            $this->tiendaRepository->loadJefeDeAlmacenRelationship();
-            $this->tiendaRepository->loadJefeDeTiendaRelationship();
-            $this->tiendaRepository->loadTrabajadoresRelationship();
-            $tienda = $this->tiendaRepository->obtenerModelo();
             
-          
-          
-            $tiendaResource =  new TiendaResource($tienda);  
-            $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Trabajador desasignado satisfactoriamente de la tienda');  
-            $responseResourse->body($tiendaResource);
-            return $responseResourse;
         }
         catch(\Exception $e){
          

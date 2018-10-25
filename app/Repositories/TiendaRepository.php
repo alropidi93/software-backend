@@ -57,10 +57,13 @@ class TiendaRepository extends BaseRepository {
         $this->model->save();
     }
 
-    public function attachTrabajador($trabajador){
+    public function attachTrabajador($trabajador, $data=null){
            
-        $this->model->trabajadores()->save($trabajador);
-        $this->model->save();
+        if (!$data)
+            $this->model->trabajadores()->save($trabajador,['deleted' => false, 'miembroPrincipal' => true]);
+        else
+            $this->model->trabajadores()->save($trabajador,['deleted' => false, 'miembroPrincipal' => $data['miembroPrincipal'] ]);
+            $this->model->save();
     }
 
     public function loadJefeDeTiendaRelationship($tienda=null){
@@ -138,12 +141,20 @@ class TiendaRepository extends BaseRepository {
     
     }
 
-    public function checkIfOwnModelTiendaHasTrabajadoPorId($id){
-        return strval($this->model->trabajadores()->where('usuario.idPersonaNatural',$id)->where('usuario.deleted',false)
-                ->whereHas('personaNatural', function ($query){
-                    $query->where('personaNatural.deleted',false);
-                })->exists());
+    // public function checkIfOwnModelTiendaHasTrabajadoPorId($id){
+    //     return $this->model->trabajadores()->where('usuario.idPersonaNatural',$id)->where('usuario.deleted',false)
+    //             ->whereHas('personaNatural', function ($query){
+    //                 $query->where('personaNatural.deleted',false);
+    //             })->exists();
     
+    // }
+
+    public function checkIfUsuarioAttachedBefore ($usuario){
+        return $this->model->trabajadores->contains($usuario);
+    }
+
+    public function deleteUsuarioRelationship($usuario){
+        return $this->model->trabajadores()->detach($usuario->idPersonaNatural);
     }
 
     

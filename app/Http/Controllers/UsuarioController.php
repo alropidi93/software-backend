@@ -290,17 +290,25 @@ class UsuarioController extends Controller
             if ($usuario->esJefeDeTiendaAsignado()){
                 $errorResource =  new ErrorResource (null);
                 $errorResource->title("Error de asignación de rol");
-                $errorResource->message("Debe desasignar al jefe de tienda, de la tienda que tiene a su cargo");
+                $errorResource->message("Debe desasignar al usuario, de la tienda de la cual es jefe de tienda");
                 return $errorResource;
             }
             if ($usuario->esJefeDeAlmacenAsignado() ){
                 $errorResource =  new ErrorResource (null);
                 $errorResource->title("Error de asignación de rol");
-                $errorResource->message("Debe desasignar al jefe de almacen, de la tienda cuyo almacen tiene a su cargo");
+                $errorResource->message("Debe desasignar al usuario, de la tienda de la cual es jefe de almacen");
+                return $errorResource;
+            }
+            $this->usuarioRepository->setModelUsuario($usuario);
+            if (($tipoUsuario->esJefeDeTienda() || $tipoUsuario->esJefeDeAlmacen()) && $this->usuarioRepository->checkIfIsPrincipalWorkerInSomeTienda() ){
+                $errorResource =  new ErrorResource (null);
+                $errorResource->title("Error de asignación de rol");
+                $errorResource->message("El usuario actual es un trabajador principal en una tienda, y el rol al que se le quiere asignar no puede tener estas características");
                 return $errorResource;
             }
             
-            $this->usuarioRepository->setModelUsuario($usuario);
+            
+            
             $this->usuarioRepository->setTipoUsuarioModel($tipoUsuario);
 
             
