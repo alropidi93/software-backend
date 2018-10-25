@@ -21,7 +21,8 @@ class AlmacenResource extends JsonResource
             'id'            => $this->id,
             'attributes'    => [
                 
-                'idTIenda' => $this->idTienda,
+                'idTienda' => $this->idTienda,
+                'nombre' => $this->nombre,
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,

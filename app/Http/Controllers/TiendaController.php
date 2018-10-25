@@ -10,6 +10,7 @@ use App\Repositories\UsuarioRepository;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TiendaResource;
 use App\Http\Resources\TiendasResource;
+
 use App\Http\Resources\ExceptionResource;
 use App\Http\Resources\ValidationResource;
 use App\Http\Resources\ResponseResource;
@@ -23,9 +24,12 @@ class TiendaController extends Controller {
 
     protected $tiendaRepository;
 
+
     public function __construct(TiendaRepository $tiendaRepository){
         TiendaResource::withoutWrapping();
+      ;
         $this->tiendaRepository = $tiendaRepository;
+
     }
 
     public function index() 
@@ -99,7 +103,10 @@ class TiendaController extends Controller {
             }
             DB::beginTransaction();
             $tienda = $this->tiendaRepository->guarda($tiendaData->all());
+            
+            
             DB::commit();
+            $this->tiendaRepository->loadAlmacenRelationship();
             $tiendaResource =  new TiendaResource($tienda);
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Tienda creada exitosamente');       

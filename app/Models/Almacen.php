@@ -12,8 +12,10 @@ class Almacen extends Model
   
     protected $fillable = [
       'id',
+      'nombre',
       'idTienda',
-      'deleted',
+      'deleted'
+ 
       
     ];
 

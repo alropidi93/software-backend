@@ -1,6 +1,7 @@
 <?php
 namespace App\Repositories;
 use App\Models\Tienda;
+use App\Models\Almacen;
 use App\Models\Usuario;
 	
 class TiendaRepository extends BaseRepository {
@@ -18,15 +19,17 @@ class TiendaRepository extends BaseRepository {
     protected $jefeDeAmacen;
   
     protected $trabajadores;
+    protected $almacen;
 
     /**
      * Create a new TiendaRepository instance.
      * @param  App\Models\Tienda $tienda
      * @return void
      */
-    public function __construct(Tienda $tienda, Usuario $jefeDeTienda, Usuario $jefeDeAlmacen) 
+    public function __construct(Tienda $tienda, Usuario $jefeDeTienda, Usuario $jefeDeAlmacen, Almacen $almacen) 
     {
         $this->model = $tienda;
+        $this->almacen = $almacen;
         $this->jefeDeTienda = $jefeDeTienda;
         $this->jefeDeAlmacen = $jefeDeAlmacen;
         
@@ -41,7 +44,11 @@ class TiendaRepository extends BaseRepository {
     {
         $dataArray['deleted'] =false;
 
-        return $this->model = $this->model->create($dataArray);
+        $this->model = $this->model->create($dataArray);
+        $this->almacen->nombre =  $dataArray['nombre'];
+        $this->almacen->deleted =  false;
+        $this->model->almacen()->save($this->almacen);
+        return $this->model;
         
     }
 
@@ -83,6 +90,16 @@ class TiendaRepository extends BaseRepository {
         else{
             $tienda->load('jefeDeAlmacen');
         }
+    }
+
+    public function loadAlmacenRelationship($tienda=null){
+        if (!$tienda){
+            $this->model->load('almacen');
+        }
+        else{
+            $tienda->load('almacen');
+        }
+        
     }
 
     public function setJefeDeTiendaModel($usuario){

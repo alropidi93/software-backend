@@ -36,6 +36,12 @@ class Tienda extends Model
         'idTienda','idUsuario')->withPivot('deleted','miembroPrincipal','created_at','updated_at');
     }
 
+    public function almacen() {
+      return $this->hasOne('App\Models\Almacen','idTienda','id');
+    }
+
+
+
   
   
   
