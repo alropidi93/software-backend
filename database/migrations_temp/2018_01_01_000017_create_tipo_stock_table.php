@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateMovimientoTable extends Migration
+class CreateTipoStockTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,18 @@ class CreateMovimientoTable extends Migration
      */
     public function up()
     {
-        Schema::create('movimiento', function (Blueprint $table) {
+        Schema::create('tipoStock', function (Blueprint $table) {
             $table->increments('id');
-           
-            $table->text('descripcion')->nullable();
-            $table->date('fecha');
-            $table->integer('idUsuario');
+            $table->string('tipo',100);
+ 
             $table->boolean('deleted');
+         
+     
             $table->timestamps();
 
-            $table->foreign('idUsuario')->references('idPersonaNatural')->on('usuario')->onUpdate('cascade')->onDelete('cascade');
-           
+
      
-         
+           
         });
       
     }
@@ -37,6 +36,6 @@ class CreateMovimientoTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('movimiento');
+        Schema::dropIfExists('tipoStock');
     }
 }

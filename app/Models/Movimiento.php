@@ -8,6 +8,7 @@ class Movimiento extends Model
 {
     protected $table = 'movimiento';
     public $timestamps = true;
+    const UPDATED_AT = null;
     
   
     protected $fillable = [

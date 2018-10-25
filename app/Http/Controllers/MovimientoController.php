@@ -68,8 +68,7 @@ class MovimientoController extends Controller
         try{
             $validator = \Validator::make($movimientoData->all(), 
                             ['descripcion' => 'required',
-                            'fecha' => 'required',
-                            'idUsuario' => 'required']);
+                             'idUsuario' => 'required']);
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }

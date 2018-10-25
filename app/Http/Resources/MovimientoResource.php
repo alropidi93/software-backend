@@ -27,8 +27,8 @@ class MovimientoResource extends JsonResource
                 'usuario' => new UsuarioResource($this->whenLoaded('usuario')), //'usuario' hace referencia al metodo relacional public function usuario() del modelo 'Movimiento', se le coloca la funcon setWhenLoaderd, para que aparezca solo cuando anteriormente se ha 'cargado la relacion', eso de 'cargar la relacion' lo explicar en MovimientoController
                 /*PFIN ARTE DE TUTORIAL PARA RELATIONSHIPS */
                 'deleted' => $this->deleted,
-                'created_at' => $this->created_at,
-                'updated_at' => $this->updated_at,
+                'created_at' => $this->created_at
+                
             ],
         ];
     }
