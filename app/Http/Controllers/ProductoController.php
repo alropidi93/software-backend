@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Producto;
 use App\Repositories\ProductoRepository;
+use App\Repositories\CategoriaRepository;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductoResource;
 use App\Http\Resources\ProductosResource;
@@ -19,9 +20,13 @@ use Illuminate\Support\Facades\Input;
 
 class ProductoController extends Controller
 {
-    public function __construct(ProductoRepository $productoRepository){
+    protected $productoRepository;
+    protected $categoriaRepository;
+
+    public function __construct(ProductoRepository $productoRepository, CategoriaRepository $categoriaRepository){
         ProductoResource::withoutWrapping();
         $this->productoRepository = $productoRepository;
+        $this->categoriaRepository = $categoriaRepository;
     }
     /**
      * Display a listing of the resource.
@@ -70,16 +75,39 @@ class ProductoController extends Controller
                             ['nombre' => 'required',
                             'stockMin' => 'required',
                             'descripcion'=>'required',
-                            'categoria' => 'required',
+                            'idCategoria' => 'required',
                             'precio' => 'required']);
 
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
+          
+            //$producto = $this->productoRepository->obtenerPorId(9);
+            // $producto->unidadMedida;
+            // $producto->categoria;
+            // $producto->tipoProducto;
+            //return $producto;
+
+            $idCategoria= $productoData['idCategoria'];
+            $categoria = $this->categoriaRepository->obtenerPorId($idCategoria);
+            
+            if (!$categoria){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Categoria no encontrada');
+                $notFoundResource->notFound(['idCategoria'=>$idCategoria]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
             DB::beginTransaction();
             
             $producto = $this->productoRepository->guarda($productoData->all());
+            // $producto->unidadMedida;
+            // $producto->categoria;
+            // $producto->tipoProducto;
+            // return $producto;
+
             DB::commit();
+            $this->productoRepository->setModel($producto);
+            $this->productoRepository->loadCategoriaRelationship();
             $productoResource =  new ProductoResource($producto);
             $responseResource = new ResponseResource(null);
             $responseResource->title('Producto creada exitosamente');       
@@ -115,6 +143,7 @@ class ProductoController extends Controller
             $this->productoRepository->loadTipoProductoRelationship($producto);
             $this->productoRepository->loadUnidadMedidaRelationship($producto);
             $this->productoRepository->loadProveedoresRelationship($producto);
+            $this->productoRepository->loadCategoriaRelationship($producto);
             $productoResource =  new ProductoResource($producto);  
             $responseResource = new ResponseResource(null);
             $responseResource->title('Mostrar producto');  
@@ -140,8 +169,9 @@ class ProductoController extends Controller
     public function update($id, Request $productoData)
     {
         try{
-        
+    
             $productoDataArray= Algorithm::quitNullValuesFromArray($productoData->all());
+            
             $validator = \Validator::make($productoDataArray, 
                             ['idTipoProducto' => 'exists:tipoProducto,id']
                         );
@@ -149,6 +179,22 @@ class ProductoController extends Controller
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
+           
+            
+         
+            if (array_key_exists('idCategoria',$productoDataArray)){
+                
+                $idCategoria = $productoDataArray['idCategoria'];
+                $categoria = $this->categoriaRepository->obtenerPorId($idCategoria);
+            
+                if (!$categoria){
+                    $notFoundResource = new NotFoundResource(null);
+                    $notFoundResource->title('Categoria no encontrada');
+                    $notFoundResource->notFound(['idCategoria'=>$idCategoria]);
+                    return $notFoundResource->response()->setStatusCode(404);
+                }
+            }
+           
             DB::beginTransaction();
             $producto = $this->productoRepository->obtenerPorId($id);
             
@@ -159,17 +205,18 @@ class ProductoController extends Controller
                 return $notFoundResource->response()->setStatusCode(404);;
             }
             
-
-            
-            
+     
             $this->productoRepository->setModel($producto);
             
             $this->productoRepository->actualiza($productoDataArray);
             $this->productoRepository->loadTipoProductoRelationship();
             $this->productoRepository->loadUnidadMedidaRelationship();
+            $this->productoRepository->loadCategoriaRelationship();
             $producto = $this->productoRepository->obtenerModelo();
             
             DB::commit();
+         
+            //$producto->categoria;
             $productoResource =  new ProductoResource($producto);
             $responseResource = new ResponseResource(null);
             

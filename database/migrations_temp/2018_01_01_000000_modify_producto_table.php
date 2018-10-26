@@ -20,6 +20,8 @@ class ModifyProductoTable extends Migration
             $table->integer('idCategoria')->nullable();
             $table->dropColumn('categoria');
             $table->foreign('idCategoria')->references('id')->on('categoria')->onUpdate('cascade')->onDelete('cascade');
+
+            
            
      
          
