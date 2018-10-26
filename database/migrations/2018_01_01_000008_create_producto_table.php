@@ -18,16 +18,16 @@ class CreateProductoTable extends Migration
             $table->string('nombre',200);
             $table->integer('stockMin');
             $table->text('descripcion');
-            $table->integer('idTipoProducto')->nullable;
-            $table->integer('idUnidadMedida');
-            $table->string('categoria',300);
+            $table->integer('idTipoProducto')->nullable();
+            $table->integer('idUnidadMedida')->nullable();
+            $table->integer('idCategoria')->nullable();
             $table->double('precio');
             $table->boolean('deleted');
             $table->timestamps();
 
             $table->foreign('idTipoProducto')->references('id')->on('tipoProducto')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('idUnidadMedida')->references('id')->on('unidadMedida')->onUpdate('cascade')->onDelete('cascade');
-     
+            $table->foreign('idCategoria')->references('id')->on('categoria')->onUpdate('cascade')->onDelete('cascade');
          
         });
       

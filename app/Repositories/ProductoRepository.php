@@ -4,11 +4,13 @@ use App\Models\Producto;
 use App\Models\Proveedor;
 use App\Models\TipoProducto;
 use App\Models\UnidadMedida;
+use App\Models\Categoria;
 	
 class ProductoRepository extends BaseRepository {
     protected $tipoProducto;
     protected $unidadMedida;
     protected $proveedor;
+    protected $categoria;
     protected $proveedores;
     /**
      * Create a new ProductoRepository instance.
@@ -17,12 +19,13 @@ class ProductoRepository extends BaseRepository {
      * @param  App\Models\Proveedor $proveedor
      * @return void
      */
-    public function __construct(Producto $producto, TipoProducto $tipoProducto,UnidadMedida $unidadMedida ,Proveedor $proveedor) 
+    public function __construct(Producto $producto, TipoProducto $tipoProducto,UnidadMedida $unidadMedida ,Proveedor $proveedor, Categoria $categoria) 
     {
         $this->model = $producto;
         $this->tipoProducto = $tipoProducto;
         $this->unidadMedida = $unidadMedida;
         $this->proveedor = $proveedor;
+        $this->categoria = $categoria;
         
     }
 
@@ -40,13 +43,8 @@ class ProductoRepository extends BaseRepository {
     }
 
     public function loadUnidadMedidaRelationship($producto=null){
-      
-
-
+    
         if (!$producto){
-        
-            
-
             $this->model = $this->model->load([
                 'unidadMedida'=>function($query){
                     $query->where('deleted', false); 
@@ -63,6 +61,28 @@ class ProductoRepository extends BaseRepository {
         }
         if ($this->model->unidadMedida){
             $this->unidadMedida = $this->model->unidadMedida;
+        }
+    }
+
+    public function loadCategoriaRelationship($producto=null){
+    
+        if (!$producto){
+            $this->model = $this->model->load([
+                'categoria'=>function($query){
+                    $query->where('deleted', false); 
+                }
+            ]);
+        }
+        else{
+            
+            $this->model =$producto->load([
+                'categoria'=>function($query){
+                    $query->where('deleted', false); 
+                }
+            ]);
+        }
+        if ($this->model->categoria){
+            $this->categoria = $this->model->categoria;
         }
     }
 
