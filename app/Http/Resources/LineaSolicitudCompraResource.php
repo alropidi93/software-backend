@@ -17,8 +17,8 @@ class LineaSolicitudCompraResource extends JsonResource
             'type'          => 'Linea de solicitud de compra',
             'id'            => $this->id,
             'attributes'    => [
-                //'producto' => new ProductoResource($this->whenLoaded('producto')),
                 'cantidad' => $this->cantidad,
+                'producto' => new ProductoResource($this->whenLoaded('producto')),
                 'proveedor' => new ProveedorResource($this->whenLoaded('proveedor')),
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,

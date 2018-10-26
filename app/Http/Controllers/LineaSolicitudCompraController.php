@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\LineaSolicitudCompra;
 use Illuminate\Http\Request;
 use App\Repositories\LineaSolicitudCompraRepository;
 use App\Http\Controllers\Controller;
@@ -32,8 +31,9 @@ class LineaSolicitudCompraController extends Controller
     {
         try{
             $lineasSolicitudCompra = $this->lineaSolicitudCompraRepository->obtenerTodos();
-            foreach ($lineasSolicitudCompra as $key => $$lineaSolicitudCompra) {
-                $this->lineaSolicitudCompraRepository->loadProveedorRelationship($lineaSolicitudCompra);   
+            foreach ($lineasSolicitudCompra as $key => $lineaSolicitudCompra) {
+                //$this->lineaSolicitudCompraRepository->loadProductoRelationship($lineaSolicitudCompra);
+                $this->lineaSolicitudCompraRepository->loadProveedorRelationship($lineaSolicitudCompra);
             }
             $LineasSolicitudCompraResource =  new LineasSolicitudCompraResource($lineasSolicitudCompra);  
             $responseResource = new ResponseResource(null);

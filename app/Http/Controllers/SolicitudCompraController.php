@@ -112,9 +112,40 @@ class SolicitudCompraController extends Controller
      * @param  \App\SolicitudCompra  $solicitudCompra
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, SolicitudCompra $solicitudCompra)
-    {
-        //
+    public function update($id, Request $solicitudCompraData){
+        try{
+        
+            $solicitudCompraDataArray= Algorithm::quitNullValuesFromArray($solicitudCompraData->all());
+            $validator = \Validator::make($solicitudCompraData, 
+                            ['idTienda' => 'exists:tienda,id']
+                        );
+            
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
+            DB::beginTransaction();
+            $solicitudCompra = $this->solicitudCompraRepository->obtenerPorId($id);
+            
+            if (!$solicitudCompra){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Solicitud de compra no encontrada');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+
+            $this->solicitudCompraRepository->setModel($solicitudCompra);
+            $this->solicitudCompraRepository->actualiza($solicitudCompraData);
+            $solicitudCompra = $this->solicitudCompraRepository->obtenerModelo();
+            DB::commit();
+            $solicitudCompraResource =  new SolicitudCompraResource($solicitudCompra);
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Solicitud de compra actualizada exitosamente');       
+            $responseResource->body($solicitudCompraResource);        
+            return $responseResource;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
     }
 
     /**
@@ -123,8 +154,28 @@ class SolicitudCompraController extends Controller
      * @param  \App\SolicitudCompra  $solicitudCompra
      * @return \Illuminate\Http\Response
      */
-    public function destroy(SolicitudCompra $solicitudCompra)
-    {
-        //
+    public function destroy($id){
+        try{
+            DB::beginTransaction();
+            $solicitudCompra = $this->solicitudCompraRepository->obtenerPorId($id);
+            if (!$solicitudCompra){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Solicitud de compra no encontrada');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            $this->solicitudCompraRepository->setModel($solicitudCompra);
+            $this->solicitudCompraRepository->softDelete();
+            
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Usuario eliminado');  
+            $responseResourse->body(['id' => $id]);
+            DB::commit();
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
     }
 }

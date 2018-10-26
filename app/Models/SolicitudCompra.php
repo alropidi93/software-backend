@@ -17,8 +17,12 @@ class SolicitudCompra extends Model
     ];
 
     public function lineasSolicitudCompra(){
-        return $this->hasMany('App\Models\LineaSolicitudCompra');
+        return $this->hasMany('App\Models\LineaSolicitudCompra', 'idSolicitudDeCompra', 'id');
     }
+
+    public function almacen() {
+        return $this->hasOne('App\Models\Almacen','idTienda','id');
+      }
 
     public function tienda() {
         return $this->belongsTo('App\Models\Tienda','idTienda','id');   
