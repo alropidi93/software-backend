@@ -10,7 +10,7 @@ class ProductoRepository extends BaseRepository {
     protected $unidadMedida;
     protected $proveedor;
     protected $proveedores;
-    /**
+    /** 
      * Create a new ProductoRepository instance.
      * @param  App\Models\Producto $producto
      * @param  App\Models\TipoProducto $tipoProducto

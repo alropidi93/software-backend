@@ -32,11 +32,9 @@ class SolicitudCompraController extends Controller
     public function index(){
         try{
             $solicitudesCompra = $this->solicitudCompraRepository->obtenerTodos();
-            // foreach ($solicitudesCompra as $key => $solicitudCompra) {
-            //     $this->solicitudCompraRepository->loadTipoProductoRelationship($solicitudCompra);
-            //     $this->solicitudCompraRepository->loadUnidadMedidaRelationship($solicitudCompra);
-            //     $this->solicitudCompraRepository->loadProveedoresRelationship($solicitudCompra);   
-            // }
+            foreach ($solicitudesCompra as $key => $solicitudCompra) {
+                $this->solicitudCompraRepository->loadLineasSolicitudCompraRelationship($solicitudCompra);
+            }
             $solicitudesCompraResource =  new SolicitudesCompraResource($solicitudesCompra);  
             $responseResource = new ResponseResource(null);
             $responseResource->title('Lista de solicitudes de compra');  
@@ -91,10 +89,8 @@ class SolicitudCompraController extends Controller
                 $notFoundResource->notFound(['id'=>$id]);
                 return $notFoundResource->response()->setStatusCode(404);;
             }
-            $this->solicitudCompraRepository->loadTipoProductoRelationship($solicitudCompra);
-            $this->solicitudCompraRepository->loadUnidadMedidaRelationship($solicitudCompra);
-            $this->solicitudCompraRepository->loadProveedoresRelationship($solicitudCompra);
-            $solicitudCompraResource =  new ProductoResource($solicitudCompra);  
+            $this->solicitudCompraRepository->loadLineasSolicitudCompraRelationship($solicitudCompra);
+            $solicitudCompraResource =  new SolicitudCompraResource($solicitudCompra);  
             $responseResource = new ResponseResource(null);
             $responseResource->title('Mostrar solicitud de compra');  
             $responseResource->body($solicitudCompraResource);

@@ -32,7 +32,7 @@ class LineaSolicitudCompraController extends Controller
         try{
             $lineasSolicitudCompra = $this->lineaSolicitudCompraRepository->obtenerTodos();
             foreach ($lineasSolicitudCompra as $key => $lineaSolicitudCompra) {
-                //$this->lineaSolicitudCompraRepository->loadProductoRelationship($lineaSolicitudCompra);
+                $this->lineaSolicitudCompraRepository->loadProductoRelationship($lineaSolicitudCompra);
                 $this->lineaSolicitudCompraRepository->loadProveedorRelationship($lineaSolicitudCompra);
             }
             $LineasSolicitudCompraResource =  new LineasSolicitudCompraResource($lineasSolicitudCompra);  
@@ -57,9 +57,10 @@ class LineaSolicitudCompraController extends Controller
         try{
             $validator = \Validator::make($lineaSolicitudCompraData->all(), 
                             ['cantidad' => 'required',
-                            //'idProducto' => 'required',
+                            'idProducto' => 'required',
                             'idSolicitudDeCompra' => 'required',
-                            'idProveedor' => 'required']);
+                            'idProveedor' => 'required'
+                            ]);
 
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
