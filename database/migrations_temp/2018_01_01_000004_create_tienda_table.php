@@ -27,7 +27,7 @@ class CreateTiendaTable extends Migration
      
             $table->timestamps();
 
-
+           
             $table->foreign('idJefeTienda')->references('idPersonaNatural')->on('usuario')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('idJefeAlmacen')->references('idPersonaNatural')->on('usuario')->onUpdate('cascade')->onDelete('cascade');
         });

@@ -9,12 +9,19 @@ abstract class BaseRepository {
      * @var Illuminate\Database\Eloquent\Model
      */
     protected $model;
+
     /**
      * Get number of records.
      *
      * @return int
-     */
+    **/
     public function cantidadElementos()
+    {
+        return count($this->obtenerTodos());
+        
+    }
+    
+    public function cantidadElementosAnyway()
     {
         $total = $this->model->count();
         return $total;

@@ -39,4 +39,9 @@ class Producto extends Model
         return $this->belongsToMany('App\Models\Proveedor','productoxproveedor',
         'idProducto','idProveedor')->withPivot('deleted','created_at','updated_at');
     }
+
+    public function almacenes(){
+        return $this->belongsToMany('App\Models\Almacen','productoxalmacen',
+        'idProducto','idAlmacen')->withPivot('idTipoStock','cantidad','deleted','created_at','updated_at');
+    }
 }

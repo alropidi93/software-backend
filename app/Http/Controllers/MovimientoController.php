@@ -101,7 +101,7 @@ class MovimientoController extends Controller
                 $notFoundResource = new NotFoundResource(null);
                 $notFoundResource->title('Movimiento no encontrado');
                 $notFoundResource->notFound(['id'=>$id]);
-                return $notFoundResource->response()->setStatusCode(404);;
+                return $notFoundResource->response()->setStatusCode(404);
             }
             $this->movimientoRepository->setModel($movimiento);
             $this->movimientoRepository->softDelete();

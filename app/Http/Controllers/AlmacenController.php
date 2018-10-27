@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Almacen;
 use App\Models\Usuario;
 use App\Repositories\AlmacenRepository;
+use App\Services\AlmacenService;
 use App\Repositories\UsuarioRepository;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AlmacenResource;
@@ -114,6 +115,44 @@ class AlmacenController extends Controller {
         }
 
        
+    }
+
+    public function cargarProductosStock(Request $data){
+        try{
+            $num_almacenes =  $this->almacenRepository->cantidadElementos();
+      
+            if ($num_almacenes==0){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Almacenes no encontrados');
+                $notFoundResource->notFound(['num_almacenes'=>$num_almacenes]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            DB::beginTransaction();
+
+            $almacenCentral = $this->almacenRepository->getAlmacenCentral();
+            $this->almacenRepository->setModel($almacenCentral);
+            $almacenService =  new AlmacenService();
+            $productosNoStockeados = $almacenService->getProductosNoStockeadosEnAlmacenConTipoAlmacen($almacenCentral,1);
+            return $productosNoStockeados;
+            foreach ($productosNoStockeados as $key => $producto) {
+                $this->almacenRepository->attachProductoStock($producto,1);
+            }
+            
+            $this->almacenRepository->attachProductoStock($producto,2);
+            $this->almacenRepository->attachProductoStock($producto,3);
+            return $almacenCentral;
+            $responseResourse->title('Stock de productos en los alamacenes, generados correctamente');  
+            $responseResourse->body("test");
+            DB::commit();
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            DB::rollback();
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
     }
  
 }

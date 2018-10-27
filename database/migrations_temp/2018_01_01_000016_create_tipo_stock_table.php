@@ -16,6 +16,7 @@ class CreateTipoStockTable extends Migration
         Schema::create('tipoStock', function (Blueprint $table) {
             $table->increments('id');
             $table->string('tipo',100);
+            $table->integer('key')->nullable();
  
             $table->boolean('deleted');
          
