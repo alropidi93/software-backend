@@ -19,7 +19,7 @@ class LineaSolicitudCompra extends Model
     ];
 
     public function solicitudCompra(){
-        return $this->belongsTo('App\Model\SolicitudCompra', 'idSolicitudDeCompra', 'id');
+        return $this->belongsTo('App\Models\SolicitudCompra', 'idSolicitudDeCompra', 'id');
     }
 
     public function proveedor() {
@@ -27,6 +27,6 @@ class LineaSolicitudCompra extends Model
     }
 
     public function producto(){
-        return $this->belongsTo('App\Model\Producto', 'idProducto', 'id');
+        return $this->belongsTo('App\Models\Producto', 'idProducto', 'id');
     }
 }

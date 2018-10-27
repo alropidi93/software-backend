@@ -8,7 +8,7 @@ use App\Models\Producto;
 class LineaSolicitudCompraRepository extends BaseRepository{
     protected $proveedor;
     protected $producto;
-    
+
     public function __construct(LineaSolicitudCompra $lineaSolicitudCompra, Proveedor $proveedor, Producto $producto){
         $this->model = $lineaSolicitudCompra;
         $this->proveedor = $proveedor;

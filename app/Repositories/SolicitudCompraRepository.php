@@ -2,6 +2,7 @@
 namespace App\Repositories;
 use App\Models\Tienda;
 use App\Models\SolicitudCompra;
+use App\Models\LineaSolicitudCompra; ///no poner esta linea de mierda me hizo perder 2 horas :')
 	
 class SolicitudCompraRepository extends BaseRepository {
     protected $lineaSolicitudCompra;
@@ -11,9 +12,10 @@ class SolicitudCompraRepository extends BaseRepository {
      * Create a new ProductoRepository instance.
      * @return void
      */
-    public function __construct(SolicitudCompra $solicitudCompra, Tienda $tienda=null){
+    public function __construct(SolicitudCompra $solicitudCompra, LineaSolicitudCompra $lineaSolicitudCompra, Tienda $tienda=null){
         $this->model = $solicitudCompra;
         $this->tienda = $tienda;
+        $this->lineaSolicitudCompra = $lineaSolicitudCompra;
     }
 
     /**
@@ -34,14 +36,16 @@ class SolicitudCompraRepository extends BaseRepository {
         if (!$solicitudCompra){
             $this->model = $this->model->load([
                 'lineasSolicitudCompra'=>function($query){
-                    $query->where('lineaSolicitudCompra.deleted', false)->wherePivot('deleted',false); 
+                    // $query->where('lineaSolicitudDeCompra.deleted', false)->wherePivot('deleted',false);
+                    $query->where('lineaSolicitudDeCompra.deleted', false); 
                 }
             ]);
         }
         else{
-            $this->model =$producto->load([
+            $this->model =$solicitudCompra->load([
                 'lineasSolicitudCompra'=>function($query){
-                    $query->where('lineaSolicitudCompra.deleted', false)->wherePivot('deleted',false); 
+                    // $query->where('lineaSolicitudDeCompra.deleted', false)->wherePivot('deleted',false); 
+                    $query->where('lineaSolicitudDeCompra.deleted', false); 
                 }
             ]);
         }
@@ -50,7 +54,7 @@ class SolicitudCompraRepository extends BaseRepository {
         }
     }
 
-    public function setLineaSolicitudCompra($lineaSolicitudCompra){
+    public function setLineaSolicitudCompraModel($lineaSolicitudCompra){
         $this->lineaSolicitudCompra = $lineaSolicitudCompra;
     }
 
