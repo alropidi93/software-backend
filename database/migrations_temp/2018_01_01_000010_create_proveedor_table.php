@@ -19,6 +19,9 @@ class CreateProveedorTable extends Migration
             $table->string('contacto',100);
             $table->string('ruc',30);
             $table->string('razonSocial',300);
+            $table->string('direccion',500);
+            $table->string('email',100);
+            $table->string('telefono',20);
             $table->boolean('deleted');
             $table->timestamps();
 
