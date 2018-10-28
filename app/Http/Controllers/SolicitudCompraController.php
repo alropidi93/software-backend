@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Input;
 
 class SolicitudCompraController extends Controller
 {
+    protected $solicitudCompraRepository;
     public function __construct(SolicitudCompraRepository $solicitudCompraRepository){
         SolicitudCompraResource::withoutWrapping();
         $this->solicitudCompraRepository = $solicitudCompraRepository;

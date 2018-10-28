@@ -16,13 +16,15 @@ class ProveedorResource extends JsonResource
     public function toArray($request)
     {
         return [
-            
             'type'          => 'Proveedor',
             'id'            => $this->id,
             'attributes'    => [
                 'ruc' => $this->ruc,
                 'razonSocial' => $this->razonSocial,
                 'contacto' => $this->contacto,
+                'direccion' => $this->direccion,
+                'email' => $this->email,
+                'telefono' => $this->telefono,
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,

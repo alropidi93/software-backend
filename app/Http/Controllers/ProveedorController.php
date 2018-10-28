@@ -32,8 +32,7 @@ class ProveedorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() 
-    {
+    public function index(){
         try{
             $proveedorResource =  new ProveedoresResource($this->proveedorRepository->obtenerTodos());  
             $responseResourse = new ResponseResource(null);
@@ -46,8 +45,7 @@ class ProveedorController extends Controller
         }
     }
 
-    public function store(Request $proveedorData)
-    {
+    public function store(Request $proveedorData){
         try{
             $validator = \Validator::make($proveedorData->all(), 
                             ['ruc' => 'required',
@@ -100,8 +98,7 @@ class ProveedorController extends Controller
         }
     }
 
-    public function show($id)
-    {
+    public function show($id){
         try{
             $proveedor = $this->proveedorRepository->obtenerPorId($id);
             if (!$proveedor){
@@ -116,14 +113,12 @@ class ProveedorController extends Controller
             $responseResourse->title('Mostrar proveedor');  
             $responseResourse->body($usuarioResource);
             return $responseResourse;
-        }
-        catch(\Exception $e){
+        }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
     }
 
-    public function busquedaPorFiltro()
-    {
+    public function busquedaPorFiltro(){
         try{
             $proveedor = $this->proveedorRepository->obtenerModelo();
             $filter = Input::get('filterBy');
@@ -161,10 +156,8 @@ class ProveedorController extends Controller
                     return $errorResource->response()->setStatusCode(400);
             }
             return $responseResource; 
-        }
-        catch(\Exception $e){
+        }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
-    
     }
 }
