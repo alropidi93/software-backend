@@ -54,6 +54,44 @@ class SolicitudCompraRepository extends BaseRepository {
         }
     }
 
+    public function loadLineasSolicitudCompraRelationshipWithExtraRelationships($solicitudCompra=null){
+        if (!$solicitudCompra){
+            $this->model = $this->model->load([
+                'lineasSolicitudCompra'=>function($query){
+                    // $query->where('lineaSolicitudDeCompra.deleted', false)->wherePivot('deleted',false);
+                    $query->where('lineaSolicitudDeCompra.deleted', false); 
+                },
+                'lineasSolicitudCompra.producto'=>function($query){
+                    
+                    $query->where('producto.deleted', false); 
+                },
+                'lineasSolicitudCompra.proveedor'=>function($query){
+                    
+                    $query->where('proveedor.deleted', false); 
+                }
+            ]);
+        }
+        else{
+            $this->model =$solicitudCompra->load([
+                'lineasSolicitudCompra'=>function($query){
+                    // $query->where('lineaSolicitudDeCompra.deleted', false)->wherePivot('deleted',false); 
+                    $query->where('lineaSolicitudDeCompra.deleted', false); 
+                },
+                'lineasSolicitudCompra.producto'=>function($query){
+                    
+                    $query->where('producto.deleted', false); 
+                },
+                'lineasSolicitudCompra.proveedor'=>function($query){
+                    
+                    $query->where('proveedor.deleted', false); 
+                }
+            ]);
+        }
+        if ($this->model->lineasSolicitudCompra){
+            $this->lineasSolicitudCompra = $this->model->lineasSolicitudCompra;
+        }
+    }
+
     public function setLineaSolicitudCompraModel($lineaSolicitudCompra){
         $this->lineaSolicitudCompra = $lineaSolicitudCompra;
     }

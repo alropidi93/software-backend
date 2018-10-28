@@ -34,7 +34,7 @@ class SolicitudCompraController extends Controller
         try{
             $solicitudesCompra = $this->solicitudCompraRepository->obtenerTodos();
             foreach ($solicitudesCompra as $key => $solicitudCompra) {
-                $this->solicitudCompraRepository->loadLineasSolicitudCompraRelationship($solicitudCompra);
+                $this->solicitudCompraRepository->loadLineasSolicitudCompraRelationshipWithExtraRelationships($solicitudCompra);
             }
             $solicitudesCompraResource =  new SolicitudesCompraResource($solicitudesCompra);  
             $responseResource = new ResponseResource(null);

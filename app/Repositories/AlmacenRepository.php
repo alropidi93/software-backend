@@ -41,6 +41,8 @@ class AlmacenRepository extends BaseRepository{
         }
         
     }
+
+    
     
    
 
