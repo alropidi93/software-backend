@@ -42,7 +42,46 @@ class AlmacenRepository extends BaseRepository{
         
     }
 
-    
+    public function getProductosNoStockedosByOwnModelAndKeyTipoStock($keyTipoStock){
+        /*$productos =  Producto::whereHas('almacenes')->get();*/
+
+        /*
+        $productos =  Producto::where('deleted',false)->whereHas('almacenes',function($query) use ($almacen){
+            $query->where('almacen.id',$almacen->id)->where('almacen.deleted',false);
+        })->get();
+        */        
+        
+        /*
+        $productos =  Producto::where('deleted',false)->whereHas('almacenes',function($query) use ($almacen){
+            $query->where('almacen.id',$almacen->id)->where('almacen.deleted',false);
+            
+        })->whereHas('tipoStocks',function ($query2) use ($tipo){
+            $query2->where('tipoStock.deleted',false)->where('tipoStock.key',$tipo);
+        })->get();
+        */
+
+        /*
+        $productos =  Producto::where('deleted',false)->whereHas('almacenes',function($query) use ($almacen){
+            $query->where('almacen.id',$almacen->id)->where('almacen.deleted',false)->where('productoxalmacen.deleted', false);
+            
+        })
+        ->whereHas('tipoStocks',function ($query2) use ($tipo){
+            $query2->where('tipoStock.deleted',false)->where('tipoStock.key',$tipo)->where('productoxalmacen.deleted', false);
+        })->get();
+        */
+        $almacen = $this->model;
+        $productos =  $this->producto->where('deleted',false)->whereDoesntHave('almacenes',function($query) use ($almacen){
+            $query->where('almacen.id',$almacen->id)->where('almacen.deleted',false)->where('productoxalmacen.deleted', false);
+            
+        })
+        ->whereDoesntHave('tipoStocks',function ($query2) use ($keyTipoStock){
+            $query2->where('tipoStock.deleted',false)->where('tipoStock.key',$keyTipoStock)->where('productoxalmacen.deleted', false);
+        })->get();
+        
+
+        return $productos;
+
+    }
     
    
 

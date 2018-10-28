@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Almacen;
 use App\Models\Usuario;
 use App\Repositories\AlmacenRepository;
-use App\Services\AlmacenService;
+
 use App\Repositories\UsuarioRepository;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AlmacenResource;
@@ -131,8 +131,8 @@ class AlmacenController extends Controller {
 
             $almacenCentral = $this->almacenRepository->getAlmacenCentral();
             $this->almacenRepository->setModel($almacenCentral);
-            $almacenService =  new AlmacenService();
-            $productosNoStockeados = $almacenService->getProductosNoStockeadosEnAlmacenConTipoAlmacen($almacenCentral,1);
+            
+            $productosNoStockeados = $this->almacenRepository->getProductosNoStockedosByOwnModelAndKeyTipoStock(1);
             return $productosNoStockeados;
             foreach ($productosNoStockeados as $key => $producto) {
                 $this->almacenRepository->attachProductoStock($producto,1);
