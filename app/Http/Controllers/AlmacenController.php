@@ -134,6 +134,7 @@ class AlmacenController extends Controller {
             
             $productosNoStockeados = $this->almacenRepository->getProductosNoStockedosByOwnModelAndKeyTipoStock(1);
             return $productosNoStockeados;
+            
             foreach ($productosNoStockeados as $key => $producto) {
                 $this->almacenRepository->attachProductoStock($producto,1);
             }
@@ -141,7 +142,7 @@ class AlmacenController extends Controller {
             $this->almacenRepository->attachProductoStock($producto,2);
             $this->almacenRepository->attachProductoStock($producto,3);
             return $almacenCentral;
-            $responseResourse->title('Stock de productos en los alamacenes, generados correctamente');  
+            $responseResourse->title('Stock de productos en los almacenes, generados correctamente');  
             $responseResourse->body("test");
             DB::commit();
             return $responseResourse;
