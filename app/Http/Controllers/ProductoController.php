@@ -303,7 +303,7 @@ class ProductoController extends Controller
                     break;
 
                 case 'categoria':
-                    $productos = $this->productoRepository->buscarPorFiltro($filter, $value);
+                    $productos = $this->productoRepository->buscarPorCategoria($value);
                     foreach ($productos as $key => $producto) {
                         $this->productoRepository->loadTipoProductoRelationship($producto);
                         $this->productoRepository->loadUnidadMedidaRelationship($producto);

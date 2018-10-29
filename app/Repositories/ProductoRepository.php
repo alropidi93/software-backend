@@ -146,7 +146,14 @@ class ProductoRepository extends BaseRepository {
             ->whereRaw("lower(tipo) like ? ",'%'.$value.'%')->where('tipoProducto.deleted','=',false)->get();
     }
 
+    public function buscarPorCategoria($value){
+        
+               
+        return $this->model->join('categoria', 'categoria.id', '=', 'producto.idCategoria')
+            ->where('producto.idCategoria',$value)->where('producto.deleted',false)->where('categoria.deleted',false)
+            ->get();
 
+    }
     public function obtenerProveedorPorId($idProveedor){
         return $this->proveedor->where('id',$idProveedor)->where('deleted',false)->first();
 
