@@ -42,6 +42,7 @@ class ProductoController extends Controller
                 $this->productoRepository->loadTipoProductoRelationship($producto);
                 $this->productoRepository->loadUnidadMedidaRelationship($producto);
                 $this->productoRepository->loadProveedoresRelationship($producto);
+                $this->productoRepository->loadCategoriaRelationship($producto);
                 
                 
             }
