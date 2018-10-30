@@ -16,7 +16,7 @@ class CreateTransferenciaTable extends Migration
         Schema::create('transferencia', function (Blueprint $table) {
             $table->integer('id')->primary();
             $table->string('estado',30);
-            $table->text('observacion');
+            $table->text('observacion')->nullable();
             
             $table->boolean('deleted');
             $table->timestamps();

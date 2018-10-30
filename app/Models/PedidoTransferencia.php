@@ -25,11 +25,11 @@ class PedidoTransferencia extends Model
     }
 
     public function almacenOrigen() {
-        return $this->belongsToMany('App\Models\Almacen','idAlmacenO','id');
+        return $this->belongsTo('App\Models\Almacen','idAlmacenO','id');
     }
 
     public function almacenDestino() {
-        return $this->belongsToMany('App\Models\Almacen','idAlmacenD','id');
+        return $this->belongsTo('App\Models\Almacen','idAlmacenD','id');
     }
 
     public function transferencia() {

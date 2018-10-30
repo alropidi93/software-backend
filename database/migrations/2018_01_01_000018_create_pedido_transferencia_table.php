@@ -15,7 +15,7 @@ class CreatePedidoTransferenciaTable extends Migration
     {
         Schema::create('pedidoDeTransferencia', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('idUsuario');
+            $table->integer('idUsuario')->nullable();
             $table->integer('idAlmacenO');
             $table->integer('idAlmacenD');
           

@@ -18,6 +18,7 @@ use App\Http\Resources\ErrorResource;
 use Illuminate\Support\Facades\DB;
 use App\Http\Helpers\Algorithm;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Collection;
 
 class PedidoTransferenciaController extends Controller {
 
@@ -154,27 +155,95 @@ class PedidoTransferenciaController extends Controller {
         }
     }
 
-    public function store(Request $pedidoTransferenciaData) 
+    public function store(Request $data) 
     {
         
         try{
-            
-            $validator = \Validator::make($pedidoTransferenciaData->all(), 
-                            ['idUsuario' => 'required',
-                            'idAlmacenO' => 'required',
-                            'idAlmacenD'=>'required']);
+            $dataArray=$data->all();
+            $validator = \Validator::make($dataArray, 
+                            [ 
+                            'idAlmacen' => 'required',
+                            'lineasPedidoTransferencia'=>  'required'
+                            ]);
 
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
+            
+
+            $almacen = $this->pedidoTransferenciaRepository->getAlmacenById($data['idAlmacen']);
+     
+            if (!$almacen){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Almacen no encontrado');
+                $notFoundResource->notFound(['idAlmacen'=>$data['idAlmacen']]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            $dataArray['idAlmacenO']=$almacen->id;
+            $dataArray['idAlmacenD']=$almacen->id;
+
+            if(array_key_exists('idUsuario',$dataArray) && $dataArray['idUsuario']!=null){
+                $usuario = $this->pedidoTransferenciaRepository->getUsuarioById($data['idUsuario']);
+            
+                if (!$usuario){
+                    $notFoundResource = new NotFoundResource(null);
+                    $notFoundResource->title('Usuario no encontrado');
+                    $notFoundResource->notFound(['idUsuario'=>$data['idUsuario']]);
+                    return $notFoundResource->response()->setStatusCode(404);;
+                }
+                $dataArray['idUsuario'] = $usuario->id;
+            }
+
+            //comparing_dates
+            
+          
+            
             DB::beginTransaction();
-            $pedidoTransferencia = $this->pedidoTransferenciaRepository->guarda($pedidoTransferenciaData->all());
+            
+            $this->pedidoTransferenciaRepository->guarda($dataArray);
+            
+            $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+            $this->pedidoTransferenciaRepository->setTransferenciaData(['estado'=>'En transito','deleted'=>false]);
+            
+            $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
+            
+            
+            $list = $data['lineasPedidoTransferencia'];
+            
+            $list_collection = new Collection($list);
+            
+            
+            foreach ($list_collection as $key => $elem) {
+                
+                $this->pedidoTransferenciaRepository->setLineaPedidoTransferenciaData($elem);
+                
+                $this->pedidoTransferenciaRepository->attachLineaPedidoTransferenciaWithOwnModels();
+                
+                 
+            }
             DB::commit();
-            $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
-            $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Pedido de transferencia creado exitosamente');       
-            $responseResourse->body($pedidoTransferenciaResource);       
-            return $responseResourse;
+            
+                
+            //return $this->pedidoTransferenciaRepository->obtenerModelo();
+            $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship();
+            
+            $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship();
+            $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
+            //return $this->campaignRepository->getModel();
+            $pedidoTransferenciaCreado = $this->pedidoTransferenciaRepository->obtenerModelo();
+            
+            
+            
+            
+            
+            
+            $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferenciaCreado);
+            $responseResource = new ResponseResource(null);
+            
+           
+            $responseResource->title('Pedido de transferencia creado exitosamente');       
+            $responseResource->body($pedidoTransferenciaResource);       
+            return $responseResource;
         }
         catch(\Exception $e){
             DB::rollback();
