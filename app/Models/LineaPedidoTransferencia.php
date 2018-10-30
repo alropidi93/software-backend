@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class LineaPedidoTransferencia extends Model
 {
-    protected $table = 'lineaPedidoTransferencia';
+    protected $table = 'lineaPedidoDeTransferencia';
     public $timestamps = true;
     
   

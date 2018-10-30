@@ -12,8 +12,7 @@ class Transferencia extends Model
   
     protected $fillable = [
       'id',
-      'idPedidoTransferencia',
-      'fecha',
+    
       'estado',
       'observacion',
       'deleted',
