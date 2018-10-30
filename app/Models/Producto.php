@@ -42,11 +42,11 @@ class Producto extends Model
 
     public function almacenes(){
         return $this->belongsToMany('App\Models\Almacen','productoxalmacen',
-        'idProducto','idAlmacen')->withPivot('idTipoStock','cantidad','deleted','created_at','updated_at');
+        'idProducto','idAlmacen')->using('App\Models\ProductoXAlmacen')->withPivot('idTipoStock','cantidad','deleted','created_at','updated_at');
     }
 
     public function tipoStocks(){
         return $this->belongsToMany('App\Models\TipoStock','productoxalmacen',
-          'idProducto','idTipoStock')->withPivot('idAlmacen','cantidad','deleted','created_at','updated_at');
+          'idProducto','idTipoStock')->using('App\Models\ProductoXAlmacen')->withPivot('idAlmacen','cantidad','deleted','created_at','updated_at');
     }
 }

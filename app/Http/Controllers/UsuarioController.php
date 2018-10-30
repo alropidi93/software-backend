@@ -266,6 +266,8 @@ class UsuarioController extends Controller
         
     }
 
+    
+
     public function asignarRol($idUsuario, Request $data){
         try{
            

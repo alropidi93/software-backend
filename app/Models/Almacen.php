@@ -25,13 +25,25 @@ class Almacen extends Model
 
     public function productos(){
         return $this->belongsToMany('App\Models\Producto','productoxalmacen',
-          'idAlmacen','idProducto')->withPivot('idTipoStock','cantidad','deleted','created_at','updated_at');
+          'idAlmacen','idProducto')->using('App\Models\ProductoXAlmacen')->withPivot('idTipoStock','cantidad','deleted','created_at','updated_at');
     }
 
     public function tipoStocks(){
         return $this->belongsToMany('App\Models\TipoStock','productoxalmacen',
-          'idAlmacen','idTipoStock')->withPivot('idProducto','cantidad','deleted','created_at','updated_at');
+          'idAlmacen','idTipoStock')->using('App\Models\ProductoXAlmacen')->withPivot('idProducto','cantidad','deleted','created_at','updated_at');
     }
+
+    // public function posts() //tipoStock
+    // {
+    //     return $this->hasManyThrough(
+    //         'App\Models\TipoStock',
+    //         'App\Model\ProductoXAlmacen',
+    //         'idAlmacen', // Foreign key on users table...
+    //         'user_id', // Foreign key on posts table...
+    //         'id', // Local key on countries table...
+    //         'id' // Local key on users table...
+    //     );
+    // }
     
     
 }

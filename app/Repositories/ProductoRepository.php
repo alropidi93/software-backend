@@ -1,6 +1,7 @@
 <?php
 namespace App\Repositories;
 use App\Models\Producto;
+use App\Models\ProductoXAlmacen;
 use App\Models\Proveedor;
 use App\Models\TipoProducto;
 use App\Models\UnidadMedida;
@@ -12,6 +13,7 @@ class ProductoRepository extends BaseRepository {
     protected $proveedor;
     protected $categoria;
     protected $proveedores;
+    protected $almacenes;
     /** 
      * Create a new ProductoRepository instance.
      * @param  App\Models\Producto $producto
@@ -113,6 +115,50 @@ class ProductoRepository extends BaseRepository {
         }
     }
 
+    public function loadAlmacenesRelationship($producto=null){
+      
+
+        if (!$producto){
+        
+            
+
+            $this->model = $this->model->load([
+                'almacenes'=>function($query){
+                    $query->where('almacen.deleted', false); 
+                }
+            ]);
+            foreach ($this->model->almacenes as $key => $almacen) {
+                $almacen->pivot->load([
+                    'tipoStock'=>function($query){
+                        $query->where('tipoStock.deleted', false); 
+                    }
+                ]);
+            }    
+        }
+        else{
+         
+            
+            $this->model =$producto->load([
+                'almacenes'=>function($query){
+                    $query->where('almacen.deleted', false); 
+                }
+            ]);
+            foreach ($this->model->almacenes as $key => $almacen) {
+                $almacen->pivot->load([
+                    'tipoStock'=>function($query){
+                        $query->where('tipoStock.deleted', false); 
+                    }
+                ]);
+            }
+            
+        
+         
+        }
+        if ($this->model->almacenes && !$producto ){
+            $this->almacenes = $this->model->almacenes;
+        }
+    }
+
     public function loadProveedoresRelationship($producto=null){
       
 
@@ -134,7 +180,7 @@ class ProductoRepository extends BaseRepository {
                 }
             ]);
         }
-        if ($this->model->proveedores){
+        if ($this->model->proveedores && !$producto){
             $this->proveedores = $this->model->proveedores;
         }
     }
@@ -172,6 +218,16 @@ class ProductoRepository extends BaseRepository {
     public function checkProductoProveedorOwnModelsRelationship(){
         return $this->model->proveedores()->where('id',$this->proveedor->id)->where('proveedor.deleted' , false)->exists();
 
+    }
+
+    public function listarConStock(){
+        $productos = $this->model->where('deleted',false)->get();
+        foreach ($productos as $key => $producto) {
+            
+            $this->loadAlmacenesRelationship($producto);
+            
+        }
+        return $productos;
     }
     
 }

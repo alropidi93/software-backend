@@ -4,9 +4,8 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class AlmacenResource extends JsonResource
+class ProductoXAlmacenResource extends JsonResource
 {
-    
     /**
      * Transform the resource into an array.
      *
@@ -17,17 +16,18 @@ class AlmacenResource extends JsonResource
     {
         return [
             
-            'type'          => 'Almacen',
-            'id'            => $this->id,
+            'type'          => 'Producto_Almacen',
+            'idProducto'            => $this->idProducto,
+            'idAlmacen'            => $this->idAlmacen,
+            'idTipoStock'            => $this->idTipoStock,
             'attributes'    => [
+                'cantidad' => $this->nombre,
                 
-                'idTienda' => $this->idTienda,
-                'nombre' => $this->nombre,
-                'productoxalmacen'=> new ProductoXAlmacenResource($this->whenLoaded('pivot')),
+              
+                'tipoStock' => new TipoStockResource($this->whenLoaded('tipoStock')),
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,
-                'productos' => new ProductosResource($this->whenLoaded('productos'))
             ],
         ];
     }

@@ -117,7 +117,7 @@ class PedidoTransferenciaRepository extends BaseRepository {
             
             $this->model =$pedidoTransferencia->load([
                 'lineasPedidoTransferencia'=>function($query){
-                    $query->where('lineaPedidoDeTransferencia.deleted', false); 
+                    $query->where('lineaPedidoDeapiTransferencia.deleted', false); 
                 }
             ]);
             
