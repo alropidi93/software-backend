@@ -118,7 +118,9 @@ class AlmacenController extends Controller {
     }
 
     public function cargarProductosStock(Request $data){
+        set_time_limit ( 1000 );
         try{
+     
             $num_almacenes =  $this->almacenRepository->cantidadElementos();
       
             if ($num_almacenes==0){
@@ -129,23 +131,43 @@ class AlmacenController extends Controller {
             }
             DB::beginTransaction();
 
-            $almacenCentral = $this->almacenRepository->getAlmacenCentral();
-            $this->almacenRepository->setModel($almacenCentral);
+
+            $almacenes = $this->almacenRepository->obtenerTodos();
+            foreach ($almacenes as $key => $almacen) {
+                $this->almacenRepository->setModel($almacen);
+                $productosNoStockeadosTipoStock1 = $this->almacenRepository->getProductosNoStockedosByOwnModelAndKeyTipoStock(1);
             
-            $productosNoStockeados = $this->almacenRepository->getProductosNoStockedosByOwnModelAndKeyTipoStock(1);
-            return $productosNoStockeados;
-            
-            foreach ($productosNoStockeados as $key => $producto) {
-                $this->almacenRepository->attachProductoStock($producto,1);
+                foreach ($productosNoStockeadosTipoStock1 as $key => $producto) {
+                    $this->almacenRepository->attachProductoStockRndByTipoStock($producto,1);
+                }
+               
+
+                $productosNoStockeadosTipoStock2 = $this->almacenRepository->getProductosNoStockedosByOwnModelAndKeyTipoStock(2);
+                foreach ($productosNoStockeadosTipoStock2 as $key => $producto) {
+                    $this->almacenRepository->attachProductoStockRndByTipoStock($producto,2);
+                }
+
+                $productosNoStockeadosTipoStock3 = $this->almacenRepository->getProductosNoStockedosByOwnModelAndKeyTipoStock(3);
+                foreach ($productosNoStockeadosTipoStock3 as $key => $producto) {
+                    $this->almacenRepository->attachProductoStockRndByTipoStock($producto,3);
+                }
+                $this->almacenRepository->loadProductosRelationship();
+                
+               
             }
-            
-            $this->almacenRepository->attachProductoStock($producto,2);
-            $this->almacenRepository->attachProductoStock($producto,3);
-            return $almacenCentral;
-            $responseResourse->title('Stock de productos en los almacenes, generados correctamente');  
-            $responseResourse->body("test");
             DB::commit();
-            return $responseResourse;
+            
+       
+            
+           
+
+            
+            $almacenesResource =  new AlmacenesResource($almacenes);
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Stock de productos en los almacenes, generados correctamente');  
+            $responseResource->body($almacenesResource);
+            
+            return $responseResource;
         }
         catch(\Exception $e){
          

@@ -36,5 +36,12 @@ class Algorithm{
     
   }
 
+  public static function getRndIntegerNumber($limit)
+  {
+
+    return rand(0,$limit);
+
+  }
+
 
 }

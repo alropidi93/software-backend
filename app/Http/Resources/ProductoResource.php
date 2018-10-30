@@ -26,6 +26,7 @@ class ProductoResource extends JsonResource
                 'unidadMedida' => new UnidadMedidaResource($this->whenLoaded('unidadMedida')),
                 'proveedores' => new ProveedoresResource($this->whenLoaded('proveedores')),
                 'categoria' => new CategoriaResource($this->whenLoaded('categoria')),
+                'productoxalmacen'=> $this->whenLoaded('pivot'),
                 'precio' => $this->precio,
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
