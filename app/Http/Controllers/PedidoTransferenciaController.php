@@ -31,13 +31,89 @@ class PedidoTransferenciaController extends Controller {
     public function index() 
     {
         try{
-            $pedidosTransferencia = $this->pedidoTransferenciaRepository->obtenerTodos();
+            $responseResource = new ResponseResource(null);
+            $filter = strtolower(Input::get('estado'));
             
+            if ($filter){
+                
+                switch ($filter) {
+                    case 'en_transito':
+                                     
+                        $pedidosTransferencia = $this->pedidoTransferenciaRepository->buscarPorFiltroPorTransferencia('estado', 'en transito');
+                        foreach ($pedidosTransferencia as $key => $pt) {
+                            $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
+                            
+                        }
+                        $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);
+                        $responseResource->title('Lista de pedidos de transferencia filtrados por estado');       
+                        $responseResource->body($pedidosTransferenciaResource);
+                        break;
+    
+                    case 'aceptado':
+                        $pedidosTransferencia = $this->pedidoTransferenciaRepository->buscarPorFiltroPorTransferencia('estado', 'aceptado');
+                        foreach ($pedidosTransferencia as $key => $pt) {
+                            $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
+                            
+                        }
+                        $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);
+                        $responseResource->title('Lista de pedidos de transferencia filtrados por estado');       
+                        $responseResource->body($pedidosTransferenciaResource);
+                        break;
+                    
+    
+                    case 'realizado':
+                        $pedidosTransferencia = $this->pedidoTransferenciaRepository->buscarPorFiltroPorTransferencia('estado', 'realizado');
+                        foreach ($pedidosTransferencia as $key => $pt) {
+                            $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
+                            
+                        }
+                        $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);
+                        $responseResource->title('Lista de pedidos de transferencia filtrados por estado');       
+                        $responseResource->body($pedidosTransferenciaResource);
+                        break;
+                    case 'denegado':
+                        $pedidosTransferencia = $this->pedidoTransferenciaRepository->buscarPorFiltroPorTransferencia('estado', 'denegado');
+                        foreach ($pedidosTransferencia as $key => $pt) {
+                            $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
+                            
+                        }
+                        $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);
+                        $responseResource->title('Lista de pedidos de transferencia filtrados por estado');       
+                        $responseResource->body($pedidosTransferenciaResource);
+                        break;
+                    case 'cancelado':
+                        $pedidosTransferencia = $this->pedidoTransferenciaRepository->buscarPorFiltroPorTransferencia('estado', 'cancelado');
+                        foreach ($pedidosTransferencia as $key => $pt) {
+                            $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
+                            
+                        }
+                        $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);
+                        $responseResource->title('Lista de pedidos de transferencia filtrados por estado');       
+                        $responseResource->body($pedidosTransferenciaResource);
+                        break;
+    
+                    default:
+                        $errorResource = new ErrorResource(null);
+                        $errorResource->title('Error de búsqueda');
+                        $errorResource->message('Valor de filtro inválido');
+                        return $errorResource->response()->setStatusCode(400);
+                }
+                return $responseResource;
+            
+            }
+
+            $pedidosTransferencia = $this->pedidoTransferenciaRepository->obtenerTodos();
+           
+            foreach ($pedidosTransferencia as $key => $pt) {
+                $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
+                
+            }
             $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);  
-            $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Lista de pedidos de transferencia');  
-            $responseResourse->body($pedidosTransferenciaResource);
-            return $responseResourse;
+            
+            
+            $responseResource->title('Lista de pedidos de transferencia');  
+            $responseResource->body($pedidosTransferenciaResource);
+            return $responseResource;
         }
         catch(\Exception $e){
          

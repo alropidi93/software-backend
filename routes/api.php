@@ -27,6 +27,7 @@ Route::resource('proveedores', 'ProveedorController');
 Route::resource('categorias', 'CategoriaController');
 Route::resource('solicitudesCompra', 'SolicitudCompraController');
 Route::resource('lineasSolicitudCompra', 'LineaSolicitudCompraController');
+Route::resource('pedidosTransferencia', 'PedidoTransferenciaController');
 
 Route::get('busqueda/proveedores','ProveedorController@busquedaPorFiltro');
 Route::get('usuariosSinTipo', 'UsuarioController@listarUsuariosSinTipo');
@@ -62,5 +63,6 @@ Route::post('almacen/cargarProductosStock','AlmacenController@cargarProductosSto
 
 Route::get('usuario/obtenerPorRolPorTienda/{idTienda}','UsuarioController@obtenerPorRolPorTienda');
 Route::get('usuario/cajerosPorTienda/{idTienda}','UsuarioController@obtenerCajerosPorTienda');
+
 
 
