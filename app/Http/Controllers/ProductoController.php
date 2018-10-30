@@ -376,6 +376,27 @@ class ProductoController extends Controller
         
     }
 
+    public function listarConStockMinimo(){
+
+        try{
+            set_time_limit(1000);
+           
+            $productos =$this->productoRepository->listarConStockMinimo();
+            $productosResource =  new ProductosResource($productos); 
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Listado de productos cuyo stock principal es menor o igual a su stock mínimo');  
+            $responseResourse->body($productosResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+        
+    }
+
 
     public function asignarProveedor($idProducto, Request $data){
         try{

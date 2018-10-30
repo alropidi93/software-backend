@@ -229,5 +229,41 @@ class ProductoRepository extends BaseRepository {
         }
         return $productos;
     }
-    
+    public function loadTipoStockRelationShipFromPivotProducto_Almacen($almacen){
+        
+                  
+
+        $almacen->pivot->load([
+            'tipoStock'=>function($query){
+                $query->where('tipoStock.deleted', false)->where('deleted',false); 
+            }
+        ]);
+
+     
+        
+    }
+
+    public function listarConStockMinimo(){
+        
+        
+           
+        $productos =$this->model->where('deleted',false)->with(['almacenes' => function ($query) {
+            $query->where('almacen.deleted',false)->where('productoxalmacen.deleted',false)
+            ->join('tipoStock', 'tipoStock.id', '=', 'productoxalmacen.idTipoStock')
+            ->join('producto','producto.id', '=', 'productoxalmacen.idProducto')
+            ->where('tipoStock.key',1)->where('tipoStock.deleted',false)
+            ->whereRaw('productoxalmacen.cantidad <= producto."stockMin"');
+        }])->get();
+
+        $productos->each(function ($producto, $key) {
+            $producto->almacenes->each(function ($almacen,$key){
+                $this->loadTipoStockRelationShipFromPivotProducto_Almacen($almacen);
+            });
+        });
+
+      
+
+        
+        return $productos;
+    }
 }

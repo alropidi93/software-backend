@@ -24,7 +24,7 @@ class TransferenciaController extends Controller {
     protected $transferenciaRepository;
 
     public function __construct(TransferenciaRepository $transferenciaRepository){
-        PedidoTransferenciaResource::withoutWrapping();
+        TransferenciaResource::withoutWrapping();
         $this->transferenciaRepository = $transferenciaRepository;
     }
 
@@ -178,6 +178,28 @@ class TransferenciaController extends Controller {
         catch(\Exception $e){
          
             DB::rollback();
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+
+       
+    }
+
+    public function listarEstados() 
+    {
+        try{
+            $estados_transferencia=['En transito', 'Aceptado','Realizado','Denegado','Cancelado'];
+            
+           
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de estados de transferencias');  
+            $responseResourse->body($estados_transferencia);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            
             
             return (new ExceptionResource($e))->response()->setStatusCode(500);
             

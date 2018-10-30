@@ -19,8 +19,13 @@ class Almacen extends Model
       
     ];
 
+
     public function tienda() {
         return $this->belongsTo('App\Models\Tienda','idTienda','id');
+    }
+
+    public function productoxalmacenes() {
+        return $this->hasMany('App\Models\ProductoXAlmacen','idAlmacen','id');
     }
 
     public function productos(){
@@ -33,17 +38,13 @@ class Almacen extends Model
           'idAlmacen','idTipoStock')->using('App\Models\ProductoXAlmacen')->withPivot('idProducto','cantidad','deleted','created_at','updated_at');
     }
 
-    // public function posts() //tipoStock
+    // public function newPivot(Model $parent, array $attributes, $table, $exists)
     // {
-    //     return $this->hasManyThrough(
-    //         'App\Models\TipoStock',
-    //         'App\Model\ProductoXAlmacen',
-    //         'idAlmacen', // Foreign key on users table...
-    //         'user_id', // Foreign key on posts table...
-    //         'id', // Local key on countries table...
-    //         'id' // Local key on users table...
-    //     );
-    // }
+    //     if ($parent instanceof Producto) {
+    //         return new ProductoXAlmacen($parent, $attributes, $table, $exists);
+    //     }
     
+    //     return parent::newPivot($parent, $attributes, $table, $exists);
+    // }
     
 }

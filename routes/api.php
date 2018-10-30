@@ -63,6 +63,12 @@ Route::get('usuario/cajerosPorTienda/{idTienda}','UsuarioController@obtenerCajer
 Route::post('almacen/cargarProductosStock','AlmacenController@cargarProductosStock');
 
 Route::get('producto/listarConStock','ProductoController@listarConStock');
+Route::get('producto/listarStockMin','ProductoController@listarConStockMinimo');
+
+
+Route::get('transferencia/listarEstados','TransferenciaController@listarEstados');
+
+
 
 
 

@@ -11,17 +11,20 @@ class Producto extends Model
     
   
     protected $fillable = [
-      'id',
-      'nombre',
-      'stockMin',
-      'descripcion',
-      'idTipoProducto',
-      'idUnidadMedida',
-      
-      'idCategoria',
-      'precio',
-      'deleted'
+        'id',
+        'nombre',
+        'stockMin',
+        'descripcion',
+        'idTipoProducto',
+        'idUnidadMedida',
+        'idCategoria',
+        'precio',
+        'deleted'
     ];
+
+   
+
+    
 
     public function tipoProducto() {
         return $this->belongsTo('App\Models\TipoProducto','idTipoProducto','id');
@@ -44,9 +47,21 @@ class Producto extends Model
         return $this->belongsToMany('App\Models\Almacen','productoxalmacen',
         'idProducto','idAlmacen')->using('App\Models\ProductoXAlmacen')->withPivot('idTipoStock','cantidad','deleted','created_at','updated_at');
     }
+    
 
     public function tipoStocks(){
         return $this->belongsToMany('App\Models\TipoStock','productoxalmacen',
           'idProducto','idTipoStock')->using('App\Models\ProductoXAlmacen')->withPivot('idAlmacen','cantidad','deleted','created_at','updated_at');
     }
+
+    public function productosxalmacenes()
+    {
+        return $this->hasMany('App\Models\ProductoXAlmacen', 'idProducto', 'id');
+    }
+
+
+    
+ 
+
+    
 }
