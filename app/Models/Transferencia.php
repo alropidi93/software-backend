@@ -15,6 +15,7 @@ class Transferencia extends Model
     
       'estado',
       'observacion',
+      'respuesta',
       'deleted',
       
     ];
