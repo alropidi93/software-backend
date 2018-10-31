@@ -21,7 +21,7 @@ class ProductoXAlmacenResource extends JsonResource
             'idAlmacen'            => $this->idAlmacen,
             'idTipoStock'            => $this->idTipoStock,
             'attributes'    => [
-                'cantidad' => $this->nombre,
+                'cantidad' => $this->cantidad,
                 
               
                 'tipoStock' => new TipoStockResource($this->whenLoaded('tipoStock')),
