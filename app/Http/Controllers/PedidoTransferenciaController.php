@@ -369,7 +369,7 @@ class PedidoTransferenciaController extends Controller {
                 foreach ($pedidosTransferencia as $key => $pedidoTransferencia) {
                     $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pedidoTransferencia); 
                     $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pedidoTransferencia); 
-                    
+                    $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pedidoTransferencia);
                     
                 }
                 
