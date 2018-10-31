@@ -13,7 +13,8 @@ class PedidoTransferenciaRepository extends BaseRepository {
     protected $almacenOrigen;
     protected $almacenDestino;
     protected $usuario;
-   
+    protected $pedidosTransferencia;
+
     /**
      * Create a new PedidoTransferencia instance.
      * @return void
@@ -191,6 +192,13 @@ class PedidoTransferenciaRepository extends BaseRepository {
     
         $ans = $this->model->lineasPedidoTransferencia()->save($this->lineaPedidoTransferencia);
        
+    }
+    public function obtenerPedidosTransferenciaPorAlmacenD($idAlmacenD){
+       // return $this->pedidosTransferencia->where('idAlmacenD',$idAlmacenD)->where('deleted',false);
+
+        $lista = $this->model->where('idAlmacenD',$idAlmacenD)->where('deleted',false)->get();
+        
+        return $lista;
     }
    
 }
