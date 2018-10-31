@@ -13,7 +13,7 @@ class PedidoTransferenciaRepository extends BaseRepository {
     protected $almacenOrigen;
     protected $almacenDestino;
     protected $usuario;
-    protected $pedidosTransferencia;
+    protected $lineasPedidoTransferencia;
 
     /**
      * Create a new PedidoTransferencia instance.
@@ -202,5 +202,15 @@ class PedidoTransferenciaRepository extends BaseRepository {
     }
    public function obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia){
        return $this->model->where('id',$idPedidoTransferencia)->where('deleted',false)->first();
+   }
+
+   public function obtenerLineasPedidoTransferenciaFromOwnModel(){
+        return $this->lineasPedidoTransferencia;
+   }
+
+   public function setLineasPedidoTransferenciaByOwnModel(){
+       
+       $this->lineasPedidoTransferencia = $this->model->lineasPedidoTransferencia;
+       unset($this->model->lineasPedidoTransferencia);
    }
 }

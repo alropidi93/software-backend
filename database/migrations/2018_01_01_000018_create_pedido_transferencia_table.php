@@ -20,6 +20,7 @@ class CreatePedidoTransferenciaTable extends Migration
             $table->integer('idAlmacenD');
           
             $table->text('descripcion');
+            $table->integer('fase');
             $table->boolean('deleted');
             $table->timestamps();
 

@@ -8,6 +8,7 @@ use App\Models\Usuario;
 use App\Repositories\PedidoTransferenciaRepository;
 use App\Repositories\UsuarioRepository;
 use App\Services\AlmacenService;
+use App\Services\PedidoTransferenciaService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PedidoTransferenciaResource;
 use App\Http\Resources\PedidosTransferenciaResource;
@@ -223,33 +224,19 @@ class PedidoTransferenciaController extends Controller {
                 }
                 $dataArray['idUsuario'] = $usuario->id;
             }
-
-            //comparing_dates
-            
-          
-            
+                              
             DB::beginTransaction();
             
             $this->pedidoTransferenciaRepository->guarda($dataArray);
-            
             $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-            
-            
-            
-            
-            
             $list = $data['lineasPedidoTransferencia'];
-            
             $list_collection = new Collection($list);
-            
-            
+                       
             foreach ($list_collection as $key => $elem) {
                 
                 $this->pedidoTransferenciaRepository->setLineaPedidoTransferenciaData($elem);
-                
                 $this->pedidoTransferenciaRepository->attachLineaPedidoTransferenciaWithOwnModels();
-                
-                 
+                            
             }
             DB::commit();
             
@@ -425,10 +412,20 @@ class PedidoTransferenciaController extends Controller {
 
     }
 
-    public function evaluarPedidoTransferencia($idPedidoTransferencia){
+    public function evaluarPedidoTransferencia($idPedidoTransferencia,Request $data){
         try{
+            $dataArray=$data->all();
+            $dataArray= Algorithm::quitNullValuesFromArray($dataArray);
+            $validator = \Validator::make($dataArray, 
+                            [ 
+                            'evaluacion' => 'required'
+                            ]);
+
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
             $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia);
-         
+            $evaluacion = $data['evaluacion'];
             
             if (!$pedidoTransferencia){
                 $notFoundResource = new NotFoundResource(null);
@@ -436,34 +433,115 @@ class PedidoTransferenciaController extends Controller {
                 $notFoundResource->notFound(['id' => $idPedidoTransferencia]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
-            if ($pedidosTransferencia->tieneRechazos(1)){
-
-            }
-            else if ($pedidosTransferencia->tieneRechazos(2)){
-
-            }
-            else if ($pedidosTransferencia->tieneRechazos(3)){
-
-            }
-
-
-
-
-
-
-
-            $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pedidoTransferencia); 
-            $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pedidoTransferencia); 
-            $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pedidoTransferencia);               
-            $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia); 
+            
+            
             $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Pedido de Transferencia encontrado');  
-            $responseResourse->body($pedidoTransferenciaResource);
+            DB::beginTransaction();
+            $this->pedidoTransferenciaRepository->setModel($pedidoTransferencia);
+            $this->pedidoTransferenciaRepository->setLineasPedidoTransferenciaByOwnModel();
+
+            if ($pedidoTransferencia->estaEnPrimerIntento()){
+                
+                if ($evaluacion){
+                    $dataArray['estado']='Aceptado';
+                    $dataArray['deleted']=false;
+                    $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
+                    $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
+                    $this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
+                    $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                    DB::commit();
+                    
+                    $text= "Pedido de transferencia aceptado en el intento {$pedidoTransferencia->fase}";
+                    $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
+                    $responseResourse->title($text);  
+                    $responseResourse->body($pedidoTransferenciaResource);
+                }
+                else{
+                    
+                    $dataArray['estado']='Denegado';
+                    $dataArray['deleted']=false;
+                    $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
+                    $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
+                    //$this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
+                    $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                    $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
+                    
+                    $almacenOrigen = $this->pedidoTransferenciaRepository->getAlmacenById($pedidoTransferencia->idAlmacenO);
+     
+                    if (!$almacenOrigen){
+                        $notFoundResource = new NotFoundResource(null);
+                        $notFoundResource->title('Almacen no encontrado');
+                        $notFoundResource->notFound(['idAlmacen'=>$pedidoTransferencia->idAlmacenO]);
+                        return $notFoundResource->response()->setStatusCode(404);
+                    }
+                    $almacenService = new AlmacenService;
+                    $pedidoTransferenciaService = new PedidoTransferenciaService;
+                    $almacenCercano = $almacenService->obtenerAlmacenCercano($almacenOrigen,2);
+                    $pedidoTransferencia->idAlmacenD = $almacenCercano->id;
+                    
+                    $nuevoPedidoTransferenciaArray = $pedidoTransferenciaService->nuevaInstancia($pedidoTransferencia,2);
+                    $lineasPedidoTransferencia;
+                    $nuevasListasArray = $pedidoTransferenciaService->nuevasLineasPedidoTransferencia($lineasPedidoTransferencia);
+                    
+                    $this->pedidoTransferenciaRepository->guarda($nuevoPedidoTransferenciaArray);
+                    
+                
+                    
+                    $list_collection = new Collection($nuevasListasArray);
+                            
+                    foreach ($list_collection as $key => $elem) {
+                        
+                        $this->pedidoTransferenciaRepository->setLineaPedidoTransferenciaData($elem);
+                        $this->pedidoTransferenciaRepository->attachLineaPedidoTransferenciaWithOwnModels();
+                                    
+                    }
+                    $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
+                    $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                    DB::commit();
+                    
+                    $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
+                    $text= "Pedido de transferencia denegado en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
+                    $responseResourse->title($text);  
+                    $responseResourse->body($pedidoTransferenciaResource);
+
+                }
+
+            }
+            else if ($pedidoTransferencia->estaEnSegundoIntento()){
+                return 20;
+                if ($evaluacion){
+
+                }
+                else{
+                    
+                }
+            }
+            else if ($pedidoTransferencia->estaEnTercerIntento()){
+                return 30;
+                if ($evaluacion){
+
+                }
+                else{
+                    
+                }
+            }
+            return 40;
+            DB::commit();
+
+
+
+
+
+
+
+            
+            
+            
             return $responseResourse;
         }
         catch(\Exception $e){
          
-            
+            DB::rollback();
             return (new ExceptionResource($e))->response()->setStatusCode(500);
             
         }

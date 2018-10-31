@@ -16,6 +16,7 @@ class PedidoTransferencia extends Model
       'idAlmacenO',
       'idAlmacenD',
       'descripcion',
+      'fase',
       'deleted',
       
     ];
@@ -38,6 +39,19 @@ class PedidoTransferencia extends Model
 
     public function lineasPedidoTransferencia() {
         return $this->hasMany('App\Models\LineaPedidoTransferencia','idPedidoTransferencia','id');
+    }
+
+
+    public function estaEnPrimerIntento() {
+        return $this->fase==1;
+    }
+
+    public function estaEnSegundoIntento() {
+        return $this->fase==2;
+    }
+
+    public function estaEnTercerIntento() {
+        return $this->fase==3;
     }
     
     
