@@ -20,7 +20,8 @@ class CreateSolicitudDeCompraTable extends Migration
         
             
             $table->integer('idTienda');
-            $table->date('fecha');
+            
+            $table->date('enviado');
             $table->boolean('deleted');
             $table->timestamps();
 

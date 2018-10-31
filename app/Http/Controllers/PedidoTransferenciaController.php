@@ -6,10 +6,17 @@ use Illuminate\Http\Request;
 use App\Models\PedidoTransferencia;
 use App\Models\Usuario;
 use App\Repositories\PedidoTransferenciaRepository;
+use App\Repositories\SolicitudCompraRepository;
+use App\Repositories\LineaSolicitudCompraRepository;
+use App\Http\Resources\LineaSolicitudCompraResource;
+use App\Http\Resources\LineasSolicitudCompraResource;
+
 use App\Repositories\UsuarioRepository;
 use App\Services\AlmacenService;
 use App\Services\PedidoTransferenciaService;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\SolicitudCompraResource;
+use App\Http\Resources\SolicitudesCompraResource;
 use App\Http\Resources\PedidoTransferenciaResource;
 use App\Http\Resources\PedidosTransferenciaResource;
 use App\Http\Resources\ExceptionResource;
@@ -25,10 +32,18 @@ use Illuminate\Support\Collection;
 class PedidoTransferenciaController extends Controller {
 
     protected $pedidoTransferenciaRepository;
+    protected $solicitudCompraRepository;
+    protected $lineaSolicitudCompraRepository;
 
-    public function __construct(PedidoTransferenciaRepository $pedidoTransferenciaRepository){
+    public function __construct(PedidoTransferenciaRepository $pedidoTransferenciaRepository, SolicitudCompraRepository $solicitudCompraRepository,LineaSolicitudCompraRepository $lineaSolicitudCompraRepository)
+    {
         PedidoTransferenciaResource::withoutWrapping();
+        
+        SolicitudCompraResource::withoutWrapping();
+        LineaSolicitudCompraResource::withoutWrapping();
         $this->pedidoTransferenciaRepository = $pedidoTransferenciaRepository;
+        $this->solicitudCompraRepository = $solicitudCompraRepository;
+        $this->lineaSolicitudCompraRepository = $lineaSolicitudCompraRepository;
     }
 
     public function index() 
@@ -164,10 +179,10 @@ class PedidoTransferenciaController extends Controller {
             $this->pedidoTransferenciaRepository->loadUsuarioRelationship();
            
             $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);  
-            $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Mostrar pedido de transferencia');  
-            $responseResourse->body($pedidoTransferenciaResource);
-            return $responseResourse;
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Mostrar pedido de transferencia');  
+            $responseResource->body($pedidoTransferenciaResource);
+            return $responseResource;
         }
         catch(\Exception $e){
             
@@ -212,6 +227,7 @@ class PedidoTransferenciaController extends Controller {
             $almacenService =  new AlmacenService;
             $almacenCercano= $almacenService->obtenerAlmacenCercano($almacen,1);
             $dataArray['idAlmacenD']=$almacenCercano->id;
+            $dataArray['fase']=1;
 
             if(array_key_exists('idUsuario',$dataArray) && $dataArray['idUsuario']!=null){
                 $usuario = $this->pedidoTransferenciaRepository->getUsuarioById($data['idUsuario']);
@@ -296,12 +312,12 @@ class PedidoTransferenciaController extends Controller {
             
             DB::commit();
             $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
-            $responseResourse = new ResponseResource(null);
+            $responseResource = new ResponseResource(null);
             
-            $responseResourse->title('Pedido de transferencia actualizado exitosamente');       
-            $responseResourse->body($pedidoTransferenciaResource);     
+            $responseResource->title('Pedido de transferencia actualizado exitosamente');       
+            $responseResource->body($pedidoTransferenciaResource);     
             
-            return $responseResourse;
+            return $responseResource;
         }
         catch(\Exception $e){
             DB::rollback();
@@ -332,11 +348,11 @@ class PedidoTransferenciaController extends Controller {
             
 
               
-            $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Pedido de transferencia eliminado');  
-            $responseResourse->body(['id' => $id]);
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Pedido de transferencia eliminado');  
+            $responseResource->body(['id' => $id]);
             DB::commit();
-            return $responseResourse;
+            return $responseResource;
         }
         catch(\Exception $e){
          
@@ -349,7 +365,8 @@ class PedidoTransferenciaController extends Controller {
        
     }
 
-    public function verPedidosTransferenciaRecibidos($idAlmacenD){
+    public function verPedidosTransferenciaRecibidos($idAlmacenD)
+    {
         {
             try{
                 $pedidosTransferencia = $this->pedidoTransferenciaRepository->obtenerPedidosTransferenciaPorAlmacenD($idAlmacenD);
@@ -369,10 +386,10 @@ class PedidoTransferenciaController extends Controller {
     
                            
                 $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia); 
-                $responseResourse = new ResponseResource(null);
-                $responseResourse->title('Listado de Pedidos de Transferencia recibidos');  
-                $responseResourse->body($pedidosTransferenciaResource);
-                return $responseResourse;
+                $responseResource = new ResponseResource(null);
+                $responseResource->title('Listado de Pedidos de Transferencia recibidos');  
+                $responseResource->body($pedidosTransferenciaResource);
+                return $responseResource;
             }
             catch(\Exception $e){
              
@@ -383,14 +400,15 @@ class PedidoTransferenciaController extends Controller {
     
         }
     }
-    public function obtenerPedidoTransferenciaPorId($idPedidoTransferencia){
+    public function obtenerPedidoTransferenciaPorId($idPedidoTransferencia)
+    {
         try{
             $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia);
          
             
             if (!$pedidoTransferencia){
                 $notFoundResource = new NotFoundResource(null);
-                $notFoundResource->title('No existe ese pedido de transferencia ');
+                $notFoundResource->title('No existe este pedido de transferencia ');
                 $notFoundResource->notFound(['id' => $idPedidoTransferencia]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
@@ -398,10 +416,10 @@ class PedidoTransferenciaController extends Controller {
             $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pedidoTransferencia); 
             $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pedidoTransferencia);               
             $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia); 
-            $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Pedido de Transferencia encontrado');  
-            $responseResourse->body($pedidoTransferenciaResource);
-            return $responseResourse;
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Pedido de Transferencia encontrado');  
+            $responseResource->body($pedidoTransferenciaResource);
+            return $responseResource;
         }
         catch(\Exception $e){
          
@@ -412,7 +430,8 @@ class PedidoTransferenciaController extends Controller {
 
     }
 
-    public function evaluarPedidoTransferencia($idPedidoTransferencia,Request $data){
+    public function evaluarPedidoTransferencia($idPedidoTransferencia,Request $data)
+    {
         try{
             $dataArray=$data->all();
             $dataArray= Algorithm::quitNullValuesFromArray($dataArray);
@@ -429,17 +448,17 @@ class PedidoTransferenciaController extends Controller {
             
             if (!$pedidoTransferencia){
                 $notFoundResource = new NotFoundResource(null);
-                $notFoundResource->title('No existe ese pedido de transferencia ');
+                $notFoundResource->title('No existe este pedido de transferencia ');
                 $notFoundResource->notFound(['id' => $idPedidoTransferencia]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
             
             
-            $responseResourse = new ResponseResource(null);
+            $responseResource = new ResponseResource(null);
             DB::beginTransaction();
             $this->pedidoTransferenciaRepository->setModel($pedidoTransferencia);
             $this->pedidoTransferenciaRepository->setLineasPedidoTransferenciaByOwnModel();
-
+            
             if ($pedidoTransferencia->estaEnPrimerIntento()){
                 
                 if ($evaluacion){
@@ -453,8 +472,8 @@ class PedidoTransferenciaController extends Controller {
                     
                     $text= "Pedido de transferencia aceptado en el intento {$pedidoTransferencia->fase}";
                     $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
-                    $responseResourse->title($text);  
-                    $responseResourse->body($pedidoTransferenciaResource);
+                    $responseResource->title($text);  
+                    $responseResource->body($pedidoTransferenciaResource);
                 }
                 else{
                     
@@ -464,6 +483,8 @@ class PedidoTransferenciaController extends Controller {
                     $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
                     //$this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
                     $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                    $text= "Pedido de transferencia denegado en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
+                    
                     $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
                     
                     $almacenOrigen = $this->pedidoTransferenciaRepository->getAlmacenById($pedidoTransferencia->idAlmacenO);
@@ -480,7 +501,7 @@ class PedidoTransferenciaController extends Controller {
                     $pedidoTransferencia->idAlmacenD = $almacenCercano->id;
                     
                     $nuevoPedidoTransferenciaArray = $pedidoTransferenciaService->nuevaInstancia($pedidoTransferencia,2);
-                    $lineasPedidoTransferencia;
+                    
                     $nuevasListasArray = $pedidoTransferenciaService->nuevasLineasPedidoTransferencia($lineasPedidoTransferencia);
                     
                     $this->pedidoTransferenciaRepository->guarda($nuevoPedidoTransferenciaArray);
@@ -495,49 +516,149 @@ class PedidoTransferenciaController extends Controller {
                         $this->pedidoTransferenciaRepository->attachLineaPedidoTransferenciaWithOwnModels();
                                     
                     }
-                    $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
+                    
                     $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
                     DB::commit();
-                    
+                    $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
+                    $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship();
+                    $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship();
+                    $this->pedidoTransferenciaRepository->loadUsuarioRelationship();
                     $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
-                    $text= "Pedido de transferencia denegado en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
-                    $responseResourse->title($text);  
-                    $responseResourse->body($pedidoTransferenciaResource);
-
+                    $responseResource->title($text);  
+                    $responseResource->body($pedidoTransferenciaResource);
+                    
                 }
 
             }
             else if ($pedidoTransferencia->estaEnSegundoIntento()){
-                return 20;
+                
                 if ($evaluacion){
 
                 }
                 else{
+                    $dataArray['estado']='Denegado';
+                    $dataArray['deleted']=false;
+                    $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
+                    $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
+                    //$this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
+                    $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                    $text= "Pedido de transferencia denegado en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al almacen central";
+                    $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
+                    $almacenOrigen = $this->pedidoTransferenciaRepository->getAlmacenById($pedidoTransferencia->idAlmacenO);
+     
+                    if (!$almacenOrigen){
+                        $notFoundResource = new NotFoundResource(null);
+                        $notFoundResource->title('Almacen no encontrado');
+                        $notFoundResource->notFound(['idAlmacen'=>$pedidoTransferencia->idAlmacenO]);
+                        return $notFoundResource->response()->setStatusCode(404);
+                    }
+                    $almacenService = new AlmacenService;
+                    $pedidoTransferenciaService = new PedidoTransferenciaService;
+                    $almacenCentral = $this->pedidoTransferenciaRepository->getAlmacenCentral();
+                    $pedidoTransferencia->idAlmacenD = $almacenCentral->id;
+                    $nuevoPedidoTransferenciaArray = $pedidoTransferenciaService->nuevaInstancia($pedidoTransferencia,3);
+                    $nuevasListasArray = $pedidoTransferenciaService->nuevasLineasPedidoTransferencia($lineasPedidoTransferencia);
+                    
+                    $this->pedidoTransferenciaRepository->guarda($nuevoPedidoTransferenciaArray);
+                    
+                
+                    
+                    $list_collection = new Collection($nuevasListasArray);
+                            
+                    foreach ($list_collection as $key => $elem) {
+                        
+                        $this->pedidoTransferenciaRepository->setLineaPedidoTransferenciaData($elem);
+                        $this->pedidoTransferenciaRepository->attachLineaPedidoTransferenciaWithOwnModels();
+                                    
+                    }
+                    
+                    $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                    DB::commit();
+                    $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
+                    $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship();
+                    $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship();
+                    $this->pedidoTransferenciaRepository->loadUsuarioRelationship();
+                    $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
+                    $responseResource->title($text);  
+                    $responseResource->body($pedidoTransferenciaResource);
                     
                 }
             }
             else if ($pedidoTransferencia->estaEnTercerIntento()){
-                return 30;
+                
                 if ($evaluacion){
 
                 }
                 else{
                     
+                    $dataArray['estado']='Denegado';
+                    $dataArray['deleted']=false;
+                    $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
+                    $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
+                    $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                    $text= "Pedido de transferencia denegado en el intento {$pedidoTransferencia->fase}, se generá o acumulará (si ya hubiese) una solicitud de compra con este producto";
+                    
+                    $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
+                    $almacenOrigen = $this->pedidoTransferenciaRepository->getAlmacenById($pedidoTransferencia->idAlmacenO);
+     
+                    if (!$almacenOrigen){
+                        $notFoundResource = new NotFoundResource(null);
+                        $notFoundResource->title('Almacen no encontrado');
+                        $notFoundResource->notFound(['idAlmacen'=>$pedidoTransferencia->idAlmacenO]);
+                        return $notFoundResource->response()->setStatusCode(404);
+                    }
+                    
+                    $tienda = $this->pedidoTransferenciaRepository->obtenerTiendaDeAlmacenOrigenFromOwnModel();
+                    
+                    if (!$tienda){
+                        $notFoundResource = new NotFoundResource(null);
+                        $notFoundResource->title('Tienda de almacen de origen no encontrado');
+                        $notFoundResource->notFound(['idAlmacen'=>$almacenOrigen->id]);
+                        return $notFoundResource->response()->setStatusCode(404);
+                    }
+                    else{
+                        $this->solicitudCompraRepository->setTiendaModel($tienda);
+                        
+                        foreach ($lineasPedidoTransferencia as $key => $lpt) {
+                            $producto = $this->lineaSolicitudCompraRepository->getProductoById($lpt->idProducto);
+                            return $producto;
+                            $this->solicitudCompraRepository->acumulaPeoductoOrCreaSolicitud($producto,$lpt->cantidad);
+                        }
+                    }
+                    
+                    //$almacenService = new AlmacenService;
+                    //$pedidoTransferenciaService = new PedidoTransferenciaService;
+                   
+                    
+                    
+                    
+                    
+                
+                    
+                    $list_collection = new Collection($nuevasListasArray);
+                            
+                    foreach ($list_collection as $key => $elem) {
+                        
+                        $this->pedidoTransferenciaRepository->setLineaPedidoTransferenciaData($elem);
+                        $this->pedidoTransferenciaRepository->attachLineaPedidoTransferenciaWithOwnModels();
+                                    
+                    }
+                    
+                    $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                    DB::commit();
+                    $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
+                    $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship();
+                    $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship();
+                    $this->pedidoTransferenciaRepository->loadUsuarioRelationship();
+                    $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
+                    $responseResource->title($text);  
+                    $responseResource->body($pedidoTransferenciaResource);
+                    
                 }
-            }
-            return 40;
-            DB::commit();
-
-
-
-
-
-
-
+            }        
             
             
-            
-            return $responseResourse;
+            return $responseResource;
         }
         catch(\Exception $e){
          

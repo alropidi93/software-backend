@@ -14,7 +14,10 @@ class LineaSolicitudCompraRepository extends BaseRepository{
         $this->proveedor = $proveedor;
         $this->producto = $producto;
     }
-
+    public function getProductoById($idProducto){
+        
+        return $this->producto->where('id',$idProducto)->where('deleted',false)->first();
+    }
     public function setProveedorModel($proveedor){
         $this->proveedor = $proveedor;
     }

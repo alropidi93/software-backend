@@ -29,6 +29,10 @@ class PedidoTransferenciaRepository extends BaseRepository {
         $this->usuario = $usuario;
     }
 
+    public function getAlmacenCentral(){
+        return $this->almacen->where('nombre','Central')->first();
+    }
+
     public function loadTransferenciaRelationship($pedidoTransferencia=null){
         if (!$pedidoTransferencia){
                   
@@ -76,6 +80,32 @@ class PedidoTransferenciaRepository extends BaseRepository {
         }
         if ($this->model->almacenOrigen && !$pedidoTransferencia){
             $this->almacenOrigen = $this->model->almacenOrigen;
+        }
+    }
+
+    public function loadUsuarioRelationship($pedidoTransferencia=null){
+        
+        if (!$pedidoTransferencia){
+                  
+            
+            $this->model = $this->model->load([
+                'usuario'=>function($query){
+                    $query->where('usuario.deleted', false);
+                }
+            ]);
+                
+        }
+        else{
+            
+            $this->model =$pedidoTransferencia->load([
+                'usuario'=>function($query){
+                    $query->where('usuario.deleted', false); 
+                }
+            ]);
+            
+        }
+        if ($this->model->usuario && !$pedidoTransferencia){
+            $this->usuario = $this->model->usuario;
         }
     }
 
@@ -150,6 +180,8 @@ class PedidoTransferenciaRepository extends BaseRepository {
         return $this->almacen->where('id',$idAlmacen)->where('deleted',false)->first();
     }
 
+    
+
     public function getUsuarioById($idUsuario){
         
         return $this->usuario->where('idPersonaNatural',$idUsuario)->where('deleted',false)->first();
@@ -200,17 +232,27 @@ class PedidoTransferenciaRepository extends BaseRepository {
         
         return $lista;
     }
-   public function obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia){
+    public function obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia){
        return $this->model->where('id',$idPedidoTransferencia)->where('deleted',false)->first();
-   }
+    }
 
-   public function obtenerLineasPedidoTransferenciaFromOwnModel(){
+    public function obtenerLineasPedidoTransferenciaFromOwnModel(){
         return $this->lineasPedidoTransferencia;
-   }
+    }
 
-   public function setLineasPedidoTransferenciaByOwnModel(){
+    public function obtenerTiendaDeAlmacenOrigenFromOwnModel(){
+        if ($this->model){
+            return $this->model->almacenOrigen->tienda;
+
+        }
+        return null;
+
+        
+    }
+
+    public function setLineasPedidoTransferenciaByOwnModel(){
        
        $this->lineasPedidoTransferencia = $this->model->lineasPedidoTransferencia;
        unset($this->model->lineasPedidoTransferencia);
-   }
+    }
 }

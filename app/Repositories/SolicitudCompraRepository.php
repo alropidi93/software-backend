@@ -96,9 +96,44 @@ class SolicitudCompraRepository extends BaseRepository {
         $this->lineaSolicitudCompra = $lineaSolicitudCompra;
     }
 
+    public function setTiendaModel($tienda){
+        $this->tienda = $tienda;
+    }
+
     public function attachLineaSolicitudCompra($lineaSolicitudCompra){
         $this->model->lineasSolicitudCompra()->save($lineaSolicitudCompra , ['deleted'=>false] );
         $this->model->save();
+    }
+
+    protected function obtenerSolictudesQueContieneProducto($producto){
+        
+        
+        return $this->model->where('enviado',false)->where('idTienda',$this->tienda->id)->where('deleted',false)->whereHas('lineasSolicitudCompra',function($q) use ($producto){
+            $q->whereHas('producto',function ($q2)use ($producto){
+                $q->where('producto.id',$producto->id)->where('producto.deleted',false);
+            });
+        });
+    }
+    public function obtenerLineaActual($producto){
+        return $this->lineaSolicitudCompra->where('idProducto',$producto->id)->where('deleted',false)
+        ->whereHas('solicitudCompra',function ($q) {
+            $q->where('solicitudCompra.idTienda',$this->tienda->id)->where('solicitudCompra.enviado',false)->where('solicitudCompra.deleted',false);
+        })->first();
+    }
+
+    public function acumulaPeoductoOrCreaSolicitud($producto,$cantidad){
+        $n_elements = $this->obtenerSolicitudQueContienenProducto($producto);
+        if ($n_elements==0){
+            //creo
+            $this->guarda(['idTienda'=>$this->tienda->id,'enviado'=>false]);
+            
+        }
+        else{
+            //actualizo
+            $lineaActual = $this->obtenerLineaActual($producto);
+            $nuevaCantidad = $cantidad +$lineaActual['cantidad'];
+            $lineaActual->update(['cantidad'=>$nuevaCantidad]);
+        }
     }
 
     // public function checkProductoProveedorOwnModelsRelationship(){
