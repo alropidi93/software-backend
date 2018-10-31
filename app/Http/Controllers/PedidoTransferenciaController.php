@@ -366,7 +366,12 @@ class PedidoTransferenciaController extends Controller {
         {
             try{
                 $pedidosTransferencia = $this->pedidoTransferenciaRepository->obtenerPedidosTransferenciaPorAlmacenD($idAlmacenD);
-             
+                foreach ($pedidosTransferencia as $key => $pedidoTransferencia) {
+                    $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pedidoTransferencia); 
+                    $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pedidoTransferencia); 
+                    
+                    
+                }
                 
                 if (!$pedidosTransferencia){
                     $notFoundResource = new NotFoundResource(null);
@@ -375,7 +380,7 @@ class PedidoTransferenciaController extends Controller {
                     return $notFoundResource->response()->setStatusCode(404);
                 }
     
-                              
+                           
                 $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia); 
                 $responseResourse = new ResponseResource(null);
                 $responseResourse->title('Listado de Pedidos de Transferencia recibidos');  
