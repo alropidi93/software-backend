@@ -358,18 +358,18 @@ class UsuarioController extends Controller
                 $password = $this->usuarioRepository->getPassword();
                 if (Hash::check($request['password'], $password)){
                     Log:info("paso el login");
-                    // if($usuario->esJefeDeTienda()){
-                    //     $this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship();
-                    // }
-                    // else if ($usuario->esJefeDeAlmacen()){
+                    if($usuario->esJefeDeTienda()){
+                        $this->usuarioRepository->loadTiendaCargoJefeTiendaRelationship();
+                    }
+                    else if ($usuario->esJefeDeAlmacen()){
                         
                         
-                    //     $this->usuarioRepository->loadTiendasCargoJefeAlmacenRelationship();
+                        $this->usuarioRepository->loadTiendaCargoJefeAlmacenRelationship();
                         
-                    // }
-                    // else if (!$usuario->isAdmin()){
-                    //     $this->usuarioRepository->loadTiendasCargoTrabajadorRelationship();
-                    // }
+                    }
+                    else if (!$usuario->isAdmin()){
+                        $this->usuarioRepository->loadTiendasCargoTrabajadorRelationship();
+                    }
                     $this->usuarioRepository->loadTipoUsuarioRelationship();
                     $usuarioResource =  new UsuarioResource($usuario);
                     $responseResourse = new ResponseResource(null);
