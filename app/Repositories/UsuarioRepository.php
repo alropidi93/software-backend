@@ -192,18 +192,29 @@ class UsuarioRepository extends BaseRepository {
 
     public function loadTiendaCargoJefeTiendaRelationship($usuario=null){
         if (!$usuario){
-            //$this->model->load('tiendasCargoJefeTienda');
             
 
-            $this->model->load(['tiendaCargoJefeTienda' => function ($query) {
-                $query->where('deleted', false);
-            }]);
+            $this->model->load([
+                'tiendaCargoJefeTienda' => function ($query) {
+                    $query->where('deleted', false);
+                },
+                'tiendaCargoJefeTienda.almacen' => function ($query) {
+                    $query->where('almacen.deleted', false);
+                },
+            
+            
+            ]);
         }
         else{
-            //$usuario->load('tiendasCargoJefeTienda');
-            $usuario->load(['tiendaCargoJefeTienda' => function ($query) {
-                $query->where('deleted', false);
-            }]);
+            
+            $usuario->load([
+                'tiendaCargoJefeTienda' => function ($query) {
+                    $query->where('deleted', false);
+                },
+                'tiendaCargoJefeTienda.almacen' => function ($query) {
+                    $query->where('almacen.deleted', false);
+                },
+            ]);
         }
         
     }
@@ -249,15 +260,25 @@ class UsuarioRepository extends BaseRepository {
         if (!$usuario){
             
 
-            $this->model->load(['tiendaCargoJefeAlmacen' => function ($query) {
-                $query->where('tienda.deleted', false);
-            }])->get();
+            $this->model->load([
+                'tiendaCargoJefeAlmacen' => function ($query) {
+                    $query->where('tienda.deleted', false);
+                },
+                'tiendaCargoJefeAlmacen.almacen' => function ($query) {
+                    $query->where('almacen.deleted', false);
+                },
+            ])->get();
         }
         else{
             
-            $usuario->load(['tiendaCargoJefeAlmacen' => function ($query) {
-                $query->where('tienda.deleted', false);
-            }])->get();
+            $usuario->load([
+                'tiendaCargoJefeAlmacen' => function ($query) {
+                    $query->where('tienda.deleted', false);
+                },
+                'tiendaCargoJefeAlmacen.almacen' => function ($query) {
+                    $query->where('almacen.deleted', false);
+                },
+            ])->get();
         }
         
     }
