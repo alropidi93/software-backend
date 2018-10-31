@@ -30,8 +30,12 @@ class UsuarioResource extends JsonResource
                 'tipoUsuario' => new TipoUsuarioResource($this->whenLoaded('tipoUsuario')),
                 'usuarioxtienda'=> $this->whenLoaded('pivot'),
                 'personaNatural' => new PersonaNaturalResource($this->whenLoaded('personaNatural')),
-                'tiendaDeLaQueEsJefeDeTienda' => new TiendasResource($this->whenLoaded('tiendasCargoJefeTienda')),
-                'tiendaDeLaQueEsJefeDeAlmacen' => new TiendasResource($this->whenLoaded('tiendasCargoJefeAlmacen'))
+                'tiendaDeLaQueEsJefeDeTienda' => new TiendaResource($this->whenLoaded('tiendaCargoJefeTienda')),
+                //'tiendaDeLaQueEsJefeDeAlmacen' => new TiendaResource($this->tiendaCargoJefeAlmacen),
+                'tiendasDeLaQueEsJefeDeTienda' => new TiendasResource($this->whenLoaded('tiendasCargoJefeTienda')),
+                'tiendasDeLaQueEsJefeDeAlmacen' => new TiendasResource($this->whenLoaded('tiendasCargoJefeAlmacen')),
+                'tiendasDeLaQueEsTrabajador' => new TiendasResource($this->whenLoaded('tiendas')),
+                
                  
             ]
            

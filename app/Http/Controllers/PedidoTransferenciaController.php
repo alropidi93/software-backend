@@ -419,6 +419,12 @@ class PedidoTransferenciaController extends Controller {
 
     }
 
-
+    public function evaluarPedidoTransferencia($idPedidoTransferencia){
+        
+    
+    } 
  
 }
+
+
+

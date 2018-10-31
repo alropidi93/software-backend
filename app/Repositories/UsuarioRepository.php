@@ -190,21 +190,53 @@ class UsuarioRepository extends BaseRepository {
         
     }
 
-    public function loadTiendasCargoJefeAlmacenRelationship($usuario=null){
-        
+    public function loadTiendasCargoTrabajadorRelationship($usuario=null){
         if (!$usuario){
-            //$this->model->load('tiendasCargoJefeAlmacen');
+            //$this->model->load('tiendasCargoJefeTienda');
+            
 
-            $this->model->with(['tiendasCargoJefeAlmacen' => function ($query) {
-                $query->where('deleted', false);
-            }])->get();
+            $this->model->load(['tiendas' => function ($query) {
+                $query->where('tienda.deleted', false);
+            }]);
         }
         else{
-            //$usuario->load('tiendasCargoJefeAlmacen');
-            $usuario->with(['tiendasCargoJefeAlmacen' => function ($query) {
-                $query->where('deleted', false);
-            }])->get();
+            //$usuario->load('tiendasCargoJefeTienda');
+            $usuario->load(['tiendas' => function ($query) {
+                $query->where('tienda.deleted', false);
+            }]);
         }
+        
+    }
+
+    public function loadTiendasCargoJefeAlmacenRelationship($usuario=null){
+        if (!$usuario){
+            $this->model->tiendaCargoJefeAlmacen;
+        }
+        else{
+            $usuario->tiendaCargoJefeAlmacen;
+        }
+        
+        // if (!$usuario){
+        //     $this->model->load('tiendasCargoJefeAlmacen');
+        // }
+        // else{
+        //     $usuario->load('tiendasCargoJefeAlmacen');
+        // }
+
+
+        // if (!$usuario){
+        //     //$this->model->load('tiendasCargoJefeAlmacen');
+
+        //     $this->model->load(['tiendaCargoJefeAlmacen' => function ($query) {
+        //         $query->where('tienda.deleted', false);
+        //     }])->get();
+        // }
+        // else{
+        //     //$usuario->load('tiendasCargoJefeAlmacen');
+        //     $usuario->load(['tiendaCargoJefeAlmacen' => function ($query) {
+        //         $query->where('tienda.deleted', false);
+        //     }])->get();
+        // }
         
     }
 

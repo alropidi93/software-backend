@@ -358,6 +358,18 @@ class UsuarioController extends Controller
                 $password = $this->usuarioRepository->getPassword();
                 if (Hash::check($request['password'], $password)){
                     Log:info("paso el login");
+                    // if($usuario->esJefeDeTienda()){
+                    //     $this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship();
+                    // }
+                    // else if ($usuario->esJefeDeAlmacen()){
+                        
+                        
+                    //     $this->usuarioRepository->loadTiendasCargoJefeAlmacenRelationship();
+                        
+                    // }
+                    // else if (!$usuario->isAdmin()){
+                    //     $this->usuarioRepository->loadTiendasCargoTrabajadorRelationship();
+                    // }
                     $this->usuarioRepository->loadTipoUsuarioRelationship();
                     $usuarioResource =  new UsuarioResource($usuario);
                     $responseResourse = new ResponseResource(null);
@@ -374,11 +386,7 @@ class UsuarioController extends Controller
             $errorResource->title('Error de logueo');       
             $errorResource->message('Credenciales no válidas');       
             return $errorResource->response()->setStatusCode(400);
-                
-          
-    
-          
-       
+         
         } catch(\Exception $e) {
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }

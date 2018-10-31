@@ -30,9 +30,19 @@ class Usuario extends Model
     public function tiendasCargoJefeTienda() {
         return $this->hasMany('App\Models\Tienda','idJefeTienda','idPersonaNatural');
     }
+
+    public function getTiendaCargoJefeTiendaAttribute()
+    {
+        return $this->tiendasCargoJefeTienda->first();
+    }
   
     public function tiendasCargoJefeAlmacen() {
         return $this->hasMany('App\Models\Tienda','idJefeAlmacen','idPersonaNatural');
+    }
+
+    public function getTiendaCargoJefeAlmacenAttribute()
+    {
+        return $this->tiendasCargoJefeAlmacen->first();
     }
 
     // public function tienda() {
