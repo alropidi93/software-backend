@@ -402,8 +402,9 @@ class PedidoTransferenciaController extends Controller {
                 $notFoundResource->notFound(['id' => $idPedidoTransferencia]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
-
-            $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pedidoTransferencia);               
+            $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pedidoTransferencia); 
+            $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pedidoTransferencia); 
+            $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pedidoTransferencia);               
             $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Pedido de Transferencia encontrado');  
