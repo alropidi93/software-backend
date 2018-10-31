@@ -35,6 +35,7 @@ Route::get('busqueda/productos', 'ProductoController@busquedaPorFiltro');
 Route::get('busqueda/tiendas', 'TiendaController@busquedaPorFiltro');
 Route::post('asignarTipoUsuario/{idUsuario}', 'UsuarioController@asignarRol');
 
+
 Route::post('tienda/asignarJefeAlmacen/{idTienda}', 'TiendaController@asignarJefeDeAlmacen');
 Route::post('tienda/desasignarJefeAlmacen/{idTienda}' , 'TiendaController@desasignarJefeDeAlmacen');
 Route::post('tienda/asignarJefeTienda/{idTienda}' , 'TiendaController@asignarJefeDeTienda');
@@ -68,7 +69,7 @@ Route::get('producto/listarStockMin','ProductoController@listarConStockMinimo');
 
 Route::get('transferencia/listarEstados','TransferenciaController@listarEstados');
 
-
+Route::get('pedidoTransferencia/verPedidosTransferenciaRecibidos/{idAlmacenD}','PedidoTransferenciaController@verPedidosTransferenciaRecibidos');
 
 
 
