@@ -200,5 +200,7 @@ class PedidoTransferenciaRepository extends BaseRepository {
         
         return $lista;
     }
-   
+   public function obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia){
+       return $this->model->where('id',$idPedidoTransferencia)->where('deleted',false)->first();
+   }
 }

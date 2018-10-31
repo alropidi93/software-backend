@@ -70,7 +70,7 @@ Route::get('producto/listarStockMin','ProductoController@listarConStockMinimo');
 Route::get('transferencia/listarEstados','TransferenciaController@listarEstados');
 
 Route::get('pedidoTransferencia/verPedidosTransferenciaRecibidos/{idAlmacenD}','PedidoTransferenciaController@verPedidosTransferenciaRecibidos');
-
+Route::get('pedidoTransferencia/obtenerPedidoTransferenciaPorId/{idPedidoTransferencia}','PedidoTransferenciaController@obtenerPedidoTransferenciaPorId');
 
 
 

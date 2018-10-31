@@ -373,6 +373,33 @@ class PedidoTransferenciaController extends Controller {
     
         }
     }
+    public function obtenerPedidoTransferenciaPorId($idPedidoTransferencia){
+        try{
+            $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia);
+         
+            
+            if (!$pedidoTransferencia){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('No existe ese pedido de transferencia ');
+                $notFoundResource->notFound(['id' => $idPedidoTransferencia]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+
+            $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pedidoTransferencia);               
+            $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia); 
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Pedido de Transferencia encontrado');  
+            $responseResourse->body($pedidoTransferenciaResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+         
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+
+    }
 
 
  
