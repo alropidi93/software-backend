@@ -45,6 +45,7 @@ class PedidoTransferenciaController extends Controller {
                             $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
                             $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pt);
                             $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pt);                            
+                            $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pt);                            
                         }
                         $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);
                         $responseResource->title('Lista de pedidos de transferencia filtrados por estado');       
@@ -56,7 +57,8 @@ class PedidoTransferenciaController extends Controller {
                         foreach ($pedidosTransferencia as $key => $pt) {
                             $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
                             $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pt);
-                            $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pt);                            
+                            $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pt);                             
                         }
                         $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);
                         $responseResource->title('Lista de pedidos de transferencia filtrados por estado');       
@@ -69,7 +71,8 @@ class PedidoTransferenciaController extends Controller {
                         foreach ($pedidosTransferencia as $key => $pt) {
                             $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
                             $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pt);
-                            $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pt);                            
+                            $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pt);                             
                         }
                         $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);
                         $responseResource->title('Lista de pedidos de transferencia filtrados por estado');       
@@ -80,7 +83,8 @@ class PedidoTransferenciaController extends Controller {
                         foreach ($pedidosTransferencia as $key => $pt) {
                             $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
                             $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pt);
-                            $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pt);    
+                            $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pt);     
                         }
                         $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);
                         $responseResource->title('Lista de pedidos de transferencia filtrados por estado');       
@@ -92,6 +96,7 @@ class PedidoTransferenciaController extends Controller {
                             $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
                             $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pt);
                             $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pt); 
                             
                         }
                         $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);
@@ -115,6 +120,7 @@ class PedidoTransferenciaController extends Controller {
                 $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
                 $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pt);
                 $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pt);
+                $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pt); 
                 
                 
             }

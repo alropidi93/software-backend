@@ -110,6 +110,12 @@ class PedidoTransferenciaRepository extends BaseRepository {
             $this->model = $this->model->load([
                 'lineasPedidoTransferencia'=>function($query){
                     $query->where('lineaPedidoDeTransferencia.deleted', false);
+                },
+                'lineasPedidoTransferencia.producto'=>function($query){
+                    $query->where('producto.deleted', false);
+                },
+                'lineasPedidoTransferencia.producto.categoria'=>function($query){
+                    $query->where('categoria.deleted', false);
                 }
             ]);
         }
@@ -117,7 +123,13 @@ class PedidoTransferenciaRepository extends BaseRepository {
             
             $this->model =$pedidoTransferencia->load([
                 'lineasPedidoTransferencia'=>function($query){
-                    $query->where('lineaPedidoDeapiTransferencia.deleted', false); 
+                    $query->where('lineaPedidoDeTransferencia.deleted', false); 
+                },
+                'lineasPedidoTransferencia.producto'=>function($query){
+                    $query->where('producto.deleted', false);
+                },
+                'lineasPedidoTransferencia.producto.categoria'=>function($query){
+                    $query->where('categoria.deleted', false);
                 }
             ]);
             

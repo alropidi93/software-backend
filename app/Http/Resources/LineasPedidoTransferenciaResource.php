@@ -15,7 +15,7 @@ class LineasPedidoTransferenciaResource extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'listaLineasPedidoTransferencia' => LineasPedidoTransferenciaResource::collection($this->collection),
+            'listaLineasPedidoTransferencia' => LineaPedidoTransferenciaResource::collection($this->collection),
         ];
     }
 }

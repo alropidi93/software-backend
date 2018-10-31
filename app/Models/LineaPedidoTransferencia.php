@@ -23,7 +23,7 @@ class LineaPedidoTransferencia extends Model
     }
 
     public function producto() {
-        return $this->belongsTo('App\Models\Prpducto','idProducto','id');
+        return $this->belongsTo('App\Models\Producto','idProducto','id');
     }
     
 }
