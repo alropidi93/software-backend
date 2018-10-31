@@ -22,7 +22,7 @@ class TransferenciaResource extends JsonResource
             'attributes'    => [
                 'estado' => $this->estado,
                 'observacion' => $this->observacion,
-             
+                'respuesta'=> $this->respuesta,
                 'deleted' => $this->deleted,
                
                 'created_at' => $this->created_at,

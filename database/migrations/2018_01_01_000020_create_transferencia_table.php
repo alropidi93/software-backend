@@ -17,6 +17,7 @@ class CreateTransferenciaTable extends Migration
             $table->integer('id')->primary();
             $table->string('estado',30);
             $table->text('observacion')->nullable();
+            $table->text('respuesta')->nullable();
             
             $table->boolean('deleted');
             $table->timestamps();
