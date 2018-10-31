@@ -7,6 +7,7 @@ use App\Models\PedidoTransferencia;
 use App\Models\Usuario;
 use App\Repositories\PedidoTransferenciaRepository;
 use App\Repositories\UsuarioRepository;
+use App\Services\AlmacenService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PedidoTransferenciaResource;
 use App\Http\Resources\PedidosTransferenciaResource;
@@ -192,10 +193,18 @@ class PedidoTransferenciaController extends Controller {
                 $notFoundResource = new NotFoundResource(null);
                 $notFoundResource->title('Almacen no encontrado');
                 $notFoundResource->notFound(['idAlmacen'=>$data['idAlmacen']]);
-                return $notFoundResource->response()->setStatusCode(404);;
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            if($almacen->esCentral()){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Almacen prohibido');
+                $errorResource->message('No se puede solicitar un pedido de transferencia para este almacen por ser el central, al menos desde este servicio');
+                return $errorResource->response()->setStatusCode(400);
             }
             $dataArray['idAlmacenO']=$almacen->id;
-            $dataArray['idAlmacenD']=$almacen->id;
+            $almacenService =  new AlmacenService;
+            $almacenCercano= $almacenService->obtenerAlmacenCercano($almacen,1);
+            $dataArray['idAlmacenD']=$almacenCercano->id;
 
             if(array_key_exists('idUsuario',$dataArray) && $dataArray['idUsuario']!=null){
                 $usuario = $this->pedidoTransferenciaRepository->getUsuarioById($data['idUsuario']);
@@ -218,9 +227,9 @@ class PedidoTransferenciaController extends Controller {
             $this->pedidoTransferenciaRepository->guarda($dataArray);
             
             $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-            $this->pedidoTransferenciaRepository->setTransferenciaData(['estado'=>'En transito','deleted'=>false]);
             
-            $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
+            
+            
             
             
             $list = $data['lineasPedidoTransferencia'];

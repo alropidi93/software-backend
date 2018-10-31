@@ -19,7 +19,10 @@ class Almacen extends Model
       
     ];
 
+    public function esCentral() {
 
+        return $this->nombre == 'Central';
+    }
     public function tienda() {
         return $this->belongsTo('App\Models\Tienda','idTienda','id');
     }
