@@ -21,8 +21,8 @@ class PedidoTransferenciaResource extends JsonResource
             'id'            => $this->id,
             'attributes'    => [
                 'usuario' => new TransferenciaResource($this->whenLoaded('usuario')),
-                'almaceOrigen' => new TransferenciaResource($this->whenLoaded('almacenOrigen')),
-                'almacenDestino' => new TransferenciaResource($this->whenLoaded('almacenDestino')),
+                'almaceOrigen' => new AlmacenResource($this->whenLoaded('almacenOrigen')),
+                'almacenDestino' => new AlmacenResource($this->whenLoaded('almacenDestino')),
                 'descripcion' => $this->descripcion,
                 'deleted' => $this->deleted,
                 'lineasPedidoTransferencia' => new LineasSolicitudCompraResource($this->whenLoaded('lineasPedidoTransferencia')),
