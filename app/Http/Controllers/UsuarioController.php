@@ -367,7 +367,7 @@ class UsuarioController extends Controller
                         $this->usuarioRepository->loadTiendaCargoJefeAlmacenRelationship();
                         
                     }
-                    else if (!$usuario->isAdmin()){
+                    else if (!$usuario->esAdmin()){
                         $this->usuarioRepository->loadTiendasCargoTrabajadorRelationship();
                     }
                     $this->usuarioRepository->loadTipoUsuarioRelationship();
