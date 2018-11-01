@@ -15,7 +15,8 @@ class LineaPedidoTransferencia extends Model
       'idProducto',
       'cantidad',
       'deleted',
-      'idPedidoTransferencia'
+      'idPedidoTransferencia',
+      'idLineaSolicitudCompra'
       
     ];
     public function pedidoTransferencia() {
@@ -24,6 +25,10 @@ class LineaPedidoTransferencia extends Model
 
     public function producto() {
         return $this->belongsTo('App\Models\Producto','idProducto','id');
+    }
+
+    public function lineaSolicitudCompra() {
+        return $this->belongsTo('App\Models\LineaSolicitudCompra','idLineaSolicitudCompra','id');
     }
     
 }
