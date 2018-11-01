@@ -454,4 +454,28 @@ class ProductoController extends Controller
         }
 
     }
+
+    public function modificarStock($idProducto, Request $data){
+        // $data con tiene: idTipoStock, idAlmacen, idProducto y cantidad
+        try{
+            DB::beginTransaction();
+            $idTipoStock = $data['idTipoStock'];
+            $idAlmacen = $data['idAlmacen'];
+            #$idProducto = $data['idProducto'];
+            $cantidad = $data['cantidad'];
+
+            $this->productoRepository->updateStock($idProducto, $idTipoStock, $idAlmacen, $cantidad);
+
+            DB::commit();
+
+            #$productoResource =  new ProductoResource($producto);  
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Stock del producto modificado correctamente');  
+            $responseResource->body('body test');
+            return $responseResource;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
 }
