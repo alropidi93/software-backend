@@ -29,4 +29,10 @@ class LineaSolicitudCompra extends Model
     public function producto(){
         return $this->belongsTo('App\Models\Producto', 'idProducto', 'id');
     }
+
+    public function lineasPedidoTransferencia(){
+    
+        return $this->hasMany('App\Models\LineaPedidoTransferencia','idLineaSolicitudCompra','id');
+       
+    }
 }

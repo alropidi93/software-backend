@@ -53,6 +53,10 @@ class PedidoTransferencia extends Model
     public function estaEnTercerIntento() {
         return $this->fase==3;
     }
+
+    public function fueEvaluado() {
+        return $this->transferencia!=null;
+    }
     
     
 }

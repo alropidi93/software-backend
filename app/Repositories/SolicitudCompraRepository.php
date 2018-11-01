@@ -38,6 +38,10 @@ class SolicitudCompraRepository extends BaseRepository {
                 'lineasSolicitudCompra'=>function($query){
                     // $query->where('lineaSolicitudDeCompra.deleted', false)->wherePivot('deleted',false);
                     $query->where('lineaSolicitudDeCompra.deleted', false); 
+                },
+                'lineasSolicitudCompra.producto'=>function($query){
+                    // $query->where('lineaSolicitudDeCompra.deleted', false)->wherePivot('deleted',false);
+                    $query->where('producto.deleted', false); 
                 }
             ]);
         }
@@ -46,6 +50,10 @@ class SolicitudCompraRepository extends BaseRepository {
                 'lineasSolicitudCompra'=>function($query){
                     // $query->where('lineaSolicitudDeCompra.deleted', false)->wherePivot('deleted',false); 
                     $query->where('lineaSolicitudDeCompra.deleted', false); 
+                },
+                'lineasSolicitudCompra.producto'=>function($query){
+                    // $query->where('lineaSolicitudDeCompra.deleted', false)->wherePivot('deleted',false);
+                    $query->where('producto.deleted', false); 
                 }
             ]);
         }
@@ -136,7 +144,13 @@ class SolicitudCompraRepository extends BaseRepository {
         }
     }
 
-    // public function checkProductoProveedorOwnModelsRelationship(){
-    //     return $this->model->proveedores()->where('id',$this->proveedor->id)->where('proveedor.deleted' , false)->exists();
-    // }
+    public function obtenerSolicitudDisponible(){
+        return $this->model->where('deleted',false)->where('enviado',false)->first();
+    }
+
+    public function crearNueva(){
+        return $this->model->create(['deleted'=>false,'enviado'=>false]);
+    }
+
+    
 }

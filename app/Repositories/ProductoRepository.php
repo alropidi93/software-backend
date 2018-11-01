@@ -266,4 +266,6 @@ class ProductoRepository extends BaseRepository {
         
         return $productos;
     }
+
+    
 }

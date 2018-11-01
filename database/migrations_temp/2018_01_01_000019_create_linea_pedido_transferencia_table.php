@@ -18,6 +18,7 @@ class CreateLineaPedidoTransferenciaTable extends Migration
             $table->integer('idProducto');
             $table->integer('cantidad');
             $table->integer('idPedidoTransferencia');
+            $table->integer('idLineaSolicitudCompra')->nullable();
             
             $table->boolean('deleted');
             $table->timestamps();
@@ -25,7 +26,7 @@ class CreateLineaPedidoTransferenciaTable extends Migration
           
             $table->foreign('idProducto')->references('id')->on('producto')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('idPedidoTransferencia')->references('id')->on('pedidoDeTransferencia')->onUpdate('cascade')->onDelete('cascade');
-                
+            $table->foreign('idLineaSolicitudCompra')->references('id')->on('lineaSolicitudDeCompra')->onUpdate('cascade')->onDelete('cascade');   
            
         });
       

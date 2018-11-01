@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\PedidoTransferencia;
 use App\Models\Usuario;
 use App\Repositories\PedidoTransferenciaRepository;
+use App\Repositories\LineaPedidoTransferenciaRepository;
 use App\Repositories\SolicitudCompraRepository;
 use App\Repositories\LineaSolicitudCompraRepository;
 use App\Http\Resources\LineaSolicitudCompraResource;
@@ -34,16 +35,19 @@ class PedidoTransferenciaController extends Controller {
     protected $pedidoTransferenciaRepository;
     protected $solicitudCompraRepository;
     protected $lineaSolicitudCompraRepository;
+    protected $lineasPedidoTransferencia;
 
-    public function __construct(PedidoTransferenciaRepository $pedidoTransferenciaRepository, SolicitudCompraRepository $solicitudCompraRepository,LineaSolicitudCompraRepository $lineaSolicitudCompraRepository)
+    public function __construct(PedidoTransferenciaRepository $pedidoTransferenciaRepository, SolicitudCompraRepository $solicitudCompraRepository,LineaSolicitudCompraRepository $lineaSolicitudCompraRepository, LineaPedidoTransferenciaRepository $lineaPedidoTransferenciaRepository)
     {
         PedidoTransferenciaResource::withoutWrapping();
         
         SolicitudCompraResource::withoutWrapping();
         LineaSolicitudCompraResource::withoutWrapping();
+        
         $this->pedidoTransferenciaRepository = $pedidoTransferenciaRepository;
         $this->solicitudCompraRepository = $solicitudCompraRepository;
         $this->lineaSolicitudCompraRepository = $lineaSolicitudCompraRepository;
+        $this->lineaPedidoTransferenciaRepository = $lineaPedidoTransferenciaRepository;
     }
 
     public function index() 
@@ -452,6 +456,17 @@ class PedidoTransferenciaController extends Controller {
                 $notFoundResource->notFound(['id' => $idPedidoTransferencia]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
+
+            if ($pedidoTransferencia->fueEvaluado()){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de validación');
+                $errorResource->message('El pedido de transferencia ya fue evaluado');
+                return $errorResource->response()->setStatusCode(400);
+            }
+
+           
+
+
             
             
             $responseResource = new ResponseResource(null);
@@ -469,7 +484,7 @@ class PedidoTransferenciaController extends Controller {
                     $this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
                     $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
                     DB::commit();
-                    
+                    $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
                     $text= "Pedido de transferencia aceptado en el intento {$pedidoTransferencia->fase}";
                     $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
                     $responseResource->title($text);  
@@ -533,6 +548,18 @@ class PedidoTransferenciaController extends Controller {
             else if ($pedidoTransferencia->estaEnSegundoIntento()){
                 
                 if ($evaluacion){
+                    $dataArray['estado']='Aceptado';
+                    $dataArray['deleted']=false;
+                    $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
+                    $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
+                    $this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
+                    $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                    DB::commit();
+                    $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
+                    $text= "Pedido de transferencia aceptado en el intento {$pedidoTransferencia->fase}";
+                    $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
+                    $responseResource->title($text);  
+                    $responseResource->body($pedidoTransferenciaResource);
 
                 }
                 else{
@@ -587,7 +614,18 @@ class PedidoTransferenciaController extends Controller {
             else if ($pedidoTransferencia->estaEnTercerIntento()){
                 
                 if ($evaluacion){
-
+                    $dataArray['estado']='Aceptado';
+                    $dataArray['deleted']=false;
+                    $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
+                    $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
+                    $this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
+                    $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                    DB::commit();
+                    $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
+                    $text= "Pedido de transferencia aceptado en el intento {$pedidoTransferencia->fase}";
+                    $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
+                    $responseResource->title($text);  
+                    $responseResource->body($pedidoTransferenciaResource);
                 }
                 else{
                     
@@ -596,7 +634,7 @@ class PedidoTransferenciaController extends Controller {
                     $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
                     $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
                     $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-                    $text= "Pedido de transferencia denegado en el intento {$pedidoTransferencia->fase}, se generá o acumulará (si ya hubiese) una solicitud de compra con este producto";
+                    $text= "Pedido de transferencia denegado en el intento {$pedidoTransferencia->fase}, se generá agragara o acumulará una linea en la solicitud de compra";
                     
                     $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
                     $almacenOrigen = $this->pedidoTransferenciaRepository->getAlmacenById($pedidoTransferencia->idAlmacenO);
@@ -608,51 +646,39 @@ class PedidoTransferenciaController extends Controller {
                         return $notFoundResource->response()->setStatusCode(404);
                     }
                     
-                    $tienda = $this->pedidoTransferenciaRepository->obtenerTiendaDeAlmacenOrigenFromOwnModel();
                     
-                    if (!$tienda){
-                        $notFoundResource = new NotFoundResource(null);
-                        $notFoundResource->title('Tienda de almacen de origen no encontrado');
-                        $notFoundResource->notFound(['idAlmacen'=>$almacenOrigen->id]);
-                        return $notFoundResource->response()->setStatusCode(404);
-                    }
-                    else{
-                        $this->solicitudCompraRepository->setTiendaModel($tienda);
-                        
-                        foreach ($lineasPedidoTransferencia as $key => $lpt) {
-                            $producto = $this->lineaSolicitudCompraRepository->getProductoById($lpt->idProducto);
-                            return $producto;
-                            $this->solicitudCompraRepository->acumulaPeoductoOrCreaSolicitud($producto,$lpt->cantidad);
-                        }
-                    }
-                    
-                    //$almacenService = new AlmacenService;
-                    //$pedidoTransferenciaService = new PedidoTransferenciaService;
                    
-                    
-                    
-                    
-                    
-                
-                    
-                    $list_collection = new Collection($nuevasListasArray);
-                            
-                    foreach ($list_collection as $key => $elem) {
                         
-                        $this->pedidoTransferenciaRepository->setLineaPedidoTransferenciaData($elem);
-                        $this->pedidoTransferenciaRepository->attachLineaPedidoTransferenciaWithOwnModels();
-                                    
+                    $solicitud = $this->solicitudCompraRepository->obtenerSolicitudDisponible();
+                    if (!$solicitud){
+                        $solicitud=  $this->solicitudCompraRepository->crearNueva();
+                        
+                        $this->solicitudCompraRepository->setModel($solicitud);
                     }
+                    $this->lineaSolicitudCompraRepository->setSolicitudCompraModel($solicitud);
+                    foreach ($lineasPedidoTransferencia as $key => $lpt) {
+                        $producto = $this->lineaSolicitudCompraRepository->getProductoById($lpt->idProducto);
+                        
+                        $lineaSolicitudCompra = $this->lineaSolicitudCompraRepository->attachOrAccumulateLineaSolicitudCompra($producto,$lpt->cantidad);
+                        
+                        $this->lineaPedidoTransferenciaRepository->setModel($lpt);
+                        
+                        $this->lineaPedidoTransferenciaRepository->attachLineaSolicitudTransferencia($lineaSolicitudCompra);
+                        $this->lineaSolicitudCompraRepository->loadProductoRelationship($lineaSolicitudCompra);
+                    }
+                                   
                     
-                    $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                    $this->solicitudCompraRepository->setModel($solicitud);
+                    
+                    $this->solicitudCompraRepository->loadLineasSolicitudCompraRelationship();
+                   
+
+                    $solicitud = $this->solicitudCompraRepository->obtenerModelo();
+                    
                     DB::commit();
-                    $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
-                    $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship();
-                    $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship();
-                    $this->pedidoTransferenciaRepository->loadUsuarioRelationship();
-                    $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
+                    $solicitudCompraResource =  new SolicitudCompraResource($solicitud);
                     $responseResource->title($text);  
-                    $responseResource->body($pedidoTransferenciaResource);
+                    $responseResource->body($solicitudCompraResource);
                     
                 }
             }        
