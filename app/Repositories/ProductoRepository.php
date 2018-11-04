@@ -215,6 +215,28 @@ class ProductoRepository extends BaseRepository {
         $this->model->save();
     }
 
+    public function updateStock($idProducto, $idTipoStock, $idAlmacen, $cantidad){
+        #$producto = $this->productoRepository->obtenerPorId($idProducto);
+        
+        // if (!$producto){
+        //     $notFoundResource = new NotFoundResource(null);
+        //     $notFoundResource->title('Producto no encontrado');
+        //     $notFoundResource->notFound(['id' => $idProducto]);
+        //     return $notFoundResource->response()->setStatusCode(404);
+        // }
+        
+        $almacen = $this->model->almacenes(function($q) use ($idTipoStock,$idAlmacen){
+            // $q->where('productoxalmacen.idTipoStock', $idTipoStock)->where('almacen.id',$idAlmacen)->where('almacen.deleted',false)->where('productoxalmacen.deleted',false);
+            $q->where('productoxalmacen.idTipoStock', $idTipoStock)->where('almacen.id',$idAlmacen)->where('producto.id', $idProducto);
+        // })->where('deleted',false)->first();
+        })->first();
+  
+        $almacen->updatePivot(['cantidad'=>$cantidad]);
+        $almacen->update(['cantidad'=>$cantidad]);
+        $almacen->pivot->cantidad= $cantidad;
+        $message->pivot->save();
+    }
+
     public function checkProductoProveedorOwnModelsRelationship(){
         return $this->model->proveedores()->where('id',$this->proveedor->id)->where('proveedor.deleted' , false)->exists();
 
@@ -266,4 +288,6 @@ class ProductoRepository extends BaseRepository {
         
         return $productos;
     }
+
+    
 }

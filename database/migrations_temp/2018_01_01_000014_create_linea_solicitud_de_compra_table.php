@@ -22,7 +22,7 @@ class CreateLineaSolicitudDeCompraTable extends Migration
             $table->integer('idProducto');
             $table->integer('cantidad');
             $table->integer('idSolicitudDeCompra');
-            $table->integer('idProveedor');
+            $table->integer('idProveedor')->nullable();
             
             $table->boolean('deleted');
             $table->timestamps();
