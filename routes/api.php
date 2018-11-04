@@ -77,6 +77,8 @@ Route::get('pedidoTransferencia/verPedidosTransferenciaJTO/{idAlmacenO}','Pedido
 Route::get('pedidoTransferencia/verPedidosTransferenciaJAD/{idAlmacenD}','PedidoTransferenciaController@verPedidosTransferenciaJAD');
 Route::get('pedidoTransferencia/verPedidosTransferenciaJTD/{idAlmacenD}','PedidoTransferenciaController@verPedidosTransferenciaJTD');
 Route::get('pedidoTransferencia/verPedidosTransferenciaJT/{idAlmacen}','PedidoTransferenciaController@verPedidosTransferenciaJT');
+Route::post('pedidoTransferencia/aceptaPedidoJTO/{idPedidoTransferencia}','PedidoTransferenciaController@aceptaPedidoJTO');
+Route::post('pedidoTransferencia/aceptaPedidoJAD/{idPedidoTransferencia}','PedidoTransferenciaController@aceptaPedidoJAD');
 Route::post('pedidoTransferencia/evaluar/{idPedidoTransferencia}','PedidoTransferenciaController@evaluarPedidoTransferencia');
 
 
