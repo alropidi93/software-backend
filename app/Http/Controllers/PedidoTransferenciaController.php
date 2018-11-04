@@ -835,10 +835,41 @@ class PedidoTransferenciaController extends Controller {
         }
     }
 
-    public function aceptaPedidoJTO($idPedidoTransferencia, Request $data){
+    public function aceptaPedidoJTO($idPedidoTransferencia, Request $pedidoTransferenciaData){
         try{
             DB::beginTransaction();
             $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerPorId($idPedidoTransferencia);
+            $evaluacion = $pedidoTransferenciaData['aceptoJTO'];
+            if (!$pedidoTransferencia){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Pedido de transferencia no encontrado');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            $this->pedidoTransferenciaRepository->setModel($pedidoTransferencia);
+            $pedidoTransferenciaDataArray= Algorithm::quitNullValuesFromArray($pedidoTransferenciaData->all());
+            $this->pedidoTransferenciaRepository->actualiza($pedidoTransferenciaDataArray);
+            $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+            if(!$evaluacion)$this->pedidoTransferenciaRepository->softDelete();
+            
+            DB::commit();
+            $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
+            $responseResource = new ResponseResource(null);
+            
+            $responseResource->title('Pedido de transferencia evaluado por el jefe de tienda origen exitosamente.');       
+            $responseResource->body($pedidoTransferenciaResource);     
+            
+            return $responseResource;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+    public function aceptaPedidoJAD($idPedidoTransferencia, Request $pedidoTransferenciaData){ //ESTO NO SERVIRIA EN EL FLUJO QUE HA SIDO CONSIDERADO
+        try{
+            DB::beginTransaction();
+            $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerPorId($idPedidoTransferencia);
+           
             if (!$pedidoTransferencia){
                 $notFoundResource = new NotFoundResource(null);
                 $notFoundResource->title('Pedido de transferencia no encontrado');
@@ -854,7 +885,7 @@ class PedidoTransferenciaController extends Controller {
             $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
             $responseResource = new ResponseResource(null);
             
-            $responseResource->title('Pedido de transferencia aceptado por el jefe de tienda origen exitosamente.');       
+            $responseResource->title('Pedido de transferencia aceptado por el jefe de almacen destino exitosamente.');       
             $responseResource->body($pedidoTransferenciaResource);     
             
             return $responseResource;
