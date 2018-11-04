@@ -17,9 +17,9 @@ class PedidoTransferencia extends Model
       'idAlmacenD',
       'descripcion',
       'fase',
-      'aceptoJTO',
-      'aceptoJAD',
-      'aceptoJTD',
+      'aceptoJTO', // Flag que determina si el Jefe de Tienda de la tienda de Origen ha aceptado el pedido de transferencia
+      'aceptoJAD', // Flag que determina si el Jefe de Almacén de la tienda de Destino ha aceptado el pedido de transferencia
+      'aceptoJTD', // Flag que determina si el Jefe de Tienda de la tienda de Destino ha aceptado el pedido de transferencia
       'deleted',
       
     ];
