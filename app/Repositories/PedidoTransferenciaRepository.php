@@ -238,6 +238,18 @@ class PedidoTransferenciaRepository extends BaseRepository {
         
         return $lista;
     }
+    public function obtenerPedidosTransferenciaJTO($idAlmacenO){
+        $lista = $this->model->where('idAlmacenO',$idAlmacenO)->where('aceptoJTO',false)->where('aceptoJAD',false)->where('aceptoJTD',false)->where('deleted',false)->get();         
+        return $lista;
+     }
+     public function obtenerPedidosTransferenciaJAD($idAlmacenD){
+        $lista = $this->model->where('idAlmacenD',$idAlmacenD)->where('aceptoJTO',true)->where('aceptoJAD',false)->where('aceptoJTD',false)->where('deleted',false)->get();         
+        return $lista;
+     }
+     public function obtenerPedidosTransferenciaJTD($idAlmacenD){
+        $lista = $this->model->where('idAlmacenD',$idAlmacenD)->where('aceptoJTO',true)->where('aceptoJAD',true)->where('aceptoJTD',false)->where('deleted',false)->get();         
+        return $lista;
+     }
     public function obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia){
        return $this->model->where('id',$idPedidoTransferencia)->where('deleted',false)->first();
     }
@@ -251,11 +263,8 @@ class PedidoTransferenciaRepository extends BaseRepository {
             return $this->model->almacenOrigen->tienda;
 
         }
-        return null;
-
-        
+        return null;        
     }
-
     public function setLineasPedidoTransferenciaByOwnModel(){
        
        $this->lineasPedidoTransferencia = $this->model->lineasPedidoTransferencia;

@@ -71,7 +71,11 @@ Route::get('transferencia/listarEstados','TransferenciaController@listarEstados'
 
 Route::get('pedidoTransferencia/verPedidosTransferenciaRecibidos/{idAlmacenD}','PedidoTransferenciaController@verPedidosTransferenciaRecibidos');
 Route::get('pedidoTransferencia/obtenerPedidoTransferenciaPorId/{idPedidoTransferencia}','PedidoTransferenciaController@obtenerPedidoTransferenciaPorId');
+Route::get('pedidoTransferencia/verPedidosTransferenciaJTO/{idAlmacenO}','PedidoTransferenciaController@verPedidosTransferenciaJTO');
+Route::get('pedidoTransferencia/verPedidosTransferenciaJAD/{idAlmacenD}','PedidoTransferenciaController@verPedidosTransferenciaJAD');
+Route::get('pedidoTransferencia/verPedidosTransferenciaJTD/{idAlmacenD}','PedidoTransferenciaController@verPedidosTransferenciaJTD');
 Route::post('pedidoTransferencia/evaluar/{idPedidoTransferencia}','PedidoTransferenciaController@evaluarPedidoTransferencia');
+
 
 
 

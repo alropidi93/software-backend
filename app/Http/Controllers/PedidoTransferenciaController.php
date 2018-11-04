@@ -694,7 +694,111 @@ class PedidoTransferenciaController extends Controller {
         }
     
     } 
- 
+    public function verPedidosTransferenciaJTO($idAlmacenO)
+    {
+        {
+            try{
+                $pedidosTransferencia = $this->pedidoTransferenciaRepository->obtenerPedidosTransferenciaJTO($idAlmacenO);
+                foreach ($pedidosTransferencia as $key => $pedidoTransferencia) {
+                    $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pedidoTransferencia); 
+                    $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pedidoTransferencia); 
+                    $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pedidoTransferencia);
+                    
+                }
+                
+                if (!$pedidosTransferencia){
+                    $notFoundResource = new NotFoundResource(null);
+                    $notFoundResource->title('No se han realizado pedidos de transferencia');
+                    $notFoundResource->notFound(['id' => $idAlmacenO]);
+                    return $notFoundResource->response()->setStatusCode(404);
+                }
+    
+                           
+                $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia); 
+                $responseResource = new ResponseResource(null);
+                $responseResource->title('Listado de Pedidos de Transferencia emitidos por esta tienda (Jefe de Tienda)');  
+                $responseResource->body($pedidosTransferenciaResource);
+                return $responseResource;
+            }
+            catch(\Exception $e){
+             
+                
+                return (new ExceptionResource($e))->response()->setStatusCode(500);
+                
+            }
+    
+        }
+    }
+    public function verPedidosTransferenciaJAD($idAlmacenD)
+    {
+        {
+            try{
+                $pedidosTransferencia = $this->pedidoTransferenciaRepository->obtenerPedidosTransferenciaJAD($idAlmacenD);
+                foreach ($pedidosTransferencia as $key => $pedidoTransferencia) {
+                    $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pedidoTransferencia); 
+                    $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pedidoTransferencia); 
+                    $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pedidoTransferencia);
+                    
+                }
+                
+                if (!$pedidosTransferencia){
+                    $notFoundResource = new NotFoundResource(null);
+                    $notFoundResource->title('No se han recibido pedidos de transferencia');
+                    $notFoundResource->notFound(['id' => $idAlmacenO]);
+                    return $notFoundResource->response()->setStatusCode(404);
+                }
+    
+                           
+                $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia); 
+                $responseResource = new ResponseResource(null);
+                $responseResource->title('Listado de Pedidos de Transferencia recibidos por esta tienda (Jefe de Almacen)');  
+                $responseResource->body($pedidosTransferenciaResource);
+                return $responseResource;
+            }
+            catch(\Exception $e){
+             
+                
+                return (new ExceptionResource($e))->response()->setStatusCode(500);
+                
+            }
+    
+        }
+    }
+    public function verPedidosTransferenciaJTD($idAlmacenD)
+    {
+        {
+            try{
+                $pedidosTransferencia = $this->pedidoTransferenciaRepository->obtenerPedidosTransferenciaJTD($idAlmacenD);
+                foreach ($pedidosTransferencia as $key => $pedidoTransferencia) {
+                    $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pedidoTransferencia); 
+                    $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pedidoTransferencia); 
+                    $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pedidoTransferencia);
+                    
+                }
+                
+                if (!$pedidosTransferencia){
+                    $notFoundResource = new NotFoundResource(null);
+                    $notFoundResource->title('No se han recibido pedidos de transferencia');
+                    $notFoundResource->notFound(['id' => $idAlmacenO]);
+                    return $notFoundResource->response()->setStatusCode(404);
+                }
+    
+                           
+                $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia); 
+                $responseResource = new ResponseResource(null);
+                $responseResource->title('Listado de Pedidos de Transferencia recibidos por esta tienda (Jefe de Tienda)');  
+                $responseResource->body($pedidosTransferenciaResource);
+                return $responseResource;
+            }
+            catch(\Exception $e){
+             
+                
+                return (new ExceptionResource($e))->response()->setStatusCode(500);
+                
+            }
+    
+        }
+    }
 }
 
 
