@@ -40,7 +40,7 @@ class TiendaController extends Controller {
                 $this->tiendaRepository->loadJefeDeTiendaRelationship($tienda);
                 $this->tiendaRepository->loadJefeDeAlmacenRelationship($tienda);
             }
-            $tiendasResource =  new TiendasResource($tiendas);  
+            $tiendasResource =  new TiendasResourceç($tiendas);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de tiendas');  
             $responseResourse->body($tiendasResource);
@@ -71,6 +71,7 @@ class TiendaController extends Controller {
             $this->tiendaRepository->setModel($tienda);
             $this->tiendaRepository->loadJefeDeTiendaRelationship();
             $this->tiendaRepository->loadJefeDeAlmacenRelationship();
+            $this->tiendaRepository->loadAlmacenRelationship();
             $tiendaResource =  new TiendaResource($tienda);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Mostrar tienda');  
@@ -639,6 +640,7 @@ class TiendaController extends Controller {
             foreach ($tiendas as $key => $tienda) {
                 $this->tiendaRepository->loadJefeDeTiendaRelationship($tienda);
                 $this->tiendaRepository->loadJefeDeAlmacenRelationship($tienda);
+                $this->tiendaRepository->loadAlmacenRelationship($tienda);
             }
             $tiendasResource =  new TiendasResource($tiendas);  
             $responseResourse = new ResponseResource(null);
