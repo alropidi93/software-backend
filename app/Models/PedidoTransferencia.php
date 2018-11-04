@@ -17,6 +17,9 @@ class PedidoTransferencia extends Model
       'idAlmacenD',
       'descripcion',
       'fase',
+      'aceptoJTO',
+      'aceptoJAD',
+      'aceptoJTD',
       'deleted',
       
     ];
