@@ -856,7 +856,7 @@ class PedidoTransferenciaController extends Controller {
             $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
             $responseResource = new ResponseResource(null);
             
-            $responseResource->title('Pedido de transferencia aceptado por el jefe de tienda origen exitosamente.');       
+            $responseResource->title('Pedido de transferencia evaluado por el jefe de tienda origen exitosamente.');       
             $responseResource->body($pedidoTransferenciaResource);     
             
             return $responseResource;
