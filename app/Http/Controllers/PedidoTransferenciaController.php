@@ -786,7 +786,42 @@ class PedidoTransferenciaController extends Controller {
                            
                 $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia); 
                 $responseResource = new ResponseResource(null);
-                $responseResource->title('Listado de Pedidos de Transferencia recibidos por esta tienda (Jefe de Tienda)');  
+                $responseResource->title('Listado de Pedidos de Transferencia recibidos por esta tienda (Jefe de Almacen)');  
+                $responseResource->body($pedidosTransferenciaResource);
+                return $responseResource;
+            }
+            catch(\Exception $e){
+             
+                
+                return (new ExceptionResource($e))->response()->setStatusCode(500);
+                
+            }
+    
+        }
+    }
+    public function verPedidosTransferenciaJT($idAlmacen)
+    {
+        {
+            try{
+                $pedidosTransferencia = $this->pedidoTransferenciaRepository->obtenerPedidosTransferenciaJT($idAlmacen);
+                foreach ($pedidosTransferencia as $key => $pedidoTransferencia) {
+                    $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pedidoTransferencia); 
+                    $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pedidoTransferencia); 
+                    $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pedidoTransferencia);
+                    
+                }
+                
+                if (!$pedidosTransferencia){
+                    $notFoundResource = new NotFoundResource(null);
+                    $notFoundResource->title('No se han realizado ni recibido pedidos de transferencia');
+                    $notFoundResource->notFound(['id' => $idAlmacenO]);
+                    return $notFoundResource->response()->setStatusCode(404);
+                }
+    
+                           
+                $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia); 
+                $responseResource = new ResponseResource(null);
+                $responseResource->title('Listado de Pedidos de Transferencia emitidos y recibidos por esta tienda (Jefe de Tienda)');  
                 $responseResource->body($pedidosTransferenciaResource);
                 return $responseResource;
             }

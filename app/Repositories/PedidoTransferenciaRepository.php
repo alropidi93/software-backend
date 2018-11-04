@@ -250,6 +250,12 @@ class PedidoTransferenciaRepository extends BaseRepository {
         $lista = $this->model->where('idAlmacenD',$idAlmacenD)->where('aceptoJTO',true)->where('aceptoJAD',true)->where('aceptoJTD',false)->where('deleted',false)->get();         
         return $lista;
      }
+     public function obtenerPedidosTransferenciaJT($idAlmacen){
+        $listaRecibidos = $this->model->where('idAlmacenD',$idAlmacen)->where('aceptoJTO',true)->where('aceptoJAD',true)->where('aceptoJTD',false)->where('deleted',false)->get();         
+        $listaEmitidos = $this->model->where('idAlmacenO',$idAlmacen)->where('aceptoJTO',false)->where('aceptoJAD',false)->where('aceptoJTD',false)->where('deleted',false)->get();
+        $lista = $listaRecibidos->merge($listaEmitidos);
+        return $lista;
+     }
     public function obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia){
        return $this->model->where('id',$idPedidoTransferencia)->where('deleted',false)->first();
     }
