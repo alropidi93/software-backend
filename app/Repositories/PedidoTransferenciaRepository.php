@@ -238,19 +238,19 @@ class PedidoTransferenciaRepository extends BaseRepository {
         
         return $lista;
     }
-    public function obtenerPedidosTransferenciaJTO($idAlmacenO){
+    public function obtenerPedidosTransferenciaJTO($idAlmacenO){ // Jefe Tienda Origen
         $lista = $this->model->where('idAlmacenO',$idAlmacenO)->where('aceptoJTO',false)->where('aceptoJAD',false)->where('aceptoJTD',false)->where('deleted',false)->get();         
         return $lista;
      }
-     public function obtenerPedidosTransferenciaJAD($idAlmacenD){
+     public function obtenerPedidosTransferenciaJAD($idAlmacenD){ //Jefe Almacen Destino
         $lista = $this->model->where('idAlmacenD',$idAlmacenD)->where('aceptoJTO',true)->where('aceptoJAD',false)->where('aceptoJTD',false)->where('deleted',false)->get();         
         return $lista;
      }
-     public function obtenerPedidosTransferenciaJTD($idAlmacenD){
+     public function obtenerPedidosTransferenciaJTD($idAlmacenD){// Jefe Tienda Destino
         $lista = $this->model->where('idAlmacenD',$idAlmacenD)->where('aceptoJTO',true)->where('aceptoJAD',true)->where('aceptoJTD',false)->where('deleted',false)->get();         
         return $lista;
      }
-     public function obtenerPedidosTransferenciaJT($idAlmacen){
+     public function obtenerPedidosTransferenciaJT($idAlmacen){ //Jefe Tienda, puede ver pedidos emitidos y recibidos
         $listaRecibidos = $this->model->where('idAlmacenD',$idAlmacen)->where('aceptoJTO',true)->where('aceptoJAD',true)->where('aceptoJTD',false)->where('deleted',false)->get();         
         $listaEmitidos = $this->model->where('idAlmacenO',$idAlmacen)->where('aceptoJTO',false)->where('aceptoJAD',false)->where('aceptoJTD',false)->where('deleted',false)->get();
         $lista = $listaRecibidos->merge($listaEmitidos);
