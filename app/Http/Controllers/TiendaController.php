@@ -633,6 +633,23 @@ class TiendaController extends Controller {
     
     }
 
+    public function obtenerTiendasFuncionales(){
+        try{
+            $tiendas = $this->tiendaRepository->obtenerTiendasFuncionales();
+            foreach ($tiendas as $key => $tienda) {
+                $this->tiendaRepository->loadJefeDeTiendaRelationship($tienda);
+                $this->tiendaRepository->loadJefeDeAlmacenRelationship($tienda);
+            }
+            $tiendasResource =  new TiendasResource($tiendas);  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de tiendas');  
+            $responseResourse->body($tiendasResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
+    }
+
 
  
 }

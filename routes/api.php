@@ -42,6 +42,7 @@ Route::post('tienda/asignarJefeTienda/{idTienda}' , 'TiendaController@asignarJef
 Route::post('tienda/desasignarJefeTienda/{idTienda}' , 'TiendaController@desasignarJefeDeTienda');
 Route::post('tienda/asignarTrabajador/{idTienda}' , 'TiendaController@asignarTrabajador');
 Route::post('tienda/desasignarTrabajador/{idTienda}' , 'TiendaController@desasignarTrabajador');
+Route::get('tienda/listarTiendasFuncionales', 'TiendaController@obtenerTiendasFuncionales');
 
 Route::post('producto/asignarProveedor/{idProducto}' , 'ProductoController@asignarProveedor');
 
