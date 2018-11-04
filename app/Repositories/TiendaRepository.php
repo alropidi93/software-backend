@@ -174,7 +174,12 @@ class TiendaRepository extends BaseRepository {
         return $this->model->trabajadores()->detach($usuario->idPersonaNatural);
     }
 
-    
+    public function obtenerTiendasFuncionales()
+    {
+        //lista las tiendas que tengan jefes asignados
+        $list = $this->model->whereNotNull('idJefeTienda')->whereNotNull('idJefeAlmacen')->where('deleted',false)->get();
+        return $list;
+    }   
 
 
 
