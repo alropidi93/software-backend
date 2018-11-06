@@ -13,7 +13,7 @@ class ProductoXAlmacen extends Pivot
     public $timestamps = true;
 
     public $incrementing = false;
-    protected $primaryKey = ['idProducto','idAlmacen','idTipoStock'];
+    //protected $primaryKey = ['idProducto','idAlmacen','idTipoStock'];
     protected $fillable = ['idProducto','idAlmacen','idTipoStock','cantidad', 'deleted'];
     
     public function __contruct(){

@@ -74,5 +74,5 @@ Route::get('pedidoTransferencia/obtenerPedidoTransferenciaPorId/{idPedidoTransfe
 Route::post('pedidoTransferencia/evaluar/{idPedidoTransferencia}','PedidoTransferenciaController@evaluarPedidoTransferencia');
 
 
-
+Route::put('producto/actualizarStock/{idProducto}' , 'ProductoController@modificarStock');
 

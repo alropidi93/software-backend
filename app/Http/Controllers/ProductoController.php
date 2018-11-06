@@ -464,10 +464,12 @@ class ProductoController extends Controller
             #$idProducto = $data['idProducto'];
             $cantidad = $data['cantidad'];
 
-            $this->productoRepository->updateStock($idProducto, $idTipoStock, $idAlmacen, $cantidad);
+            $producto = $this->productoRepository->obtenerPorId($idProducto);
+            $this->productoRepository->setModel($producto);
+            return $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $cantidad);
 
             DB::commit();
-
+            
             #$productoResource =  new ProductoResource($producto);  
             $responseResource = new ResponseResource(null);
             $responseResource->title('Stock del producto modificado correctamente');  
