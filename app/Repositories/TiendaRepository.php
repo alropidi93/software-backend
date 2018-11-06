@@ -26,13 +26,13 @@ class TiendaRepository extends BaseRepository {
      * @param  App\Models\Tienda $tienda
      * @return void
      */
-    public function __construct(Tienda $tienda, Usuario $jefeDeTienda, Usuario $jefeDeAlmacen, Almacen $almacen) 
+    public function __construct(Tienda $tienda, Usuario $jefeDeTienda, Usuario $jefeDeAlmacen, Almacen $almacen=null)  
     {
         $this->model = $tienda;
         $this->almacen = $almacen;
         $this->jefeDeTienda = $jefeDeTienda;
         $this->jefeDeAlmacen = $jefeDeAlmacen;
-        
+
     }
 
     /**
@@ -174,8 +174,10 @@ class TiendaRepository extends BaseRepository {
         return $this->model->trabajadores()->detach($usuario->idPersonaNatural);
     }
 
-    
-
-
-
+    public function obtenerTiendasFuncionales()
+    {
+        //lista las tiendas que tengan jefes asignados
+        $list = $this->model->whereNotNull('idJefeTienda')->whereNotNull('idJefeAlmacen')->where('deleted',false)->get();
+        return $list;
+    }
 }

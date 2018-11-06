@@ -39,6 +39,7 @@ class TiendaController extends Controller {
             foreach ($tiendas as $key => $tienda) {
                 $this->tiendaRepository->loadJefeDeTiendaRelationship($tienda);
                 $this->tiendaRepository->loadJefeDeAlmacenRelationship($tienda);
+                $this->tiendaRepository->loadAlmacenRelationship($tienda);
             }
             $tiendasResource =  new TiendasResource($tiendas);  
             $responseResourse = new ResponseResource(null);
@@ -71,6 +72,7 @@ class TiendaController extends Controller {
             $this->tiendaRepository->setModel($tienda);
             $this->tiendaRepository->loadJefeDeTiendaRelationship();
             $this->tiendaRepository->loadJefeDeAlmacenRelationship();
+            $this->tiendaRepository->loadAlmacenRelationship();
             $tiendaResource =  new TiendaResource($tienda);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Mostrar tienda');  
@@ -633,6 +635,28 @@ class TiendaController extends Controller {
     
     }
 
+    public function obtenerTiendasFuncionales(){
+        try{
+            $tiendas = $this->tiendaRepository->obtenerTiendasFuncionales();
+            foreach ($tiendas as $key => $tienda) {
+                $this->tiendaRepository->loadJefeDeTiendaRelationship($tienda);
+                $this->tiendaRepository->loadJefeDeAlmacenRelationship($tienda);
+                $this->tiendaRepository->loadAlmacenRelationship($tienda);
+            }
+            $tiendasResource =  new TiendasResource($tiendas);  
+            foreach($tiendasResource as $key => $tiendaResource){
+                if(is_null($tiendaResource['almacen'])){
+                    $tiendasResource->forget($key);
+                }
+            }
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de tiendas');  
+            $responseResourse->body($tiendasResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
+    }
 
  
 }

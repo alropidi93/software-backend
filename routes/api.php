@@ -28,6 +28,7 @@ Route::resource('categorias', 'CategoriaController');
 Route::resource('solicitudesCompra', 'SolicitudCompraController');
 Route::resource('lineasSolicitudCompra', 'LineaSolicitudCompraController');
 Route::resource('pedidosTransferencia', 'PedidoTransferenciaController');
+Route::resource('almacen', 'AlmacenController');
 
 Route::get('busqueda/proveedores','ProveedorController@busquedaPorFiltro');
 Route::get('usuariosSinTipo', 'UsuarioController@listarUsuariosSinTipo');
@@ -42,6 +43,7 @@ Route::post('tienda/asignarJefeTienda/{idTienda}' , 'TiendaController@asignarJef
 Route::post('tienda/desasignarJefeTienda/{idTienda}' , 'TiendaController@desasignarJefeDeTienda');
 Route::post('tienda/asignarTrabajador/{idTienda}' , 'TiendaController@asignarTrabajador');
 Route::post('tienda/desasignarTrabajador/{idTienda}' , 'TiendaController@desasignarTrabajador');
+Route::get('tienda/listarTiendasFuncionales', 'TiendaController@obtenerTiendasFuncionales');
 
 Route::post('producto/asignarProveedor/{idProducto}' , 'ProductoController@asignarProveedor');
 
@@ -71,8 +73,16 @@ Route::get('transferencia/listarEstados','TransferenciaController@listarEstados'
 
 Route::get('pedidoTransferencia/verPedidosTransferenciaRecibidos/{idAlmacenD}','PedidoTransferenciaController@verPedidosTransferenciaRecibidos');
 Route::get('pedidoTransferencia/obtenerPedidoTransferenciaPorId/{idPedidoTransferencia}','PedidoTransferenciaController@obtenerPedidoTransferenciaPorId');
+Route::get('pedidoTransferencia/verPedidosTransferenciaJTO/{idAlmacenO}','PedidoTransferenciaController@verPedidosTransferenciaJTO');// no esta en uso
+Route::get('pedidoTransferencia/verPedidosTransferenciaJAD/{idAlmacenD}','PedidoTransferenciaController@verPedidosTransferenciaJAD');// el servicio se llama JA en Postman
+Route::get('pedidoTransferencia/verPedidosTransferenciaJTD/{idAlmacenD}','PedidoTransferenciaController@verPedidosTransferenciaJTD');// no esta en uso
+Route::get('pedidoTransferencia/verPedidosTransferenciaJT/{idAlmacen}','PedidoTransferenciaController@verPedidosTransferenciaJT');
+Route::get('pedidoTransferencia/obtenerPedidosTransferenciaJefeTienda/{idAlmacen}','PedidoTransferenciaController@obtenerPedidosTransferenciaJefeTienda');
+Route::post('pedidoTransferencia/aceptaPedidoJTO/{idPedidoTransferencia}','PedidoTransferenciaController@aceptaPedidoJTO');
+Route::post('pedidoTransferencia/aceptaPedidoJAD/{idPedidoTransferencia}','PedidoTransferenciaController@aceptaPedidoJAD');// se usa como Aceptar TEST en Postman
 Route::post('pedidoTransferencia/evaluar/{idPedidoTransferencia}','PedidoTransferenciaController@evaluarPedidoTransferencia');
 
 
 Route::put('producto/actualizarStock/{idProducto}' , 'ProductoController@modificarStock');
+
 

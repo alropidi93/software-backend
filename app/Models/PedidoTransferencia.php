@@ -17,6 +17,9 @@ class PedidoTransferencia extends Model
       'idAlmacenD',
       'descripcion',
       'fase',
+      'aceptoJTO', // Flag que determina si el Jefe de Tienda de la tienda de Origen ha aceptado el pedido de transferencia
+      'aceptoJAD', // Flag que determina si el Jefe de Almacén de la tienda de Destino ha aceptado el pedido de transferencia
+      'aceptoJTD', // Flag que determina si el Jefe de Tienda de la tienda de Destino ha aceptado el pedido de transferencia
       'deleted',
       
     ];
@@ -57,6 +60,12 @@ class PedidoTransferencia extends Model
     public function fueEvaluado() {
         return $this->transferencia!=null;
     }
+
+    public function fueAceptadoJTO(){
+        return $this->aceptoJTO;
+    }
     
-    
+    public function fueAceptadoJAD(){
+        return $this->aceptoJAD;
+    }
 }
