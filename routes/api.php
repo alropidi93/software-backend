@@ -77,6 +77,7 @@ Route::get('pedidoTransferencia/verPedidosTransferenciaJTO/{idAlmacenO}','Pedido
 Route::get('pedidoTransferencia/verPedidosTransferenciaJAD/{idAlmacenD}','PedidoTransferenciaController@verPedidosTransferenciaJAD');// el servicio se llama JA en Postman
 Route::get('pedidoTransferencia/verPedidosTransferenciaJTD/{idAlmacenD}','PedidoTransferenciaController@verPedidosTransferenciaJTD');// no esta en uso
 Route::get('pedidoTransferencia/verPedidosTransferenciaJT/{idAlmacen}','PedidoTransferenciaController@verPedidosTransferenciaJT');
+Route::get('pedidoTransferencia/obtenerPedidosTransferenciaJefeTienda/{idAlmacen}','PedidoTransferenciaController@obtenerPedidosTransferenciaJefeTienda');
 Route::post('pedidoTransferencia/aceptaPedidoJTO/{idPedidoTransferencia}','PedidoTransferenciaController@aceptaPedidoJTO');
 Route::post('pedidoTransferencia/aceptaPedidoJAD/{idPedidoTransferencia}','PedidoTransferenciaController@aceptaPedidoJAD');// se usa como Aceptar TEST en Postman
 Route::post('pedidoTransferencia/evaluar/{idPedidoTransferencia}','PedidoTransferenciaController@evaluarPedidoTransferencia');

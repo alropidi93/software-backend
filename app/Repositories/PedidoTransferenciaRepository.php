@@ -256,6 +256,13 @@ class PedidoTransferenciaRepository extends BaseRepository {
         $lista = $listaRecibidos->merge($listaEmitidos);
         return $lista;
      }
+
+     public function obtenerPedidosTransferenciaJefeTienda($idAlmacen){
+        $listaRecibidos = $this->model->where('idAlmacenD',$idAlmacen)->where('deleted',false)->get();         
+        $listaEmitidos = $this->model->where('idAlmacenO',$idAlmacen)->where('deleted',false)->get();
+        $lista = $listaRecibidos->merge($listaEmitidos);
+        return $lista;
+     }
     public function obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia){
        return $this->model->where('id',$idPedidoTransferencia)->where('deleted',false)->first();
     }
