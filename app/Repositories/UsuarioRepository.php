@@ -13,16 +13,9 @@ class UsuarioRepository extends BaseRepository {
      * @var App\Models\PersonaNatural
      */
     protected $personaNatural;
-    /**
-     * The PersonaNatural instance.
-     *
-     * @var App\Models\PersonaNatural
-     */
     protected $tipoUsuario;
-
     protected $tienda;
 
-  
     /**
      * Create a new UsuarioRepository instance.
      * @param  App\Models\Usuario $usuario
@@ -31,17 +24,14 @@ class UsuarioRepository extends BaseRepository {
      * @param  App\Models\Tienda $tienda
      * @return void
      */
-    public function __construct(Usuario $usuario=null, PersonaNatural $personaNatural=null, TipoUsuario $tipoUsuario=null,Tienda $tienda=null) 
-    {
+    public function __construct(Usuario $usuario=null, PersonaNatural $personaNatural=null, TipoUsuario $tipoUsuario=null,Tienda $tienda=null){
         $this->model = $usuario;
         $this->personaNatural = $personaNatural;
         $this->tipoUsuario = $tipoUsuario;
         $this->tienda = $tienda;
-        
     }
 
-    protected function setPersonaNaturalData($dataPersona)
-    {
+    protected function setPersonaNaturalData($dataPersona){
         $this->personaNatural['nombre'] =  $dataPersona['nombre'];
         $this->personaNatural['apellidos'] =  $dataPersona['apellidos'];
         $this->personaNatural['genero'] =  $dataPersona['genero'];
@@ -50,52 +40,39 @@ class UsuarioRepository extends BaseRepository {
         $this->personaNatural['fechaNac'] =  DateFormat::spanishDateToEnglishDate($dataPersona['fechaNac']);
         $this->personaNatural['direccion'] =  $dataPersona['direccion'];
         $this->personaNatural['deleted'] =  false; //default value
-        
     }
 
-    protected function setUsuarioData($dataUsuario)
-    {
+    protected function setUsuarioData($dataUsuario){
         $this->model['password'] =  bcrypt($dataUsuario['password']);
-       
         /*nullable fields*/
         $this->model['idTipoUsuario'] = array_key_exists('idTipoUsuario',$dataUsuario)? $dataUsuario['idTipoUsuario']:null;
         $this->model['idTienda'] = array_key_exists('idTienda',$dataUsuario)? $dataUsuario['idTienda']:null;
         /* end nullable fields*/
         $this->model['deleted'] =  false; //default value
-        
     }
 
     protected function savePersonaNatural(){
-        $this->personaNatural->save();
-        
+        $this->personaNatural->save();    
     }
 
     protected function attachUsuarioToPersonaNatural($personaNatural, $usuario){
         return $personaNatural->usuario()->save($usuario);
     }
 
-   
-
     /**
      * Save data from the array
      *
      * @return App\Models\Model
      */
-    public function guarda($dataArray)
-    {
-        
+    public function guarda($dataArray){
         $this->setPersonaNaturalData($dataArray); //set data only in its PersonaNatural model
         $this->savePersonaNatural(); //saving in database
         $this->setUsuarioData($dataArray);// set data only in its Usuario model
         $this->attachUsuarioToPersonaNatural($this->personaNatural,$this->model);
         $this->model->personaNatural;//loading personaNatural
-       
-        
     }
 
-    public function actualiza($dataArray)
-    {
-        
+    public function actualiza($dataArray){
         //persona natural no tiene atributos con el mismo nombre de atributos del usuario que se vayan a actualizar
         //deleted, created_at y updated_at son comunes, pero estos jamas se actualizaran por acá
         if (array_key_exists('fechaNac',$dataArray))
@@ -104,26 +81,15 @@ class UsuarioRepository extends BaseRepository {
             $dataArray['password'] = bcrypt($dataArray['password']);
         $this->personaNatural->update($dataArray);
         $this->model->update($dataArray); //set data only in its PersonaNatural model
-       
-        
-       
-        
     }
 
-    public function actualizaSoloUsuario($dataArray)
-    {
-        
+    public function actualizaSoloUsuario($dataArray){
         //persona natural no tiene atributos con el mismo nombre de atributos del usuario que se vayan a actualizar
         //deleted, created_at y updated_at son comunes, pero estos jamas se actualizaran por acá
-        
         if (array_key_exists('password',$dataArray))
             $dataArray['password'] = bcrypt($dataArray['password']);
         
         $this->model->update($dataArray); //set data only in its PersonaNatural model
-       
-        
-       
-        
     }
 
     public function listarUsuariosSinTipo(){
@@ -139,7 +105,6 @@ class UsuarioRepository extends BaseRepository {
         $lista = $this->model->where('deleted',false)->get();
         foreach ($lista as $key => $usuario) {
             $usuario->personaNatural;
-            
         }
         return $lista;
     }
@@ -148,8 +113,7 @@ class UsuarioRepository extends BaseRepository {
         return $personaNatural->usuario()->save($usuario);
     }
 
-    public function attachRolWithOwnModels(){
-          
+    public function attachRolWithOwnModels(){ 
         $this->tipoUsuario->usuarios()->save($this->model);
         //$this->model->tipoUsuario()->save($this->tipoUsuario);
     }
@@ -169,44 +133,33 @@ class UsuarioRepository extends BaseRepository {
         else{
             $usuario->load('tipoUsuario');
         }
-        
     }
 
     public function loadTiendasCargoJefeTiendaRelationship($usuario=null){
         if (!$usuario){
             //$this->model->load('tiendasCargoJefeTienda');
-            
-
             $this->model->load(['tiendasCargoJefeTienda' => function ($query) {
                 $query->where('deleted', false);
             }]);
-        }
-        else{
+        }else{
             //$usuario->load('tiendasCargoJefeTienda');
             $usuario->load(['tiendasCargoJefeTienda' => function ($query) {
                 $query->where('deleted', false);
             }]);
         }
-        
     }
 
     public function loadTiendaCargoJefeTiendaRelationship($usuario=null){
         if (!$usuario){
-            
-
             $this->model->load([
                 'tiendaCargoJefeTienda' => function ($query) {
                     $query->where('deleted', false);
                 },
                 'tiendaCargoJefeTienda.almacen' => function ($query) {
                     $query->where('almacen.deleted', false);
-                },
-            
-            
+                },   
             ]);
-        }
-        else{
-            
+        }else{   
             $usuario->load([
                 'tiendaCargoJefeTienda' => function ($query) {
                     $query->where('deleted', false);
@@ -216,50 +169,37 @@ class UsuarioRepository extends BaseRepository {
                 },
             ]);
         }
-        
     }
 
     public function loadTiendasCargoTrabajadorRelationship($usuario=null){
         if (!$usuario){
             //$this->model->load('tiendasCargoJefeTienda');
-            
-
             $this->model->load(['tiendas' => function ($query) {
                 $query->where('tienda.deleted', false);
             }]);
-        }
-        else{
+        }else{
             //$usuario->load('tiendasCargoJefeTienda');
             $usuario->load(['tiendas' => function ($query) {
                 $query->where('tienda.deleted', false);
             }]);
         }
-        
     }
 
     public function loadTiendasCargoJefeAlmacenRelationship($usuario=null){
-        
         if (!$usuario){
-            
-
             $this->model->load(['tiendasCargoJefeAlmacen' => function ($query) {
                 $query->where('tienda.deleted', false);
             }])->get();
-        }
-        else{
+        }else{
             
             $usuario->load(['tiendasCargoJefeAlmacen' => function ($query) {
                 $query->where('tienda.deleted', false);
             }])->get();
         }
-        
     }
 
     public function loadTiendaCargoJefeAlmacenRelationship($usuario=null){
-        
         if (!$usuario){
-            
-
             $this->model->load([
                 'tiendaCargoJefeAlmacen' => function ($query) {
                     $query->where('tienda.deleted', false);
@@ -268,9 +208,7 @@ class UsuarioRepository extends BaseRepository {
                     $query->where('almacen.deleted', false);
                 },
             ])->get();
-        }
-        else{
-            
+        }else{
             $usuario->load([
                 'tiendaCargoJefeAlmacen' => function ($query) {
                     $query->where('tienda.deleted', false);
@@ -279,21 +217,16 @@ class UsuarioRepository extends BaseRepository {
                     $query->where('almacen.deleted', false);
                 },
             ])->get();
-        }
-        
+        }   
     }
 
-    
-
-    public function obtenerUsuarioPorId($id)
-    {
+    public function obtenerUsuarioPorId($id){
         $user = $this->model->where('idPersonaNatural',$id)->where('deleted',false)->first();
         if($user) $user->personaNatural;
         return $user;
     }
 
-    public function obtenerUsuarioPorEmail($email)
-    {
+    public function obtenerUsuarioPorEmail($email){
         $personaNatural = $this->personaNatural->where('email',$email)->where('deleted',false)->first();
         if($personaNatural){
             $this->setPersonaNaturalModel($personaNatural);
@@ -302,7 +235,6 @@ class UsuarioRepository extends BaseRepository {
             return $usuario;
         }
         return null;
-        
     }
 
     public function obtenerUsuarioPorDni($dni)
@@ -315,7 +247,6 @@ class UsuarioRepository extends BaseRepository {
             return $usuario;
         }
         return null;
-        
     }
 
     protected function setPersonaNaturalModel($personaNatural){
@@ -338,7 +269,6 @@ class UsuarioRepository extends BaseRepository {
         $personaNatural =  $usuario->personaNatural;
         if($usuario->personaNatural)
             $this->personaNatural =  $personaNatural;
-
     }
 
     public function softDelete(){
@@ -346,26 +276,19 @@ class UsuarioRepository extends BaseRepository {
         $this->personaNatural->save();
         $this->model->deleted = true;
         $this->model->save();
-       
-
     }
 
     public function listarAdmins(){
-        
         $admins = $this->model->whereHas('tipoUsuario', function ($query) {
                 $query->where('key', 0);
         })->get();
         foreach ($admins as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $admins;
     }
 
     public function listarAdminsSinTienda(){
-        
-        
-
         $admins = $this->model->whereHas('tipoUsuario', function ($query) {
             $query->where('key', 0)->where('deleted',false);
         })->whereDoesntHave('tiendas', function ($query2) {
@@ -373,13 +296,11 @@ class UsuarioRepository extends BaseRepository {
         })->where('usuario.deleted',false)->get();
         foreach ($admins as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $admins;
     }
 
     public function listarCajeros(){
-        
         $cajeros = $this->model->whereHas('tipoUsuario', function ($query) {
             $query->where(function($q2){
                 return $q2->where('key',4)->orWhere('key',5);
@@ -387,15 +308,11 @@ class UsuarioRepository extends BaseRepository {
         })->where('deleted',false)->get();
         foreach ($cajeros as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $cajeros;
-
-        
     }
 
     public function listarCajerosSinTienda(){
-        
         $cajeros = $this->model->whereHas('tipoUsuario', function ($query) {
             $query->where(function($q2){
                 return $q2->where('key',4)->orWhere('key',5);
@@ -406,11 +323,8 @@ class UsuarioRepository extends BaseRepository {
         
         foreach ($cajeros as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $cajeros;
-
-        
     }
 
     public function listarCajerosPorTienda($tienda=null){
@@ -427,31 +341,21 @@ class UsuarioRepository extends BaseRepository {
        
         foreach ($cajeros as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $cajeros;
-
-        
     }
 
     public function listarCajerosVentas(){
-        
         $cajerosVentas = $this->model->whereHas('tipoUsuario', function ($query) {
                 $query->where('key', 4)->where('deleted',false);
         })->where('deleted',false)->get();
         foreach ($cajerosVentas as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $cajerosVentas;
-
-        
     }
 
     public function listarCajerosVentasSinTienda(){
-        
-        
-
         $cajerosVentas = $this->model->whereHas('tipoUsuario', function ($query) {
             $query->where('key', 4)->where('deleted',false);
         })->whereDoesntHave('tiendas', function ($query2) {
@@ -459,7 +363,6 @@ class UsuarioRepository extends BaseRepository {
         })->where('usuario.deleted',false)->get();
         foreach ($cajerosVentas as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $cajerosVentas;
     }
@@ -471,17 +374,11 @@ class UsuarioRepository extends BaseRepository {
         })->where('deleted',false)->get();
         foreach ($cajerosDevoluciones as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $cajerosDevoluciones;
-
-        
     }
 
     public function listarCajerosDevolucionesSinTienda(){
-        
-        
-
         $cajerosDevoluciones = $this->model->whereHas('tipoUsuario', function ($query) {
             $query->where('key', 5)->where('deleted',false);
         })->whereDoesntHave('tiendas', function ($query2) {
@@ -489,39 +386,31 @@ class UsuarioRepository extends BaseRepository {
         })->where('usuario.deleted',false)->get();
         foreach ($cajerosDevoluciones as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $cajerosDevoluciones;
     }
 
     public function listarJefesTienda(){
-        
         $jefesTienda = $this->model->whereHas('tipoUsuario', function ($query) {
                 $query->where('key', 1)->where('deleted',false);
         })->where('deleted',false)->get();
         foreach ($jefesTienda as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $jefesTienda;
     }
 
     public function listarCompradores(){
-        
         $compradores = $this->model->whereHas('tipoUsuario', function ($query) {
                 $query->where('key', 2)->where('deleted',false);
         })->where('deleted',false)->get();
         foreach ($compradores as $key => $usuario) {
-            $usuario->personaNatural;
-            
+            $usuario->personaNatural;   
         } 
         return $compradores;
     }
 
     public function listarCompradoresSinTienda(){
-        
-        
-
         $compradores = $this->model->whereHas('tipoUsuario', function ($query) {
             $query->where('key', 2)->where('deleted',false);
         })->whereDoesntHave('tiendas', function ($query2) {
@@ -529,55 +418,43 @@ class UsuarioRepository extends BaseRepository {
         })->where('usuario.deleted',false)->get();
         foreach ($compradores as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $compradores;
     }
 
     public function listarAlmaceneros(){
-        
         $almaceneros = $this->model->whereHas('tipoUsuario', function ($query) {
                 $query->where('key', 6)->where('deleted',false);
         })->where('deleted',false)->get();
         foreach ($almaceneros as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $almaceneros;
     }
 
     public function listarAlmacenerosSinTienda(){
-        
-        
-
         $almaceneros = $this->model->whereHas('tipoUsuario', function ($query) {
             $query->where('key', 6)->where('deleted',false);
         })->whereDoesntHave('tiendas', function ($query2) {
             $query2->where('tienda.deleted', false);
         })->where('usuario.deleted',false)->get();
         foreach ($almaceneros as $key => $usuario) {
-            $usuario->personaNatural;
-            
+            $usuario->personaNatural;       
         } 
         return $almaceneros;
     }
 
     public function listarJefesAlmacen(){
-        
         $jefesAlmacen = $this->model->whereHas('tipoUsuario', function ($query) {
                 $query->where('key', 3)->where('deleted',false);
         })->where('deleted',false)->get();
         foreach ($jefesAlmacen as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $jefesAlmacen;
     }
-
     
     public function listarJefesTiendaSinTienda(){
-
-        
         $jefesTienda = $this->model->whereHas('tipoUsuario', function ($query) {
             $query->where('key', 1)->where('deleted',false);
         })->whereDoesntHave('tiendasCargoJefeTienda', function ($query2) {
@@ -585,19 +462,11 @@ class UsuarioRepository extends BaseRepository {
         })->where('deleted',false)->get();
         foreach ($jefesTienda as $key => $usuario) {
             $usuario->personaNatural;
-            
         }   
         return $jefesTienda;
-
-
-      
     }
 
     public function listarJefesAlmacenSinTienda(){
-
-        
-
-
         $jefesAlmacen = $this->model->whereHas('tipoUsuario', function ($query) {
             $query->where('key', 3)->where('deleted',false);
         })->whereDoesntHave('tiendasCargoJefeAlmacen', function ($query2) {
@@ -605,46 +474,29 @@ class UsuarioRepository extends BaseRepository {
         })->where('deleted',false)->get();
         foreach ($jefesAlmacen as $key => $usuario) {
             $usuario->personaNatural;
-            
         }  
         return $jefesAlmacen;
-
-      
     }
 
     public function listarAdminsPorTienda($tienda=null){
-       
-
         if (!$tienda){
             $tienda= $this->tienda;
         }
-    
         $admins = $tienda->trabajadores()->where('usuario.deleted',false)
                     ->where('usuarioxtienda.deleted',false)
                     ->whereHas('tipoUsuario', function ($query) {
                         $query->where('key', 0)->where('deleted',false);
                     })->get();
-       
         foreach ($admins as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
-        return $admins;
-
-
-
-
-
-        
+        return $admins;        
     }
 
     public function listarCompradoresPorTienda($tienda=null){
-
-
         if (!$tienda){
             $tienda= $this->tienda;
         }
-    
         $compradores =  $tienda->trabajadores()->where('usuario.deleted',false)
                     ->where('usuarioxtienda.deleted',false)
                     ->whereHas('tipoUsuario', function ($query) {
@@ -653,7 +505,6 @@ class UsuarioRepository extends BaseRepository {
                     
         foreach ($compradores as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $compradores;
     }
@@ -670,27 +521,22 @@ class UsuarioRepository extends BaseRepository {
                     })->get();
        
         foreach ($cajerosVentas as $key => $usuario) {
-            $usuario->personaNatural;
-            
+            $usuario->personaNatural;   
         } 
         return $cajerosVentas;
     }
 
     public function listarCajerosDevolucionesPorTienda($tienda=null){
-     
         if (!$tienda){
             $tienda= $this->tienda;
         }
-    
         $cajerosDevoluciones =  $tienda->trabajadores()->where('usuario.deleted',false)
                     ->where('usuarioxtienda.deleted',false)
                     ->whereHas('tipoUsuario', function ($query) {
                         $query->where('key', 5)->where('deleted',false);
                     })->get();
-       
         foreach ($cajerosDevoluciones as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $cajerosDevoluciones;
     }
@@ -699,7 +545,6 @@ class UsuarioRepository extends BaseRepository {
         if (!$tienda){
             $tienda= $this->tienda;
         }
-    
         $almaceneros =  $tienda->trabajadores()->where('usuario.deleted',false)
                     ->where('usuarioxtienda.deleted',false)
                     ->whereHas('tipoUsuario', function ($query) {
@@ -708,7 +553,6 @@ class UsuarioRepository extends BaseRepository {
        
         foreach ($almaceneros as $key => $usuario) {
             $usuario->personaNatural;
-            
         } 
         return $almaceneros;
     }
@@ -717,7 +561,6 @@ class UsuarioRepository extends BaseRepository {
         if (!$tienda){
             $tienda= $this->tienda;
         }
-    
         $jefeTienda = $this->model->whereHas('tiendasCargoJefeTienda', function ($query) use($tienda) {
             $query->where('id', $tienda->id)->where('deleted',false);
         })->whereHas('tipoUsuario', function ($query) {
@@ -726,9 +569,6 @@ class UsuarioRepository extends BaseRepository {
         if($jefeTienda){
             $jefeTienda->personaNatural;
         }
-        
-            
-        
         return $jefeTienda;
     }
 
@@ -736,7 +576,6 @@ class UsuarioRepository extends BaseRepository {
         if (!$tienda){
             $tienda= $this->tienda;
         }
-    
         $jefeAlmacen = $this->model->whereHas('tiendasCargoJefeAlmacen', function ($query)use($tienda) {
             $query->where('id', $tienda->id)->where('deleted',false);
         })->whereHas('tipoUsuario', function ($query) {
@@ -744,10 +583,7 @@ class UsuarioRepository extends BaseRepository {
         })->where('deleted',false)->first();
         if($jefeAlmacen){
             $jefeAlmacen->personaNatural;
-        }
-        
-            
-        
+        }       
         return $jefeAlmacen;
     }
 
@@ -761,13 +597,4 @@ class UsuarioRepository extends BaseRepository {
         }
         return false;
     }
-    
-
-    
-    
-  
-  
-
-  
-    
 }
