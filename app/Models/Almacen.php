@@ -14,6 +14,7 @@ class Almacen extends Model
       'id',
       'nombre',
       'idTienda',
+      'idJefeAlmacenCentral',
       'deleted'
  
       
@@ -40,6 +41,19 @@ class Almacen extends Model
         return $this->belongsToMany('App\Models\TipoStock','productoxalmacen',
           'idAlmacen','idTipoStock')->using('App\Models\ProductoXAlmacen')->withPivot('idProducto','cantidad','deleted','created_at','updated_at');
     }
+
+    public function jefeDeAlmacenCentral() {
+        return $this->belongsTo('App\Models\Usuario','idJefeAlmacenCentral','idPersonaNatural');
+    }
+
+    public function tieneJefeAlmacenCentral(){
+        if ($this->esJefeDeAlmacen()){
+            return $this->jefeDeAlmacenCentral()->where('deleted',false)->exists();
+        }
+        return false;
+    }
+
+    
 
     // public function newPivot(Model $parent, array $attributes, $table, $exists)
     // {

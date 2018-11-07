@@ -26,6 +26,9 @@ class Usuario extends Model
     public function tipoUsuario() {
         return $this->belongsTo('App\Models\TipoUsuario','idTipoUsuario','id');
     }
+   
+
+    
 
     public function tiendasCargoJefeTienda() {
         return $this->hasMany('App\Models\Tienda','idJefeTienda','idPersonaNatural');
@@ -39,6 +42,9 @@ class Usuario extends Model
   
     public function tiendasCargoJefeAlmacen() {
         return $this->hasMany('App\Models\Tienda','idJefeAlmacen','idPersonaNatural');
+    }
+    public function almacenCentral() {
+        return $this->hasOne('App\Models\Almacen','idJefeAlmacenCentral','idPersonaNatural');
     }
 
     public function tiendaCargoJefeAlmacen() {
@@ -69,7 +75,7 @@ class Usuario extends Model
 
     public function esJefeDeTiendaAsignado(){
         if ($this->esJefeDeTienda() ){
-            return $this->tiendasCargoJefeTienda()->exists();
+            return $this->tiendasCargoJefeTienda()->where('deleted',false)->exists();
         }
         return false;
     }
@@ -82,7 +88,15 @@ class Usuario extends Model
     public function esJefeDeAlmacenAsignado(){
         
         if ($this->esJefeDeAlmacen()){
-            return $this->tiendasCargoJefeAlmacen()->exists();
+            return $this->tiendasCargoJefeAlmacen()->where('deleted',false)->exists();
+        }
+        return false;
+    }
+
+    public function esJefeDeAlmacenCentral(){
+        
+        if ($this->almacenCentral){
+            return $this->almacenCentral()->where('deleted',false)->exists();
         }
         return false;
     }

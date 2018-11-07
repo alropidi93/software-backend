@@ -342,6 +342,14 @@ class TiendaController extends Controller {
                 $notFoundResource->notFound(['idJefeAlmacen'=>$idUsuario]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
+
+            if ($usuario->esJefeDeAlmacenCentral()){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de integridad');
+                $errorResource->message('El usuario ya es jefe del almacen central');
+                return $errorResource->response()->setStatusCode(400);
+
+            }
             
             $this->tiendaRepository->setModel($tienda);
             $this->tiendaRepository->setJefeDeAlmacenModel($usuario);

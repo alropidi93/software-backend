@@ -3,6 +3,7 @@ namespace App\Repositories;
 use App\Models\Almacen;
 use App\Models\Producto;
 use App\Models\TipoStock;
+use App\Models\Usuario;
 use App\Http\Helpers\Algorithm;
 
 	
@@ -12,13 +13,18 @@ class AlmacenRepository extends BaseRepository{
     protected $producto;
     protected $tipoStock;
     protected $productos;
+    protected $jefeAlmacenCentral;
    
-    public function __construct(Almacen $almacen,Producto $producto, TipoStock $tipoStock )
+    public function __construct(Almacen $almacen,Producto $producto, TipoStock $tipoStock ,Usuario $jefeAlmacenCentral)
     {
         $this->model = $almacen;
         $this->producto = $producto;
         $this->tipoStock = $tipoStock;
+        $this->jefeAlmacenCentral = $jefeAlmacenCentral;
 
+    }
+    public function setJefeAlmacenCentralModel($usuario){
+        $this->jefeAlmacenCentral = $usuario;       
     }
 
     public function loadProductosRelationship($almacen=null){
@@ -121,7 +127,27 @@ class AlmacenRepository extends BaseRepository{
 
         $this->model->productos()->save($producto , ['idTipoStock'=>$tipoStock->id,'cantidad'=>$cantidadRnd,'deleted'=>false] );
         $this->model->save();
-    }   
+    }
+    
+    public function loadJefeDeAlmacenCentralRelationship($tienda=null){
+        if (!$tienda){
+            $this->model->load('jefeDeAlmacenCentral');
+        }
+        else{
+            $tienda->load('jefeDeAlmacenCentral');
+        }
+        
+    }
+
+    public function attachJefeAlmacenCentral(){
+           
+        $this->model->jefeDeAlmacenCentral()->associate($this->jefeAlmacenCentral);
+        $this->model->save();
+
+      
+    }
+
+    
     
     
 }
