@@ -359,6 +359,7 @@ class UsuarioController extends Controller
                 if (Hash::check($request['password'], $password)){
                     Log:info("paso el login");
                     if($usuario->esJefeDeTienda()){
+                        
                         $this->usuarioRepository->loadTiendaCargoJefeTiendaRelationship();
                     }
                     else if ($usuario->esJefeDeAlmacen()){
@@ -370,6 +371,7 @@ class UsuarioController extends Controller
                     else if (!$usuario->esAdmin()){
                         $this->usuarioRepository->loadTiendasCargoTrabajadorRelationship();
                     }
+                    
                     $this->usuarioRepository->loadTipoUsuarioRelationship();
                     $usuarioResource =  new UsuarioResource($usuario);
                     $responseResourse = new ResponseResource(null);
@@ -754,8 +756,10 @@ class UsuarioController extends Controller
            
             
             $usuarioService = new UsuarioService;
-            $title = 'Listado de cajeros sin tienda asignada (de ventas y de devoluciones)';         
+            $title = 'Listado de cajeros sin tienda asignada (de ventas y de devoluciones)';  
+                   
             $usuarios = $this->usuarioRepository->listarCajerosSinTienda();
+            //return $usuarios;
             if ($filter && $value){
                         
                 switch ($filter) {
@@ -774,6 +778,7 @@ class UsuarioController extends Controller
                         break;
                 }
             }
+            
             foreach ($usuarios as $key => $usuario) {
                 $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
                 //$this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship($usuario);

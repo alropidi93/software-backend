@@ -397,9 +397,9 @@ class UsuarioRepository extends BaseRepository {
             $query->where(function($q2){
                 return $q2->where('key',4)->orWhere('key',5);
             })->where('deleted',false);
-        })->whereDoesntHave('tienda', function ($query2) {
-            $query2->where('deleted', false);
-        })->where('deleted',false)->get();
+        })->whereDoesntHave('tiendas', function ($query2) {
+            $query2->where('tienda.deleted', false);
+        })->where('usuario.deleted',false)->get();
         
         foreach ($cajeros as $key => $usuario) {
             $usuario->personaNatural;
