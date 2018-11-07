@@ -663,11 +663,8 @@ class UsuarioController extends Controller
             $responseResource->body($usuariosResource);
             
             return $responseResource; 
-        }
-        catch(\Exception $e){
-                
-            return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
     
     }
@@ -689,14 +686,9 @@ class UsuarioController extends Controller
             $responseResourse->title('Lista de jefes de tienda no asignados a tiendas');  
             $responseResourse->body($usuariosResource);
             return $responseResourse;
-        }
-        catch(\Exception $e){
-         
-            
+        }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
         }
-
     }
 
 
