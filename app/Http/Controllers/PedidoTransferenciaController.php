@@ -455,18 +455,19 @@ class PedidoTransferenciaController extends Controller {
             $dataArray= Algorithm::quitNullValuesFromArray($dataArray);
             $validator = \Validator::make($dataArray, 
                             [ 
-                            'evaluacion' => 'required'
+                            'evaluacion' => 'required',
+                            'idUsuario'=>'required'
+                            
                             ]);
 
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
+            $idUsuario =  $data['idUsuario'];
             $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia);
-            $evaluacion = $data['evaluacion'];
-            
             if (!$pedidoTransferencia){
                 $notFoundResource = new NotFoundResource(null);
-                $notFoundResource->title('No existe este pedido de transferencia ');
+                $notFoundResource->title('No existe este pedido de transferencia');
                 $notFoundResource->notFound(['id' => $idPedidoTransferencia]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
@@ -477,54 +478,119 @@ class PedidoTransferenciaController extends Controller {
                 $errorResource->message('El pedido de transferencia ya fue evaluado');
                 return $errorResource->response()->setStatusCode(400);
             }
+            $this->pedidoTransferenciaRepository->setModel($pedidoTransferencia);
+
+            $usuario = $this->pedidoTransferenciaRepository->getUsuarioById($idUsuario);
+            if (!$usuario){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('No existe este usuario');
+                $notFoundResource->notFound(['id' => $idUsuario]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            $this->pedidoTransferenciaRepository->setUsuarioModel($usuario);
+            $tienda = $this->pedidoTransferenciaRepository->getTiendaDeAlmacen();
+     
+            if (!$tienda){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('No existe esta tienda');
+                $notFoundResource->notFound(['id' => $tienda->id]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            if (!($usuario->esJefeDeTiendaAsignado() && $this->pedidoTransferenciaRepository->usuarioEsJefeDeTiendaDe($tienda))){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de autorización');
+                $errorResource->message('El usuario no tiene los privilegios para evaluar este pedido de transferencia');
+                return $errorResource->response()->setStatusCode(400);
+
+            }
+            else if (!($usuario->esJefeDeAlmacenAsignado() && $this->pedidoTransferenciaRepository->usuarioEsJefeDeAlmacenDe($tienda))){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de autorización');
+                $errorResource->message('El usuario no tiene los privilegios para evaluar este pedido de transferencia');
+                return $errorResource->response()->setStatusCode(400);
+            }
+            else{
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de autorización');
+                $errorResource->message('El usuario no tiene los privilegios para evaluar este pedido de transferencia');
+                return $errorResource->response()->setStatusCode(400);
+            }
+            
+            $evaluacion = $data['evaluacion'];
+            
+            
 
             //verificar si el jefe de tienda origen acepto el pedido
-            if(!$pedidoTransferencia->fueAceptadoJTO()){
-                $errorResource = new ErrorResource(null);
-                $errorResource->title('Error de validación');
-                $errorResource->message('El pedido de transferencia no fue aceptado por el jefe de tienda origen');
-                return $errorResource->response()->setStatusCode(400);
-            }
+            // if(!$pedidoTransferencia->fueAceptadoJTO()){
+            //     $errorResource = new ErrorResource(null);
+            //     $errorResource->title('Error de validación');
+            //     $errorResource->message('El pedido de transferencia no fue aceptado por el jefe de tienda origen');
+            //     return $errorResource->response()->setStatusCode(400);
+            // }
 
-            //verificar si el jefe de almacen destino acepto el pedido
-            if(!$pedidoTransferencia->fueAceptadoJAD()){
-                $errorResource = new ErrorResource(null);
-                $errorResource->title('Error de validación');
-                $errorResource->message('El pedido de transferencia no fue aceptado por el jefe de almacen destino');
-                return $errorResource->response()->setStatusCode(400);
-            }
+            
+
+          
 
             
             $responseResource = new ResponseResource(null);
             DB::beginTransaction();
-            $this->pedidoTransferenciaRepository->setModel($pedidoTransferencia);
+            
             $this->pedidoTransferenciaRepository->setLineasPedidoTransferenciaByOwnModel();
             
             if ($pedidoTransferencia->estaEnPrimerIntento()){
                 
                 if ($evaluacion){
-                    $dataArray['estado']='Aceptado';
-                    $dataArray['deleted']=false;
-                    $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
-                    $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
-                    $this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
-                    $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-                    DB::commit();
+                    if ($usuario->esJefeDeAlmacenAsignado()){
+                        $pedidosTransferencia->actualiza(['aceptoJAD'=>true]);
+                        DB::commit();
+                        $text= "Pedido de transferencia aceptado por el jefe de almacen en el intento {$pedidoTransferencia->fase}";
+
+                    }
+                    else{
+                        //verificar si el jefe de almacen destino acepto el pedido
+                        if(!$pedidoTransferencia->fueAceptadoJAD()){
+                            $errorResource = new ErrorResource(null);
+                            $errorResource->title('Error de validación');
+                            $errorResource->message('El pedido de transferencia no fue aceptado por el jefe de almacen destino');
+                            return $errorResource->response()->setStatusCode(400);
+                        }
+                       
+                        $dataArray['estado']='Aceptado';
+                        $dataArray['deleted']=false;
+                        $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
+                        $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
+                        $this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
+                        $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                        DB::commit();
+                        $text= "Pedido de transferencia aceptado por el jefe de tienda en el intento {$pedidoTransferencia->fase}";
+                        
+                    }
                     $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
-                    $text= "Pedido de transferencia aceptado en el intento {$pedidoTransferencia->fase}";
+                    
                     $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
                     $responseResource->title($text);  
                     $responseResource->body($pedidoTransferenciaResource);
+                    
                 }
                 else{
-                    
+                    if ($usuario->esJefeDeAlmacenAsignado()){
+                        $pedidosTransferencia->actualiza(['aceptoJAD'=>false]);
+                        
+                        $text= "Pedido de transferencia denegado por el jefe de almacen en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
+
+                    }
+                    else{
+                        $text= "Pedido de transferencia denegado por el jefe de tienda en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
+                    }
+
                     $dataArray['estado']='Denegado';
                     $dataArray['deleted']=false;
                     $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
                     $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
                     //$this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
                     $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-                    $text= "Pedido de transferencia denegado en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
+                    
                     
                     $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
                     
@@ -574,28 +640,57 @@ class PedidoTransferenciaController extends Controller {
             else if ($pedidoTransferencia->estaEnSegundoIntento()){
                 
                 if ($evaluacion){
-                    $dataArray['estado']='Aceptado';
-                    $dataArray['deleted']=false;
-                    $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
-                    $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
-                    $this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
-                    $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-                    DB::commit();
+
+                    if ($usuario->esJefeDeAlmacenAsignado()){
+                        $pedidosTransferencia->actualiza(['aceptoJAD'=>true]);
+                        DB::commit();
+                        $text= "Pedido de transferencia aceptado por el jefe de almacen en el intento {$pedidoTransferencia->fase}";
+
+                    }
+                    else{
+                        //verificar si el jefe de almacen destino acepto el pedido
+                        if(!$pedidoTransferencia->fueAceptadoJAD()){
+                            $errorResource = new ErrorResource(null);
+                            $errorResource->title('Error de validación');
+                            $errorResource->message('El pedido de transferencia no fue aceptado por el jefe de almacen destino');
+                            return $errorResource->response()->setStatusCode(400);
+                        }
+                        $dataArray['estado']='Aceptado';
+                        $dataArray['deleted']=false;
+                        $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
+                        $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
+                        $this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
+                        $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                        DB::commit();
+                        
+                        $text= "Pedido de transferencia aceptado por el jefe de tienda en el intento {$pedidoTransferencia->fase}";
+                        
+                    }
                     $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
-                    $text= "Pedido de transferencia aceptado en el intento {$pedidoTransferencia->fase}";
+                    
                     $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
                     $responseResource->title($text);  
                     $responseResource->body($pedidoTransferenciaResource);
+                    
 
                 }
                 else{
+                    if ($usuario->esJefeDeAlmacenAsignado()){
+                        $pedidosTransferencia->actualiza(['aceptoJAD'=>false]);
+                        
+                        $text= "Pedido de transferencia denegado por el jefe de almacen en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
+
+                    }
+                    else{
+                        $text= "Pedido de transferencia denegado por el jefe de tienda en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
+                    }
                     $dataArray['estado']='Denegado';
                     $dataArray['deleted']=false;
                     $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
                     $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
                     //$this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
                     $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-                    $text= "Pedido de transferencia denegado en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al almacen central";
+                    //$text= "Pedido de transferencia denegado en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al almacen central";
                     $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
                     $almacenOrigen = $this->pedidoTransferenciaRepository->getAlmacenById($pedidoTransferencia->idAlmacenO);
      
@@ -640,27 +735,53 @@ class PedidoTransferenciaController extends Controller {
             else if ($pedidoTransferencia->estaEnTercerIntento()){
                 
                 if ($evaluacion){
-                    $dataArray['estado']='Aceptado';
-                    $dataArray['deleted']=false;
-                    $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
-                    $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
-                    $this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
-                    $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-                    DB::commit();
+                    if ($usuario->esJefeDeAlmacenAsignado()){
+                        $pedidosTransferencia->actualiza(['aceptoJAD'=>true]);
+                        DB::commit();
+                        $text= "Pedido de transferencia aceptado por el jefe de almacen en el intento {$pedidoTransferencia->fase}";
+
+                    }
+                    else{
+                        //verificar si el jefe de almacen destino acepto el pedido
+                        if(!$pedidoTransferencia->fueAceptadoJAD()){
+                            $errorResource = new ErrorResource(null);
+                            $errorResource->title('Error de validación');
+                            $errorResource->message('El pedido de transferencia no fue aceptado por el jefe de almacen destino');
+                            return $errorResource->response()->setStatusCode(400);
+                        }
+                        $dataArray['estado']='Aceptado';
+                        $dataArray['deleted']=false;
+                        $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
+                        $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
+                        $this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
+                        $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                        DB::commit();
+                        
+                        $text= "Pedido de transferencia aceptado por el jefe de tienda en el intento {$pedidoTransferencia->fase}";
+                       
+                    }
                     $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
-                    $text= "Pedido de transferencia aceptado en el intento {$pedidoTransferencia->fase}";
                     $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
                     $responseResource->title($text);  
                     $responseResource->body($pedidoTransferenciaResource);
+                    
                 }
                 else{
-                    
+                    if ($usuario->esJefeDeAlmacenAsignado()){
+                        $pedidosTransferencia->actualiza(['aceptoJAD'=>false]);
+                        
+                        $text= "Pedido de transferencia denegado por el jefe de almacen en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
+
+                    }
+                    else{
+                        $text= "Pedido de transferencia denegado por el jefe de tienda en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
+                    }
                     $dataArray['estado']='Denegado';
                     $dataArray['deleted']=false;
                     $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
                     $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
                     $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-                    $text= "Pedido de transferencia denegado en el intento {$pedidoTransferencia->fase}, se generá agragara o acumulará una linea en la solicitud de compra";
+                    //$text= "Pedido de transferencia denegado en el intento {$pedidoTransferencia->fase}, se generá agragara o acumulará una linea en la solicitud de compra";
                     
                     $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
                     $almacenOrigen = $this->pedidoTransferenciaRepository->getAlmacenById($pedidoTransferencia->idAlmacenO);

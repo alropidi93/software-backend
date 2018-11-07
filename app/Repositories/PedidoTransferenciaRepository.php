@@ -242,6 +242,18 @@ class PedidoTransferenciaRepository extends BaseRepository {
         
     }
 
+    public function setUsuarioModel($usuario)
+    {
+        $this->usuario =  $usuario;
+     
+        
+    }
+
+    public function getTiendaDeAlmacen(){
+
+        return $this->model->almacenOrigen->tienda;
+    }
+
     public function setTransferenciaData($dataTransferencia)
     {
         $this->transferencia =  new Transferencia($dataTransferencia);
@@ -306,5 +318,23 @@ class PedidoTransferenciaRepository extends BaseRepository {
        
        $this->lineasPedidoTransferencia = $this->model->lineasPedidoTransferencia;
        unset($this->model->lineasPedidoTransferencia);
+    }
+
+    public function usuarioEsJefeDeTiendaDe($tienda){
+        if(!$this->usuario){
+            return $false;
+        }
+        $usuario = $this->usuario;
+        $tiendaDeLaQueEsJefe = $usuario->tiendaCargoJefeTienda;
+        return $tiendaDeLaQueEsJefe->id == $tienda->id;
+    }
+
+    public function usuarioEsJefeDeAlmacenDe($tienda){
+        if(!$this->usuario){
+            return $false;
+        }
+        $usuario = $this->usuario;
+        $tiendaDeLaQueEsJefe = $usuario->tiendaCargoJefeAlmacen;
+        return $tiendaDeLaQueEsJefe->id == $tienda->id;
     }
 }

@@ -539,6 +539,7 @@ class UsuarioController extends Controller
                 case 2:
                     $title = 'Listado por rol sin tienda asignada - Compradores';
                     $usuarios = $this->usuarioRepository->listarCompradoresSinTienda();
+                    
                     if ($filter && $value){
                         
                         switch ($filter) {
@@ -817,6 +818,8 @@ class UsuarioController extends Controller
                 $notFoundResource->notFound(['id' => $idTienda]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
+            
+            $this->usuarioRepository->setTiendaModel($tienda);
             $rol = Input::get('rol');
            
             $responseResource = new ResponseResource(null);
@@ -824,7 +827,7 @@ class UsuarioController extends Controller
             
             switch ($rol) {
                 case 0:
-                    $usuarios = $this->usuarioRepository->listarAdminsPorTienda($idTienda);
+                    $usuarios = $this->usuarioRepository->listarAdminsPorTienda();
                     if (!$usuarios || count($usuarios)==0){
                         $notFoundResource = new NotFoundResource(null);
                         $notFoundResource->title('Admins de la tienda no encontrados');
@@ -843,7 +846,7 @@ class UsuarioController extends Controller
                     break;
                 case 1:
                     
-                    $usuario = $this->usuarioRepository->obtenerJefeTiendaPorTienda($idTienda);
+                    $usuario = $this->usuarioRepository->obtenerJefeTiendaPorTienda();
                     if (!$usuario){
                         $notFoundResource = new NotFoundResource(null);
                         $notFoundResource->title('Jefe de tienda de la tienda no encontrado');
@@ -861,10 +864,10 @@ class UsuarioController extends Controller
                     
                 
                 
-                break;
+                    break;
 
                 case 2:
-                    $usuarios = $this->usuarioRepository->listarCompradoresPorTienda($idTienda);
+                    $usuarios = $this->usuarioRepository->listarCompradoresPorTienda();
                     if (!$usuarios || count($usuarios)==0){
                         $notFoundResource = new NotFoundResource(null);
                         $notFoundResource->title('Compradores de la tienda no encontrados');
@@ -884,7 +887,7 @@ class UsuarioController extends Controller
                     break;
 
                 case 3:
-                    $usuario = $this->usuarioRepository->obtenerJefeAlmacenPorTienda($idTienda);
+                    $usuario = $this->usuarioRepository->obtenerJefeAlmacenPorTienda();
                     if (!$usuario ){
                         $notFoundResource = new NotFoundResource(null);
                         $notFoundResource->title('Jefe de almacen de la tienda no encontrado');
@@ -901,7 +904,7 @@ class UsuarioController extends Controller
                     break;
 
                 case 4:
-                    $usuarios = $this->usuarioRepository->listarCajerosVentasPorTienda($idTienda);
+                    $usuarios = $this->usuarioRepository->listarCajerosVentasPorTienda();
                     if (!$usuarios || count($usuarios)==0){
                         $notFoundResource = new NotFoundResource(null);
                         $notFoundResource->title('Cajeros de ventas de la tienda no encontrados');
@@ -919,7 +922,7 @@ class UsuarioController extends Controller
                   
                     break;
                 case 5:
-                    $usuarios = $this->usuarioRepository->listarCajerosDevolucionesPorTienda($idTienda);
+                    $usuarios = $this->usuarioRepository->listarCajerosDevolucionesPorTienda();
                     if (!$usuarios || count($usuarios)==0){
                         $notFoundResource = new NotFoundResource(null);
                         $notFoundResource->title('Cajeros de devoluciones de la tienda no encontrados');
@@ -938,7 +941,7 @@ class UsuarioController extends Controller
                     
                     break;
                 case 6:
-                    $usuarios = $this->usuarioRepository->listarAlmacenerosPorTienda($idTienda);
+                    $usuarios = $this->usuarioRepository->listarAlmacenerosPorTienda();
                     if (!$usuarios || count($usuarios)==0){
                         $notFoundResource = new NotFoundResource(null);
                         $notFoundResource->title('Almaceneros de la tienda no encontrados');
