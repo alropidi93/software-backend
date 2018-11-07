@@ -15,6 +15,7 @@ class PedidoTransferencia extends Model
       'idUsuario',
       'idAlmacenO',
       'idAlmacenD',
+      'idAlmacenD2',
       'descripcion',
       'fase',
       'aceptoJTO', // Flag que determina si el Jefe de Tienda de la tienda de Origen ha aceptado el pedido de transferencia
@@ -34,6 +35,9 @@ class PedidoTransferencia extends Model
 
     public function almacenDestino() {
         return $this->belongsTo('App\Models\Almacen','idAlmacenD','id');
+    }
+    public function almacenDestino2() {
+        return $this->belongsTo('App\Models\Almacen','idAlmacenD2','id');
     }
 
     public function transferencia() {
