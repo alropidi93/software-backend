@@ -216,31 +216,15 @@ class ProductoRepository extends BaseRepository {
     }
 
     public function updateStock($idTipoStock, $idAlmacen, $cantidad){
-        #$producto = $this->productoRepository->obtenerPorId($idProducto);
-        
-        // if (!$producto){
-        //     $notFoundResource = new NotFoundResource(null);
-        //     $notFoundResource->title('Producto no encontrado');
-        //     $notFoundResource->notFound(['id' => $idProducto]);
-        //     return $notFoundResource->response()->setStatusCode(404);
-        // }
-        
-        // $almacen = $this->model->almacenes(function($q) use ($idTipoStock,$idAlmacen){
-        //     $q->where('productoxalmacen.idTipoStock', $idTipoStock)->where('almacen.id',$idAlmacen)->where('almacen.deleted',false)->where('productoxalmacen.deleted',false);
-            
-        // })->where('almacen.deleted',false)->first();
-        $productoxalmacen =  ProductoXAlmacen::where('idAlmacen',$idAlmacen)->where('idProducto',$this->model->id)->where('idTipoStock',$idTipoStock)->where('deleted',false)->first();//->where('idAlmacen',$idAlmacen)->where('idProducto',$this->model->id)->where('deleted',false)->first();
-        return $productoxalmacen->cantidad;    
-        $productoxalmacen->cantidad = $cantidad;
-        $productoxalmacen->save();
-        //$this->model->almacenes()->where('almacen.id',$idAlmacen)->where('productoxalmacen.idTipoStock', $idTipoStock)->updateExistingPivot($idAlmacen, ['cantidad'=>$cantidad]);
-        // $almacen->pivot->cantidad = $cantidad;
-        // $almacen->pivot->save();
-
-        
-        //return $almacen;
        
-        //$this->model->almacenes()->updateExistingPivot($almacen->pivot, array('cantidad' => $cantidad), false);
+   
+        $productoxalmacen =  ProductoXAlmacen::where('idAlmacen',$idAlmacen)
+                            ->where('idProducto',$this->model->id)
+                            ->where('idTipoStock',$idTipoStock)
+                            ->where('deleted',false)
+                            ->update(['cantidad'=>$cantidad]);
+        
+      
        
        
     }

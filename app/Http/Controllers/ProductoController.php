@@ -466,7 +466,7 @@ class ProductoController extends Controller
 
             $producto = $this->productoRepository->obtenerPorId($idProducto);
             $this->productoRepository->setModel($producto);
-            return $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $cantidad);
+            $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $cantidad);
 
             DB::commit();
             
