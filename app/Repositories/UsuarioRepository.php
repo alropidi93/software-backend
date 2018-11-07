@@ -424,16 +424,7 @@ class UsuarioRepository extends BaseRepository {
                             return $q2->where('key',4)->orWhere('key',5);
                         })->where('deleted',false);
                     })->get();
-
-        // $cajeros = $this->model->whereHas('tipoUsuario', function ($query) {
-        //     $query->where(function($q2){
-        //         return $q2->where('key',4)->orWhere('key',5);
-        //     })->where('deleted',false);
-        // })->whereHas('tiendas', function ($q){
-        //     $q->where('usuarioxtienda.deleted',false)->where('tienda.deleted',false);
-        // })->get();
-
-        
+       
         foreach ($cajeros as $key => $usuario) {
             $usuario->personaNatural;
             
@@ -621,21 +612,45 @@ class UsuarioRepository extends BaseRepository {
       
     }
 
-    public function listarAdminsPorTienda($idTienda){
-        $admins = $this->model->whereHas('tipoUsuario', function ($query) use($idTienda){
-            $query->where('key', 0)->where('deleted',false);
-        })->where('idTienda',$idTienda)->where('deleted',false)->get();
+    public function listarAdminsPorTienda($tienda=null){
+       
+
+        if (!$tienda){
+            $tienda= $this->tienda;
+        }
+    
+        $admins = $tienda->trabajadores()->where('usuario.deleted',false)
+                    ->where('usuarioxtienda.deleted',false)
+                    ->whereHas('tipoUsuario', function ($query) {
+                        $query->where('key', 0)->where('deleted',false);
+                    })->get();
+       
         foreach ($admins as $key => $usuario) {
             $usuario->personaNatural;
             
         } 
         return $admins;
+
+
+
+
+
+        
     }
 
-    public function listarCompradoresPorTienda($idTienda){
-        $compradores = $this->model->whereHas('tipoUsuario', function ($query) use($idTienda){
-            $query->where('key', 2)->where('deleted',false);
-        })->where('idTienda',$idTienda)->where('deleted',false)->get();
+    public function listarCompradoresPorTienda($tienda=null){
+
+
+        if (!$tienda){
+            $tienda= $this->tienda;
+        }
+    
+        $compradores =  $tienda->trabajadores()->where('usuario.deleted',false)
+                    ->where('usuarioxtienda.deleted',false)
+                    ->whereHas('tipoUsuario', function ($query) {
+                        $query->where('key', 2)->where('deleted',false);
+                    })->get();
+                    
         foreach ($compradores as $key => $usuario) {
             $usuario->personaNatural;
             
@@ -643,10 +658,17 @@ class UsuarioRepository extends BaseRepository {
         return $compradores;
     }
 
-    public function listarCajerosVentasPorTienda($idTienda){
-        $cajerosVentas = $this->model->whereHas('tipoUsuario', function ($query) use($idTienda){
-            $query->where('key', 4)->where('deleted',false);
-        })->where('idTienda',$idTienda)->where('deleted',false)->get();
+    public function listarCajerosVentasPorTienda($tienda=null){
+        if (!$tienda){
+            $tienda= $this->tienda;
+        }
+    
+        $cajerosVentas =  $tienda->trabajadores()->where('usuario.deleted',false)
+                    ->where('usuarioxtienda.deleted',false)
+                    ->whereHas('tipoUsuario', function ($query) {
+                        $query->where('key', 4)->where('deleted',false);
+                    })->get();
+       
         foreach ($cajerosVentas as $key => $usuario) {
             $usuario->personaNatural;
             
@@ -654,10 +676,18 @@ class UsuarioRepository extends BaseRepository {
         return $cajerosVentas;
     }
 
-    public function listarCajerosDevolucionesPorTienda($idTienda){
-        $cajerosDevoluciones = $this->model->whereHas('tipoUsuario', function ($query) use($idTienda){
-            $query->where('key', 5)->where('deleted',false);
-        })->where('idTienda',$idTienda)->where('deleted',false)->get();
+    public function listarCajerosDevolucionesPorTienda($tienda=null){
+     
+        if (!$tienda){
+            $tienda= $this->tienda;
+        }
+    
+        $cajerosDevoluciones =  $tienda->trabajadores()->where('usuario.deleted',false)
+                    ->where('usuarioxtienda.deleted',false)
+                    ->whereHas('tipoUsuario', function ($query) {
+                        $query->where('key', 5)->where('deleted',false);
+                    })->get();
+       
         foreach ($cajerosDevoluciones as $key => $usuario) {
             $usuario->personaNatural;
             
@@ -665,10 +695,17 @@ class UsuarioRepository extends BaseRepository {
         return $cajerosDevoluciones;
     }
 
-    public function listarAlmacenerosPorTienda($idTienda){
-        $almaceneros = $this->model->whereHas('tipoUsuario', function ($query)use($idTienda) {
-            $query->where('key', 6)->where('deleted',false);
-        })->where('idTienda',$idTienda)->where('deleted',false)->get();
+    public function listarAlmacenerosPorTienda($tienda=null){
+        if (!$tienda){
+            $tienda= $this->tienda;
+        }
+    
+        $almaceneros =  $tienda->trabajadores()->where('usuario.deleted',false)
+                    ->where('usuarioxtienda.deleted',false)
+                    ->whereHas('tipoUsuario', function ($query) {
+                        $query->where('key', 6)->where('deleted',false);
+                    })->get();
+       
         foreach ($almaceneros as $key => $usuario) {
             $usuario->personaNatural;
             
@@ -676,10 +713,13 @@ class UsuarioRepository extends BaseRepository {
         return $almaceneros;
     }
 
-    public function obtenerJefeTiendaPorTienda($idTienda){
-        
-        $jefeTienda = $this->model->whereHas('tiendasCargoJefeTienda', function ($query) use($idTienda) {
-            $query->where('id', $idTienda)->where('deleted',false);
+    public function obtenerJefeTiendaPorTienda($tienda=null){
+        if (!$tienda){
+            $tienda= $this->tienda;
+        }
+    
+        $jefeTienda = $this->model->whereHas('tiendasCargoJefeTienda', function ($query) use($tienda) {
+            $query->where('id', $tienda->id)->where('deleted',false);
         })->whereHas('tipoUsuario', function ($query) {
             $query->where('key', 1)->where('deleted',false);
         })->where('deleted',false)->first();
@@ -692,9 +732,13 @@ class UsuarioRepository extends BaseRepository {
         return $jefeTienda;
     }
 
-    public function obtenerJefeAlmacenPorTienda($idTienda){
-        $jefeAlmacen = $this->model->whereHas('tiendasCargoJefeAlmacen', function ($query)use($idTienda) {
-            $query->where('id', $idTienda)->where('deleted',false);
+    public function obtenerJefeAlmacenPorTienda($tienda=null){
+        if (!$tienda){
+            $tienda= $this->tienda;
+        }
+    
+        $jefeAlmacen = $this->model->whereHas('tiendasCargoJefeAlmacen', function ($query)use($tienda) {
+            $query->where('id', $tienda->id)->where('deleted',false);
         })->whereHas('tipoUsuario', function ($query) {
             $query->where('key', 3)->where('deleted',false);
         })->where('deleted',false)->first();
