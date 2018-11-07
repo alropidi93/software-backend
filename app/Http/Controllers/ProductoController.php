@@ -33,8 +33,7 @@ class ProductoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
+    public function index(){
         try{
             $productos = $this->productoRepository->obtenerTodos();
             
@@ -42,9 +41,7 @@ class ProductoController extends Controller
                 $this->productoRepository->loadTipoProductoRelationship($producto);
                 $this->productoRepository->loadUnidadMedidaRelationship($producto);
                 $this->productoRepository->loadProveedoresRelationship($producto);
-                $this->productoRepository->loadCategoriaRelationship($producto);
-                
-                
+                $this->productoRepository->loadCategoriaRelationship($producto);       
             }
 
             $productosResource =  new ProductosResource($productos);  
@@ -52,13 +49,8 @@ class ProductoController extends Controller
             $responseResource->title('Lista de productos');  
             $responseResource->body($productosResource);
             return $responseResource;
-        }
-        catch(\Exception $e){
-         
-            
-            
+        }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
         }
     }
 
@@ -68,10 +60,8 @@ class ProductoController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $productoData)
-    {
-        try{
-            
+    public function store(Request $productoData){
+        try{   
             $validator = \Validator::make($productoData->all(), 
                             ['nombre' => 'required',
                             'stockMin' => 'required',
@@ -114,13 +104,9 @@ class ProductoController extends Controller
             $responseResource->title('Producto creada exitosamente');       
             $responseResource->body($productoResource);       
             return $responseResource;
-        }
-        catch(\Exception $e){
+        }catch(\Exception $e){
             DB::rollback();
-            
-            
             return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
         }
     }
 
@@ -130,8 +116,7 @@ class ProductoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
+    public function show($id){
         try{
             $producto = $this->productoRepository->obtenerPorId($id);
             
@@ -150,13 +135,8 @@ class ProductoController extends Controller
             $responseResource->title('Mostrar producto');  
             $responseResource->body($productoResource);
             return $responseResource;
-        }
-        catch(\Exception $e){
-            
-            
-            
+        }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
         }
     }
 
@@ -167,10 +147,8 @@ class ProductoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update($id, Request $productoData)
-    {
+    public function update($id, Request $productoData){
         try{
-    
             $productoDataArray= Algorithm::quitNullValuesFromArray($productoData->all());
             
             $validator = \Validator::make($productoDataArray, 
@@ -180,11 +158,8 @@ class ProductoController extends Controller
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
-           
-            
          
-            if (array_key_exists('idCategoria',$productoDataArray)){
-                
+            if (array_key_exists('idCategoria',$productoDataArray)){   
                 $idCategoria = $productoDataArray['idCategoria'];
                 $categoria = $this->categoriaRepository->obtenerPorId($idCategoria);
             
@@ -205,7 +180,6 @@ class ProductoController extends Controller
                 $notFoundResource->notFound(['id'=>$id]);
                 return $notFoundResource->response()->setStatusCode(404);;
             }
-            
      
             $this->productoRepository->setModel($producto);
             
@@ -225,13 +199,9 @@ class ProductoController extends Controller
             $responseResource->body($productoResource);     
             
             return $responseResource;
-        }
-        catch(\Exception $e){
+        }catch(\Exception $e){
             DB::rollback();
-            
-            
             return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
         }
     }
 
@@ -241,8 +211,7 @@ class ProductoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
+    public function destroy($id){
         try{
             DB::beginTransaction();
             $producto = $this->productoRepository->obtenerPorId($id);
@@ -255,26 +224,18 @@ class ProductoController extends Controller
             }
             $this->productoRepository->setModel($producto);
             $this->productoRepository->softDelete();
-            
 
-              
             $responseResource = new ResponseResource(null);
             $responseResource->title('Producto eliminada');  
             $responseResource->body(['id' => $id]);
             DB::commit();
             return $responseResource;
-        }
-        catch(\Exception $e){
-         
-            
-            
+        }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
         }
     }
 
-    public function busquedaPorFiltro()
-    {
+    public function busquedaPorFiltro(){
         try{
             $producto = $this->productoRepository->obtenerModelo();
             $filter = Input::get('filterBy');
@@ -285,12 +246,10 @@ class ProductoController extends Controller
                 $errorResource->title('Error de búsqueda');
                 $errorResource->message('Parámetros inválidos para la búsqueda');
                 return $errorResource->response()->setStatusCode(400);
-
             }
           
             switch ($filter) {
-                case 'nombre':
-                                  
+                case 'nombre':        
                     $productos = $this->productoRepository->buscarPorFiltro($filter, $value);
                     foreach ($productos as $key => $producto) {
                         $this->productoRepository->loadTipoProductoRelationship($producto);
@@ -301,7 +260,6 @@ class ProductoController extends Controller
                     $responseResource->title('Lista de productos filtrados por nombre');       
                     $responseResource->body($productosResource);
                     break;
-
                 case 'categoria':
                     $productos = $this->productoRepository->buscarPorCategoria($value);
                     
@@ -314,8 +272,6 @@ class ProductoController extends Controller
                     $responseResource->title('Lista de productos filtrados por categoria');       
                     $responseResource->body($productosResource);
                     break;
-                
-
                 case 'tipo':
                     $productos = $this->productoRepository->buscarPorTipo($value);
                     
@@ -339,23 +295,17 @@ class ProductoController extends Controller
                     $responseResource->title('Lista de productos filtrados por categoria');       
                     $responseResource->body($productosResource);
                     break;
-
                 default:
                     $errorResource = new ErrorResource(null);
                     $errorResource->title('Error de búsqueda');
                     $errorResource->message('Valor de filtro inválido');
-                    return $errorResource->response()->setStatusCode(400);
-                    
+                    return $errorResource->response()->setStatusCode(400);           
             }
             
             return $responseResource; 
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
-        catch(\Exception $e){
-                  
-            return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
-        }
-    
     }
 
     public function listarConStock(){
@@ -387,30 +337,21 @@ class ProductoController extends Controller
     }
 
     public function listarConStockMinimo(){
-
         try{
             set_time_limit(1000);
-           
             $productos =$this->productoRepository->listarConStockMinimo();
             $productosResource =  new ProductosResource($productos); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Listado de productos cuyo stock principal es menor o igual a su stock mínimo');  
             $responseResourse->body($productosResource);
             return $responseResourse;
-        }
-        catch(\Exception $e){
-         
-            
-            return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
-        }
-        
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }        
     }
-
 
     public function asignarProveedor($idProducto, Request $data){
         try{
-           
             DB::beginTransaction();
             $producto = $this->productoRepository->obtenerPorId($idProducto);
          
@@ -431,9 +372,6 @@ class ProductoController extends Controller
                 return $notFoundResource->response()->setStatusCode(404);
             }
 
-            
-            
-           
             $this->productoRepository->setModel($producto);
              
             $this->productoRepository->setProveedorModel($proveedor);
@@ -455,35 +393,39 @@ class ProductoController extends Controller
             $responseResourse->title('Proveedor agregado a producto como uno de sus proveedores');  
             $responseResourse->body($productoResource);
             return $responseResourse;
-        }
-        catch(\Exception $e){
-         
+        }catch(\Exception $e){
             DB::rollback();
-            return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
-
     }
 
     public function modificarStock($idProducto, Request $data){
-        // $data con tiene: idTipoStock, idAlmacen, idProducto y cantidad
+        // $data con tiene: idTipoStock, idAlmacen y cantidad
         try{
+            $productoDataArray= Algorithm::quitNullValuesFromArray($data->all());
+            $validator = \Validator::make($productoDataArray, 
+                            ['idTipoStock' => 'required',
+                            'idAlmacen' => 'required',
+                            'cantidad'=>'required']);
+
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
             DB::beginTransaction();
             $idTipoStock = $data['idTipoStock'];
             $idAlmacen = $data['idAlmacen'];
-            #$idProducto = $data['idProducto'];
             $cantidad = $data['cantidad'];
 
             $producto = $this->productoRepository->obtenerPorId($idProducto);
             $this->productoRepository->setModel($producto);
             $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $cantidad);
 
+            $producto = $this->productoRepository->obtenerModelo();
             DB::commit();
-            
-            #$productoResource =  new ProductoResource($producto);  
+            $productoResource =  new ProductoResource($producto);  
             $responseResource = new ResponseResource(null);
             $responseResource->title('Stock del producto modificado correctamente');  
-            $responseResource->body('body test');
+            $responseResource->body($productoResource);
             return $responseResource;
         }catch(\Exception $e){
             DB::rollback();
