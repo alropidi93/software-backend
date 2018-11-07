@@ -23,12 +23,14 @@ use Illuminate\Support\Facades\Input;
 class TiendaController extends Controller {
 
     protected $tiendaRepository;
+    protected $usuarioRepository; //para modificar  el id tienda
 
 
-    public function __construct(TiendaRepository $tiendaRepository){
+    public function __construct(TiendaRepository $tiendaRepository, UsuarioRepository $usuarioRepository){
         TiendaResource::withoutWrapping();
       ;
         $this->tiendaRepository = $tiendaRepository;
+        $this->usuarioRepository = $usuarioRepository;
 
     }
 
@@ -441,7 +443,6 @@ class TiendaController extends Controller {
             }
             $usuarioRepository =  new UsuarioRepository(new Usuario);
             $usuario =  $usuarioRepository->obtenerUsuarioPorId($idUsuario);
-            
             if (!$usuario){
                 $notFoundResource = new NotFoundResource(null);
                 $notFoundResource->title('Usuario no encontrado');
@@ -489,6 +490,12 @@ class TiendaController extends Controller {
             $data['miembroPrincipal']= ($usuario->esJefeDeTienda()|| $usuario->esJefeDeAlmacen()) ? false: ($miembroPrincipalFlag == "null" ? true:$miembroPrincipalFlag);
             //$data['miembroPrincipal']=false;
             //return json_encode($data['miembroPrincipal']);
+
+            //para modificar su id tienda
+            $usuarioDataArray= Algorithm::quitNullValuesFromArray($data->all());
+            $this->usuarioRepository->setModelUsuario($usuario);
+            $this->usuarioRepository->actualiza($usuarioDataArray);
+            $usuario = $this->usuarioRepository->obtenerModelo();
                       
             $this->tiendaRepository->setModel($tienda);
             if ($this->tiendaRepository->checkIfUsuarioAttachedBefore($usuario)){
