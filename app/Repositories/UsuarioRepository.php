@@ -325,6 +325,9 @@ class UsuarioRepository extends BaseRepository {
     public function setTipoUsuarioModel($tipoUsuario){
         $this->tipoUsuario =  $tipoUsuario;
     }
+    public function setTiendamodel($tienda){
+        $this->tienda =  $tienda;
+    }
 
     public function getPassword(){
         return $this->model->password;
@@ -410,20 +413,27 @@ class UsuarioRepository extends BaseRepository {
         
     }
 
-    public function listarCajerosPorTienda($idTienda){
+    public function listarCajerosPorTienda($tienda=null){
+        if (!$tienda){
+            $tienda= $this->tienda;
+        } 
+        $cajeros =  $tienda->trabajadores()->where('usuario.deleted',false)
+                    ->where('usuarioxtienda.deleted',false)
+                    ->whereHas('tipoUsuario', function ($query) {
+                        $query->where(function($q2){
+                            return $q2->where('key',4)->orWhere('key',5);
+                        })->where('deleted',false);
+                    })->get();
+
+        // $cajeros = $this->model->whereHas('tipoUsuario', function ($query) {
+        //     $query->where(function($q2){
+        //         return $q2->where('key',4)->orWhere('key',5);
+        //     })->where('deleted',false);
+        // })->whereHas('tiendas', function ($q){
+        //     $q->where('usuarioxtienda.deleted',false)->where('tienda.deleted',false);
+        // })->get();
+
         
-        $cajeros = $this->model->whereHas('tipoUsuario', function ($query) {
-            $query->where(function($q2){
-                return $q2->where('key',4)->orWhere('key',5);
-            })->where('deleted',false);
-        })->whereHas('tiendas', function ($q){
-            $q->where('usuarioxtienda.deleted',false)->where('tienda.deleted',false);
-        })->get();
-
-
-       
-
-        return $cajeros;
         foreach ($cajeros as $key => $usuario) {
             $usuario->personaNatural;
             

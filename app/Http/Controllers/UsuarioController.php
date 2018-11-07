@@ -989,10 +989,10 @@ class UsuarioController extends Controller
                 $notFoundResource->notFound(['id' => $idTienda]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
-
-            $usuarios = $this->usuarioRepository->listarCajerosPorTienda($idTienda);
-            
-            if (!$usuarios){
+            $this->usuarioRepository->setTiendaModel($tienda);
+            $usuarios = $this->usuarioRepository->listarCajerosPorTienda();
+    
+            if (count($usuarios)==0){
                 $notFoundResource = new NotFoundResource(null);
                 $notFoundResource->title('Cajeros de la tienda no encontrados');
                 $notFoundResource->notFound(['idTienda' => $idTienda]);
@@ -1000,10 +1000,12 @@ class UsuarioController extends Controller
             }
             foreach ($usuarios as $key => $usuario) {
                 $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+               
                 //$this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship($usuario);
                 
                 
             }
+            
             
             $usuariosResource =  new UsuariosResource($usuarios); 
             $responseResourse = new ResponseResource(null);
