@@ -204,6 +204,22 @@ class PedidoTransferenciaRepository extends BaseRepository {
         })->where('deleted',false)->get();
 
     }
+    public function buscarPorFiltroPorTransferenciaPorAlmacen($idAlmacen,$key, $value){
+        $listaEmitidos= $this->model->whereHas('transferencia',function ($q) use($key,$value){
+            $q->whereRaw("lower({$key}) like ? ",'%'.$value.'%')->where('deleted',false);
+        })->where('idAlmacenO',$idAlmacen)->where('deleted',false)->get();
+        $listaRecibidos= $this->model->whereHas('transferencia',function ($q) use($key,$value){
+            $q->whereRaw("lower({$key}) like ? ",'%'.$value.'%')->where('deleted',false);
+        })->where('idAlmacenD',$idAlmacen)->where('deleted',false)->get();
+        $lista = $listaRecibidos->merge($listaEmitidos);
+        return $lista;
+    }
+    public function obtenerTodosPorAlmacen($idAlmacen){
+        $listaRecibidos = $this->model->where('idAlmacenD',$idAlmacen)->where('deleted',false)->get();         
+        $listaEmitidos = $this->model->where('idAlmacenO',$idAlmacen)->where('deleted',false)->get();
+        $lista = $listaRecibidos->merge($listaEmitidos);
+        return $lista;
+    }
 
     public function getAlmacenById($idAlmacen){
         
