@@ -622,8 +622,11 @@ class UsuarioController extends Controller
                     
                     break;
                 case 6:
+                
                     $title = 'Listado por rol sin tienda asignada - Almaceneros';
+                    
                     $usuarios = $this->usuarioRepository->listarAlmacenerosSinTienda();
+                    
                     if ($filter && $value){
                         
                         switch ($filter) {
