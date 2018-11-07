@@ -416,7 +416,14 @@ class UsuarioRepository extends BaseRepository {
             $query->where(function($q2){
                 return $q2->where('key',4)->orWhere('key',5);
             })->where('deleted',false);
-        })->where('idTienda',$idTienda)->where('deleted',false)->get();
+        })->whereHas('tiendas', function ($q){
+            $q->where('usuarioxtienda.deleted',false)->where('tienda.deleted',false);
+        })->get();
+
+
+       
+
+        return $cajeros;
         foreach ($cajeros as $key => $usuario) {
             $usuario->personaNatural;
             
@@ -588,6 +595,8 @@ class UsuarioRepository extends BaseRepository {
     public function listarJefesAlmacenSinTienda(){
 
         
+
+
         $jefesAlmacen = $this->model->whereHas('tipoUsuario', function ($query) {
             $query->where('key', 3)->where('deleted',false);
         })->whereDoesntHave('tiendasCargoJefeAlmacen', function ($query2) {

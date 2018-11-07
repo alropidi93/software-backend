@@ -64,6 +64,7 @@ Route::get('usuario/obtenerPorRolPorTienda/{idTienda}','UsuarioController@obtene
 Route::get('usuario/cajerosPorTienda/{idTienda}','UsuarioController@obtenerCajerosPorTienda');
 
 Route::post('almacen/cargarProductosStock','AlmacenController@cargarProductosStock');
+Route::post('almacen/asignarJefeDeAlmacenCentral','AlmacenController@asignarJefeAlmacenCentral');
 
 Route::get('producto/listarConStock','ProductoController@listarConStock');
 Route::get('producto/listarStockMin','ProductoController@listarConStockMinimo');

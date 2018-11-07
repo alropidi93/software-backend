@@ -703,6 +703,7 @@ class UsuarioController extends Controller
         try{
                         
             $usuarios = $this->usuarioRepository->listarJefesAlmacenSinTienda();
+            
             foreach ($usuarios as $key => $usuario) {
                 $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
                 //$this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship($usuario);
@@ -990,6 +991,7 @@ class UsuarioController extends Controller
             }
 
             $usuarios = $this->usuarioRepository->listarCajerosPorTienda($idTienda);
+            
             if (!$usuarios){
                 $notFoundResource = new NotFoundResource(null);
                 $notFoundResource->title('Cajeros de la tienda no encontrados');
