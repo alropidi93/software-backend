@@ -139,6 +139,30 @@ class PedidoTransferenciaRepository extends BaseRepository {
             $this->almacenDestino = $this->model->almacenDestino;
         }
     }
+    public function loadAlmacenDestino2Relationship($pedidoTransferencia=null){
+        if (!$pedidoTransferencia){
+                  
+
+            $this->model = $this->model->load([
+                'almacenDestino2'=>function($query){
+                    $query->where('almacen.deleted', false);
+                }
+            ]);
+        }
+        else{
+            
+            $this->model =$pedidoTransferencia->load([
+                'almacenDestino2'=>function($query){
+                    $query->where('almacen.deleted', false); 
+                }
+            ]);
+            
+        }
+        if ($this->model->almacenDestino2 && !$pedidoTransferencia){
+            $this->almacenDestino2 = $this->model->almacenDestino2;
+        }
+    }
+
 
     public function loadLineasPedidoTransferenciaRelationship($pedidoTransferencia=null){
         if (!$pedidoTransferencia){
