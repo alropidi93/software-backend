@@ -187,17 +187,19 @@ class ProductoRepository extends BaseRepository {
 
     public function buscarPorTipo($value){
         
-               
-        return $this->model->join('tipoProducto', 'tipoProducto.id', '=', 'producto.idTipoProducto')
-            ->whereRaw("lower(tipo) like ? ",'%'.$value.'%')->where('tipoProducto.deleted','=',false)->get();
+        return $this->model->whereHas('tipoProducto',function($q) use ($value) {
+            $q->whereRaw("lower(tipo) like ? ",'%'.$value.'%')->where('tipoProducto.deleted',false);          
+        })->get();     
+
+        // return $this->model->join('tipoProducto', 'tipoProducto.id', '=', 'producto.idTipoProducto')
+        //     ->whereRaw("lower(tipo) like ? ",'%'.$value.'%')->where('tipoProducto.deleted','=',false)->get();
     }
 
     public function buscarPorCategoria($value){
         
-               
-        return $this->model->join('categoria', 'categoria.id', '=', 'producto.idCategoria')
-            ->where('producto.idCategoria',$value)->where('producto.deleted',false)->where('categoria.deleted',false)
-            ->get();
+        return $this->model->whereHas('categoria',function($q) use ($value) {
+            $q->where('categoria.id',$value)->where('categoria.deleted',false);          
+        })->get();
 
     }
     public function obtenerProveedorPorId($idProveedor){
@@ -223,10 +225,7 @@ class ProductoRepository extends BaseRepository {
                             ->where('idTipoStock',$idTipoStock)
                             ->where('deleted',false)
                             ->update(['cantidad'=>$cantidad]);
-        
-      
-       
-       
+           
     }
 
     public function checkProductoProveedorOwnModelsRelationship(){

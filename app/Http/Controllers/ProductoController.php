@@ -304,6 +304,7 @@ class ProductoController extends Controller
 
                 case 'categoria':
                     $productos = $this->productoRepository->buscarPorCategoria($value);
+                    
                     foreach ($productos as $key => $producto) {
                         $this->productoRepository->loadTipoProductoRelationship($producto);
                         $this->productoRepository->loadUnidadMedidaRelationship($producto);
@@ -317,6 +318,7 @@ class ProductoController extends Controller
 
                 case 'tipo':
                     $productos = $this->productoRepository->buscarPorTipo($value);
+                    
                     foreach ($productos as $key => $producto) {
                         $this->productoRepository->loadTipoProductoRelationship($producto);
                         $this->productoRepository->loadUnidadMedidaRelationship($producto);
