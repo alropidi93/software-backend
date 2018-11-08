@@ -82,6 +82,7 @@ Route::get('pedidoTransferencia/obtenerPedidosTransferenciaJefeTienda/{idAlmacen
 Route::post('pedidoTransferencia/aceptaPedidoJTO/{idPedidoTransferencia}','PedidoTransferenciaController@aceptaPedidoJTO');
 Route::post('pedidoTransferencia/aceptaPedidoJAD/{idPedidoTransferencia}','PedidoTransferenciaController@aceptaPedidoJAD');// se usa como Aceptar TEST en Postman
 Route::post('pedidoTransferencia/evaluar/{idPedidoTransferencia}','PedidoTransferenciaController@evaluarPedidoTransferencia');
+Route::get('pedidoTransferencia/obtenerHistorialPedidosTransferencia/{idPedidoTransferencia}','PedidoTransferenciaController@obtenerHistorialPedidosTransferencia');
 
 
 Route::put('producto/actualizarStock/{idProducto}' , 'ProductoController@modificarStock');

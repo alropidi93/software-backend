@@ -561,9 +561,8 @@ class TiendaController extends Controller {
                 $errorResource->message('La tienda no cuenta con este trabajador asociado');
                 return $errorResource->response()->setStatusCode(400);
             }
-            //$usuarioRepository->setModel($usuario);
-            
-            //$usuarioRepository->actualizaSoloUsuario(['idTienda'=>null]);          
+            $usuarioRepository->setModel($usuario);            
+            $usuarioRepository->actualizaSoloUsuario(['idTienda'=>null]);          
             $status = $this->tiendaRepository->deleteUsuarioRelationship($usuario);          
             
             if ($status || !$status){

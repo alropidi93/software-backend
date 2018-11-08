@@ -663,11 +663,8 @@ class UsuarioController extends Controller
             $responseResource->body($usuariosResource);
             
             return $responseResource; 
-        }
-        catch(\Exception $e){
-                
-            return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
     
     }
@@ -689,53 +686,35 @@ class UsuarioController extends Controller
             $responseResourse->title('Lista de jefes de tienda no asignados a tiendas');  
             $responseResourse->body($usuariosResource);
             return $responseResourse;
-        }
-        catch(\Exception $e){
-         
-            
+        }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
         }
-
     }
 
 
     public function listarJefesDeAlmacenSinTienda(){
         try{
-                        
             $usuarios = $this->usuarioRepository->listarJefesAlmacenSinTienda();
-            
             foreach ($usuarios as $key => $usuario) {
                 $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
-                //$this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship($usuario);
-                
-                
-            }
-            
+                //$this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship($usuario);   
+            }   
             $usuariosResource =  new UsuariosResource($usuarios); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de jefes de almacenes no asignados a tiendas');  
             $responseResourse->body($usuariosResource);
             return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
-        catch(\Exception $e){
-         
-            
-            return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
-        }
-
     }
 
     public function listarCajeros(){
         try{
-                        
             $usuarios = $this->usuarioRepository->listarCajeros();
             foreach ($usuarios as $key => $usuario) {
                 $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
-                //$this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship($usuario);
-                
-                
+                //$this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship($usuario);       
             }
             
             $usuariosResource =  new UsuariosResource($usuarios); 
@@ -743,23 +722,15 @@ class UsuarioController extends Controller
             $responseResourse->title('Lista de cajeros (de ventas y de devoluciones)');  
             $responseResourse->body($usuariosResource);
             return $responseResourse;
-        }
-        catch(\Exception $e){
-         
-            
+        }catch(\Exception $e){   
             return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
         }
-
     }
 
     public function listarCajerosSinTiendaAsignada(){
         try{
             $filter = Input::get('filterBy');
             $value = strtolower(Input::get('value'));
-            
-           
-            
             $usuarioService = new UsuarioService;
             $title = 'Listado de cajeros sin tienda asignada (de ventas y de devoluciones)';  
                    
@@ -787,31 +758,20 @@ class UsuarioController extends Controller
             foreach ($usuarios as $key => $usuario) {
                 $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
                 //$this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship($usuario);
-                
-                
             }
-            
             $usuariosResource =  new UsuariosResource($usuarios); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title($title);  
             $responseResourse->body($usuariosResource);
             return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
-        catch(\Exception $e){
-         
-            
-            return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
-        }
-
     }
 
-    public function obtenerPorRolPorTienda($idTienda)
-    {
+    public function obtenerPorRolPorTienda($idTienda){
         try{
-            $tienda = $this->usuarioRepository->obtenerTiendaPorId($idTienda);
-         
-            
+            $tienda = $this->usuarioRepository->obtenerTiendaPorId($idTienda);   
             if (!$tienda){
                 $notFoundResource = new NotFoundResource(null);
                 $notFoundResource->title('Tienda no encontrada');
@@ -823,7 +783,6 @@ class UsuarioController extends Controller
             $rol = Input::get('rol');
            
             $responseResource = new ResponseResource(null);
-            
             
             switch ($rol) {
                 case 0:
@@ -840,12 +799,9 @@ class UsuarioController extends Controller
                                  
                     }
                     $usuariosResource =  new UsuariosResource($usuarios);
-                
                     $responseResource->body($usuariosResource);
-                  
                     break;
                 case 1:
-                    
                     $usuario = $this->usuarioRepository->obtenerJefeTiendaPorTienda();
                     if (!$usuario){
                         $notFoundResource = new NotFoundResource(null);
@@ -853,19 +809,11 @@ class UsuarioController extends Controller
                         $notFoundResource->notFound(['idTienda' => $idTienda]);
                         return $notFoundResource->response()->setStatusCode(404);
                     }
-                    
                     $responseResource->title('Jefe de tienda de determinada tienda');
-                    
                     $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
                     $usuarioResource =  new UsuarioResource($usuario);
-                
                     $responseResource->body($usuarioResource);
-                                 
-                    
-                
-                
                     break;
-
                 case 2:
                     $usuarios = $this->usuarioRepository->listarCompradoresPorTienda();
                     if (!$usuarios || count($usuarios)==0){
@@ -876,16 +824,11 @@ class UsuarioController extends Controller
                     }
                     $responseResource->title('Listado de compradores por tienda');
                     foreach ($usuarios as $key => $usuario) {
-                        $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
-                                 
+                        $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);       
                     }
                     $usuariosResource =  new UsuariosResource($usuarios);
-                
                     $responseResource->body($usuariosResource);
-                
-                
                     break;
-
                 case 3:
                     $usuario = $this->usuarioRepository->obtenerJefeAlmacenPorTienda();
                     if (!$usuario ){
@@ -897,12 +840,8 @@ class UsuarioController extends Controller
                     $responseResource->title('Jefes de almacén de determinada tienda');
                     $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
                     $usuarioResource =  new UsuarioResource($usuario);
-                
                     $responseResource->body($usuarioResource);
-                
-                
                     break;
-
                 case 4:
                     $usuarios = $this->usuarioRepository->listarCajerosVentasPorTienda();
                     if (!$usuarios || count($usuarios)==0){
@@ -917,9 +856,7 @@ class UsuarioController extends Controller
                                  
                     }
                     $usuariosResource =  new UsuariosResource($usuarios);
-                
                     $responseResource->body($usuariosResource);
-                  
                     break;
                 case 5:
                     $usuarios = $this->usuarioRepository->listarCajerosDevolucionesPorTienda();
@@ -932,13 +869,9 @@ class UsuarioController extends Controller
                     $responseResource->title('Listado cajeros de devoluciones por tienda');
                     foreach ($usuarios as $key => $usuario) {
                         $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
-                                 
                     }
                     $usuariosResource =  new UsuariosResource($usuarios);
-                
                     $responseResource->body($usuariosResource);
-                   
-                    
                     break;
                 case 6:
                     $usuarios = $this->usuarioRepository->listarAlmacenerosPorTienda();
@@ -954,37 +887,24 @@ class UsuarioController extends Controller
                                  
                     }
                     $usuariosResource =  new UsuariosResource($usuarios);
-                
                     $responseResource->body($usuariosResource);
-                    
                     break;
-
                 default:
                     $errorResource = new ErrorResource(null);
                     $errorResource->title('Error de búsqueda');
                     $errorResource->message('Valor de rol inválido');
                     return $errorResource->response()->setStatusCode(400);
-                    
             }
-            
-            
-            
             return $responseResource; 
-        }
-        catch(\Exception $e){
-                
+        }catch(\Exception $e){       
             return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
         }
-    
     }
 
 
-    public function obtenerCajerosPorTienda($idTienda)
-    {
+    public function obtenerCajerosPorTienda($idTienda){
         try{
             $tienda = $this->usuarioRepository->obtenerTiendaPorId($idTienda);
-         
             
             if (!$tienda){
                 $notFoundResource = new NotFoundResource(null);
@@ -1003,25 +923,16 @@ class UsuarioController extends Controller
             }
             foreach ($usuarios as $key => $usuario) {
                 $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
-               
                 //$this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship($usuario);
-                
-                
             }
-            
             
             $usuariosResource =  new UsuariosResource($usuarios); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Listado de cajeros (de ventas y de devoluciones) de determinada tienda');  
             $responseResourse->body($usuariosResource);
             return $responseResourse;
-        }
-        catch(\Exception $e){
-         
-            
+        }catch(\Exception $e){   
             return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
         }
-
     }
 }

@@ -1107,7 +1107,128 @@ class PedidoTransferenciaController extends Controller {
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
     }
+    public function obtenerHistorialPedidosTransferencia($idAlmacen) {
+        try{
+            $responseResource = new ResponseResource(null);
+            $filter = strtolower(Input::get('estado'));
+            
+            if ($filter){
+                
+                switch ($filter) {
+                    case 'en_transito':
+                                     
+                        $pedidosTransferencia = $this->pedidoTransferenciaRepository->buscarPorFiltroPorTransferenciaPorAlmacen($idAlmacen,'estado', 'en transito');
+                        foreach ($pedidosTransferencia as $key => $pt) {
+                            $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadAlmacenDestino2Relationship($pt);
+                            $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pt);
+                            
+                        }
+                        $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);
+                        $responseResource->title('Lista de pedidos de transferencia filtrados por estado');       
+                        $responseResource->body($pedidosTransferenciaResource);
+                        break;
+    
+                    case 'aceptado':
+                        $pedidosTransferencia = $this->pedidoTransferenciaRepository->buscarPorFiltroPorTransferenciaPorAlmacen($idAlmacen,'estado', 'aceptado');
+                        foreach ($pedidosTransferencia as $key => $pt) {
+                            $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadAlmacenDestino2Relationship($pt);
+                            $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pt);
+                            
+                        }
+                        $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);
+                        $responseResource->title('Lista de pedidos de transferencia filtrados por estado');       
+                        $responseResource->body($pedidosTransferenciaResource);
+                        break;
+                    
+    
+                    case 'realizado':
+                        $pedidosTransferencia = $this->pedidoTransferenciaRepository->buscarPorFiltroPorTransferenciaPorAlmacen($idAlmacen,'estado', 'realizado');
+                        foreach ($pedidosTransferencia as $key => $pt) {
+                            $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadAlmacenDestino2Relationship($pt);
+                            $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pt);
+                            
+                        }
+                        $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);
+                        $responseResource->title('Lista de pedidos de transferencia filtrados por estado');       
+                        $responseResource->body($pedidosTransferenciaResource);
+                        break;
+                    case 'denegado':
+                        $pedidosTransferencia = $this->pedidoTransferenciaRepository->buscarPorFiltroPorTransferenciaPorAlmacen($idAlmacen,'estado', 'denegado');
+                        foreach ($pedidosTransferencia as $key => $pt) {
+                            $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadAlmacenDestino2Relationship($pt);
+                            $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pt);
+                            
+                        }
+                        $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);
+                        $responseResource->title('Lista de pedidos de transferencia filtrados por estado');       
+                        $responseResource->body($pedidosTransferenciaResource);
+                        break;
+                    case 'cancelado':
+                        $pedidosTransferencia = $this->pedidoTransferenciaRepository->buscarPorFiltroPorTransferenciaPorAlmacen($idAlmacen,'estado', 'cancelado');
+                        foreach ($pedidosTransferencia as $key => $pt) {
+                            $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pt);
+                            $this->pedidoTransferenciaRepository->loadAlmacenDestino2Relationship($pt);
+                            $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pt);
+                            
+                        }
+                        $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);
+                        $responseResource->title('Lista de pedidos de transferencia filtrados por estado');       
+                        $responseResource->body($pedidosTransferenciaResource);
+                        break;
+    
+                    default:
+                        $errorResource = new ErrorResource(null);
+                        $errorResource->title('Error de búsqueda');
+                        $errorResource->message('Valor de filtro inválido');
+                        return $errorResource->response()->setStatusCode(400);
+                }
+                return $responseResource;
+            
+            }
+
+            $pedidosTransferencia = $this->pedidoTransferenciaRepository->obtenerTodosPorAlmacen($idAlmacen);
+           
+            foreach ($pedidosTransferencia as $key => $pt) {
+                $this->pedidoTransferenciaRepository->loadTransferenciaRelationship($pt);
+                $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship($pt);
+                $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship($pt);
+                $this->pedidoTransferenciaRepository->loadAlmacenDestino2Relationship($pt);
+                $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship($pt);
+                
+            }
+            $pedidosTransferenciaResource =  new PedidosTransferenciaResource($pedidosTransferencia);  
+            
+            
+            $responseResource->title('Lista de pedidos de transferencia');  
+            $responseResource->body($pedidosTransferenciaResource);
+            return $responseResource;
+        }
+        catch(\Exception $e){
+         
+            
+            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+
+       
+    }
 }
+
 
 
 
