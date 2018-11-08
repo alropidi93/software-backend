@@ -515,7 +515,7 @@ class PedidoTransferenciaController extends Controller {
             $this->pedidoTransferenciaRepository->setLineasPedidoTransferenciaByOwnModel();
             $this->pedidoTransferenciaRepository->setUsuarioModel($usuario);
             $almacenCentral = null;
-
+            //Para los de fase 1
             if ($pedidoTransferencia->estaEnPrimerIntento()){
 
                 $tienda = $this->pedidoTransferenciaRepository->getTiendaDeAlmacenDestino();
@@ -668,6 +668,7 @@ class PedidoTransferenciaController extends Controller {
                 }
 
             }
+            //Para los de fase 2
             else if ($pedidoTransferencia->estaEnSegundoIntento()){
                 $tienda = $this->pedidoTransferenciaRepository->getTiendaDeAlmacenDestino();
                 /* Validaciones de fase 2(es igual que para fase 1)*/
@@ -814,6 +815,7 @@ class PedidoTransferenciaController extends Controller {
                     
                 }
             }
+            //Para los de fase 3
             else if ($pedidoTransferencia->estaEnTercerIntento()){
                 $almacenCentral = $this->pedidoTransferenciaRepository->getAlmacenDestino();
                 /* Validaciones de fase 3 */
