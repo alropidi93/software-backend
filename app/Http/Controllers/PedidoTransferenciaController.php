@@ -453,10 +453,7 @@ class PedidoTransferenciaController extends Controller {
             $responseResource->title('Pedido de Transferencia encontrado');  
             $responseResource->body($pedidoTransferenciaResource);
             return $responseResource;
-        }
-        catch(\Exception $e){
-         
-            
+        }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);
             
         }
