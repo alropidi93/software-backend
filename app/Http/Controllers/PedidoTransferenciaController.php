@@ -247,7 +247,7 @@ class PedidoTransferenciaController extends Controller {
             $dataArray['idAlmacenO']=$almacen->id;
             $almacenService =  new AlmacenService;
             $almacenCercano= $almacenService->obtenerAlmacenCercano($almacen,1);
-            $dataArray['idAlmacenD']=$almacenCercano->id;
+            //$dataArray['idAlmacenD']=$almacenCercano->id;
             $dataArray['fase']=1;
             
             $idUsuario =  $data['idUsuario'];
