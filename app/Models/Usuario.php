@@ -81,7 +81,7 @@ class Usuario extends Model
     }
 
     public function esJefeDeAlmacen(){
-        
+        //return $this->tipoUsuario()->where('key',3)->where('deleted',false)->first();
         return $this->tipoUsuario()->where('key',3)->where('deleted',false)->exists();
     }
 
@@ -99,5 +99,10 @@ class Usuario extends Model
             return $this->almacenCentral()->where('deleted',false)->exists();
         }
         return false;
+    }
+
+    public function noEsJefe(){
+        //return $this->esJefeDeAlmacen() ;
+        return (!$this->esJefeDeTienda() && !$this->esJefeDeAlmacen());
     }
 }

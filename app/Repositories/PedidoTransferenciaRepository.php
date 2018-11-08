@@ -39,6 +39,8 @@ class PedidoTransferenciaRepository extends BaseRepository {
         return $this->almacen->where('nombre','Central')->first();
     }
 
+    
+
     public function loadTransferenciaRelationship($pedidoTransferencia=null){
         if (!$pedidoTransferencia){
                   
@@ -245,13 +247,29 @@ class PedidoTransferenciaRepository extends BaseRepository {
     public function setUsuarioModel($usuario)
     {
         $this->usuario =  $usuario;
-     
-        
+           
+    }
+    public function setAlmacenModel($almacen)
+    {
+        $this->almacen =  $almacen;
+       
     }
 
-    public function getTiendaDeAlmacen(){
-
+    public function getTiendaDeAlmacenOrigen(){
         return $this->model->almacenOrigen->tienda;
+    }
+
+    public function getTiendaDeAlmacenDestino(){
+        return $this->model->almacenDestino->tienda;
+    }
+
+    public function getAlmacenDestino(){
+        return $this->model->almacenDestino;
+    }
+
+    public function getTiendaDeAlmacenOwnModel(){
+
+        return $this->almacen->tienda;
     }
 
     public function setTransferenciaData($dataTransferencia)
@@ -321,20 +339,30 @@ class PedidoTransferenciaRepository extends BaseRepository {
     }
 
     public function usuarioEsJefeDeTiendaDe($tienda){
-        if(!$this->usuario){
-            return $false;
+        if(!$this->usuario   || !$tienda){
+            return false;
         }
         $usuario = $this->usuario;
-        $tiendaDeLaQueEsJefe = $usuario->tiendaCargoJefeTienda;
+        $tiendaDeLaQueEsJefe = $usuario->tiendaCargoJefeTienda()->where('deleted',false)->first();
         return $tiendaDeLaQueEsJefe->id == $tienda->id;
     }
 
     public function usuarioEsJefeDeAlmacenDe($tienda){
-        if(!$this->usuario){
-            return $false;
+        if(!$this->usuario  || !$tienda){
+            return false;
         }
         $usuario = $this->usuario;
-        $tiendaDeLaQueEsJefe = $usuario->tiendaCargoJefeAlmacen;
+        $tiendaDeLaQueEsJefe = $usuario->tiendaCargoJefeAlmacen()->where('deleted',false)->first();;
         return $tiendaDeLaQueEsJefe->id == $tienda->id;
+    }
+
+    public function usuarioEsJefeDeAlmacenCentralDe($almacen){
+   
+        if(!$this->usuario){
+            return false;
+        }
+        $usuario = $this->usuario;
+        $almacenDelQueEsJefe = $usuario->almacenCentral()->where('deleted',false)->first();;
+        return $almacenDelQueEsJefe->id == $almacen->id;
     }
 }

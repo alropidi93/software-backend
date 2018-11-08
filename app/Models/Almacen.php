@@ -21,7 +21,7 @@ class Almacen extends Model
     ];
 
     public function esCentral() {
-
+        //return false;
         return $this->nombre == 'Central';
     }
     public function tienda() {

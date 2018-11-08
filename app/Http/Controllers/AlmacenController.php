@@ -222,7 +222,7 @@ class AlmacenController extends Controller {
                 return $errorResource->response()->setStatusCode(400);
 
             }
-            return 4;
+            
             if ($usuario->esJefeDeAlmacenAsignado()){
                 
                 $errorResource = new ErrorResource(null);
