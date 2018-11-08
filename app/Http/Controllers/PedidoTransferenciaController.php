@@ -247,7 +247,7 @@ class PedidoTransferenciaController extends Controller {
             $dataArray['idAlmacenO']=$almacen->id;
             $almacenService =  new AlmacenService;
             $almacenCercano= $almacenService->obtenerAlmacenCercano($almacen,1);
-            //$dataArray['idAlmacenD']=$almacenCercano->id;
+            $dataArray['idAlmacenD']=$almacenCercano->id;
             $dataArray['fase']=1;
             
             $idUsuario =  $data['idUsuario'];
@@ -506,10 +506,11 @@ class PedidoTransferenciaController extends Controller {
                 $notFoundResource->notFound(['id' => $idUsuario]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
+            
             $this->pedidoTransferenciaRepository->setUsuarioModel($usuario);
             
-            $tienda = $this->pedidoTransferenciaRepository->getTiendaDeAlmacenDestino();
-            
+            return $tienda = $this->pedidoTransferenciaRepository->getTiendaDeAlmacenDestino();
+
             $almacenCentral = null;
             
             if(!$tienda){
@@ -533,7 +534,7 @@ class PedidoTransferenciaController extends Controller {
                 
                 
             }
-
+            
             //return $this->pedidoTransferenciaRepository->usuarioEsJefeDeTiendaDe($tienda) ;
             if($usuario->noEsJefe()){
                
@@ -566,9 +567,7 @@ class PedidoTransferenciaController extends Controller {
                 return $errorResource->response()->setStatusCode(400);
             }
                          
-            
-            
-           
+                       
 
             if($usuario->esJefeDeTiendaAsignado() && !$pedidoTransferencia->fueAceptadoJAD()){
                 $errorResource = new ErrorResource(null);

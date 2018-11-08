@@ -272,10 +272,12 @@ class PedidoTransferenciaRepository extends BaseRepository {
     }
 
     public function getTiendaDeAlmacenOrigen(){
+        
         return $this->model->almacenOrigen->tienda;
     }
 
     public function getTiendaDeAlmacenDestino(){
+        return $this->model;//->almacenDestino;
         return $this->model->almacenDestino->tienda;
     }
 
