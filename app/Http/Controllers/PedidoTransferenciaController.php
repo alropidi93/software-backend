@@ -509,7 +509,7 @@ class PedidoTransferenciaController extends Controller {
             
             $this->pedidoTransferenciaRepository->setUsuarioModel($usuario);
             
-            return $tienda = $this->pedidoTransferenciaRepository->getTiendaDeAlmacenDestino();
+            $tienda = $this->pedidoTransferenciaRepository->getTiendaDeAlmacenDestino();
 
             $almacenCentral = null;
             
