@@ -68,6 +68,7 @@ Route::post('almacen/asignarJefeDeAlmacenCentral','AlmacenController@asignarJefe
 
 Route::get('producto/listarConStock','ProductoController@listarConStock');
 Route::get('producto/listarStockMin','ProductoController@listarConStockMinimo');
+Route::get('producto/listarProductosDeAlmacen/{idAlmacen}','ProductoController@listarProductosDeAlmacen');
 
 
 Route::get('transferencia/listarEstados','TransferenciaController@listarEstados');

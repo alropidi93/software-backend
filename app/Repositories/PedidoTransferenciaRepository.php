@@ -277,7 +277,7 @@ class PedidoTransferenciaRepository extends BaseRepository {
     }
 
     public function getTiendaDeAlmacenDestino(){
-        return $this->model;//->almacenDestino;
+        //return $this->model;//->almacenDestino;
         return $this->model->almacenDestino->tienda;
     }
 
@@ -326,9 +326,20 @@ class PedidoTransferenciaRepository extends BaseRepository {
         $listaRecibidos = $this->model->where('idAlmacenD',$idAlmacen)->where('aceptoJTO',true)->where('aceptoJAD',true)->where('aceptoJTD',false)->where('deleted',false)->get();         
         $listaEmitidos = $this->model->where('idAlmacenO',$idAlmacen)->where('aceptoJTO',false)->where('aceptoJAD',false)->where('aceptoJTD',false)->where('deleted',false)->get();
         $lista = $listaRecibidos->merge($listaEmitidos);
+        // $lista=array();
+        // foreach ($lista2 as $key => $pedidoTransferencia){
+        //     if(!$pedidoTransferencia->fueEvaluado()) {
+        //         array_push($lista, $pedidoTransferencia);
+        //     }
+        // }
+       
+        foreach ($lista as $key => $pedidoTransferencia){
+            if($pedidoTransferencia->transferencia!=null){
+             unset($lista[$key]);
+            }
         return $lista;
      }
-
+    }
      public function obtenerPedidosTransferenciaJefeTienda($idAlmacen){
         $listaRecibidos = $this->model->where('idAlmacenD',$idAlmacen)->where('deleted',false)->get();         
         $listaEmitidos = $this->model->where('idAlmacenO',$idAlmacen)->where('deleted',false)->get();

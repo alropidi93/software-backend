@@ -214,6 +214,14 @@ class ProductoRepository extends BaseRepository {
         return $productos;
     }
 
+    public function listarConStockPorTienda($idTienda){
+        $productos = $this->model->where('deleted',false)->get();
+        foreach ($productos as $key => $producto) {
+            $this->loadAlmacenesRelationship($producto)->where;
+        }
+        return $productos;
+    }
+
     public function listarProductosDeAlmacen($idAlmacen){
         /* Muestra los productos que se ofrecen en el almacen indicado */
         $productos = $this->model->where('deleted',false)->get();
