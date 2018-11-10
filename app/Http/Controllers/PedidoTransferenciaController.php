@@ -642,6 +642,9 @@ class PedidoTransferenciaController extends Controller {
                     
                     $nuevasListasArray = $pedidoTransferenciaService->nuevasLineasPedidoTransferencia($lineasPedidoTransferencia);
                     
+                    $nuevoPedidoTransferenciaArray['aceptoJTO'] = true;
+                    $nuevoPedidoTransferenciaArray['aceptoJAD'] = false;
+                    $nuevoPedidoTransferenciaArray['aceptoJTD'] = false;
                     $this->pedidoTransferenciaRepository->guarda($nuevoPedidoTransferenciaArray);
                     
                 
