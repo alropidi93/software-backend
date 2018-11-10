@@ -483,14 +483,12 @@ class PedidoTransferenciaController extends Controller {
                 $notFoundResource->notFound(['id' => $idPedidoTransferencia]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
-
             if ($pedidoTransferencia->fueEvaluado()){
                 $errorResource = new ErrorResource(null);
                 $errorResource->title('Error de validación');
                 $errorResource->message('El pedido de transferencia ya culminó su ciclo de evaluación');
                 return $errorResource->response()->setStatusCode(400);
             }
-            
             if (!$pedidoTransferencia->fueAceptadoJTO()){
                 $errorResource = new ErrorResource(null);
                 $errorResource->title('Error de validación');
@@ -509,7 +507,6 @@ class PedidoTransferenciaController extends Controller {
             /* Fin de validaciones generales */
             $evaluacion = $data['evaluacion'];
             $responseResource = new ResponseResource(null);
-       
             DB::beginTransaction();
             
             $this->pedidoTransferenciaRepository->setLineasPedidoTransferenciaByOwnModel();
@@ -517,7 +514,6 @@ class PedidoTransferenciaController extends Controller {
             $almacenCentral = null;
             //Para los de fase 1
             if ($pedidoTransferencia->estaEnPrimerIntento()){
-
                 $tienda = $this->pedidoTransferenciaRepository->getTiendaDeAlmacenDestino();
                 /* Validaciones de fase 1(es igual que para fase 2)*/
                 if (!$tienda){
