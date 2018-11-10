@@ -323,8 +323,12 @@ class PedidoTransferenciaRepository extends BaseRepository {
         return $lista;
      }
      public function obtenerPedidosTransferenciaJT($idAlmacen){ //Jefe Tienda, puede ver pedidos emitidos y recibidos
-        $listaRecibidos = $this->model->where('idAlmacenD',$idAlmacen)->where('aceptoJTO',true)->where('aceptoJAD',true)->where('aceptoJTD',false)->where('deleted',false)->get();         
-        $listaEmitidos = $this->model->where('idAlmacenO',$idAlmacen)->where('aceptoJTO',false)->where('aceptoJAD',false)->where('aceptoJTD',false)->where('deleted',false)->get();
+        $listaRecibidos = $this->model->where('idAlmacenD',$idAlmacen)->where('aceptoJTO',true)->where('aceptoJAD',true)->where('aceptoJTD',false)->whereDoesntHave('transferencia',function($q){
+            $q->where('transferencia.deleted',false);
+        })->where('deleted',false)->get();         
+        $listaEmitidos = $this->model->where('idAlmacenO',$idAlmacen)->where('aceptoJTO',false)->where('aceptoJAD',false)->where('aceptoJTD',false)->whereDoesntHave('transferencia',function($q){
+            $q->where('transferencia.deleted',false);
+        })->where('deleted',false)->get();
         $lista = $listaRecibidos->merge($listaEmitidos);
         // $lista=array();
         // foreach ($lista2 as $key => $pedidoTransferencia){
@@ -332,13 +336,18 @@ class PedidoTransferenciaRepository extends BaseRepository {
         //         array_push($lista, $pedidoTransferencia);
         //     }
         // }
-       
-        foreach ($lista as $key => $pedidoTransferencia){
-            if($pedidoTransferencia->transferencia!=null){
-             unset($lista[$key]);
-            }
+        
+        // foreach ($lista as $key => $pedidoTransferencia){
+        //     //$pedidoTransferencia->load('transferencia');
+        //     if($pedidoTransferencia->transferencia){
+        //         Log::info("Esta descartando");
+        //         unset($lista[$key]);
+        //         Log::info(json_encode("lista"));
+        //     }
+        
+        // }
+        
         return $lista;
-     }
     }
      public function obtenerPedidosTransferenciaJefeTienda($idAlmacen){
         $listaRecibidos = $this->model->where('idAlmacenD',$idAlmacen)->where('deleted',false)->get();         
