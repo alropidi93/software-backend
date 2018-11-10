@@ -449,7 +449,6 @@ class TiendaController extends Controller {
               
             $miembroPrincipalFlag = strval(Input::get('miembroPrincipal'));
 
-            
             // return $miembroPrincipalFlag;
             // return intval( $miembroPrincipalFlag==false|| $miembroPrincipalFlag==null);
             //return json_encode($miembroPrincipalFlag);
@@ -481,8 +480,9 @@ class TiendaController extends Controller {
             //$data['miembroPrincipal']=false;
             //return json_encode($data['miembroPrincipal']);
 
-            //para modificar su id tienda
+            //this will be used to update idTienda for the user
             $usuarioDataArray= Algorithm::quitNullValuesFromArray($data->all());
+            $usuarioDataArray = array( 'idTienda' => (int)$idTienda);
             $this->usuarioRepository->setModelUsuario($usuario);
             $this->usuarioRepository->actualiza($usuarioDataArray);
             $usuario = $this->usuarioRepository->obtenerModelo();
@@ -500,21 +500,16 @@ class TiendaController extends Controller {
             
             $this->tiendaRepository->loadTrabajadoresRelationship();
             $tienda =  $this->tiendaRepository->obtenerModelo();
-           
           
             $tiendaResource =  new TiendaResource($tienda);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Trabajador agregado a tienda satisfactoriamente');  
             $responseResourse->body($tiendaResource);
             return $responseResourse;
-        }
-        catch(\Exception $e){
-         
+        }catch(\Exception $e){
             DB::rollback();
             return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
         }
-
     }
 
     public function desasignarTrabajador($idTienda,Request $data){
@@ -545,7 +540,6 @@ class TiendaController extends Controller {
             //return $tienda->trabajadores()->where('usuario.idPersonaNatural',$id)->first();
 
             if(!$this->tiendaRepository->checkIfUsuarioAttachedBefore($usuario)){
-
                 $errorResource = new ErrorResource(null);
                 $errorResource->title('Error de integridad');
                 $errorResource->message('La tienda no cuenta con este trabajador asociado');
@@ -561,27 +555,17 @@ class TiendaController extends Controller {
                 $this->tiendaRepository->loadJefeDeTiendaRelationship();
                 $this->tiendaRepository->loadTrabajadoresRelationship();
                 $tienda = $this->tiendaRepository->obtenerModelo();
-                
-            
             
                 $tiendaResource =  new TiendaResource($tienda);  
                 $responseResourse = new ResponseResource(null);
                 $responseResourse->title('Trabajador desasignado satisfactoriamente de la tienda');  
                 $responseResourse->body($tiendaResource);
                 return $responseResourse;
-            }
-
-          
-           
-            
-        }
-        catch(\Exception $e){
-         
+            }   
+        }catch(\Exception $e){
             DB::rollback();
-            return (new ExceptionResource($e))->response()->setStatusCode(500);
-            
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
-
     }
 
   
