@@ -14,8 +14,7 @@ class PedidoTransferenciaResource extends JsonResource
      * @return array
      */
 
-    public function toArray($request)
-    {
+    public function toArray($request){
         return [
             'type'          => 'Pedido de tranferencia',
             'id'            => $this->id,
