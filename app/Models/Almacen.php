@@ -13,11 +13,10 @@ class Almacen extends Model
     protected $fillable = [
       'id',
       'nombre',
+      'distrito',
       'idTienda',
       'idJefeAlmacenCentral',
       'deleted'
- 
-      
     ];
 
     public function esCentral() {

@@ -23,6 +23,7 @@ class AlmacenResource extends JsonResource
                 
                 'idTienda' => $this->idTienda,
                 'nombre' => $this->nombre,
+                'distrito' => $this->distrito,
                 'productoxalmacen'=> new ProductoXAlmacenResource($this->whenLoaded('pivot')),
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
