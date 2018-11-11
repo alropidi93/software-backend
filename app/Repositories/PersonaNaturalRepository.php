@@ -34,7 +34,7 @@ class PersonaNaturalRepository extends BaseRepository {
         return null;
     }
 
-    public function setModelPersonaNatural($personaNatural){
+    public function setPersonaNaturalModel($personaNatural){
         $this->model =  $personaNatural;
     }
 

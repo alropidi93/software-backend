@@ -46,7 +46,43 @@ class PersonaJuridicaController extends Controller
         }
     }
 
-   
+    public function update(Request $personaJuridicaData, $id){
+        try{
+            $personaJuridicaDataArray= Algorithm::quitNullValuesFromArray($personaJuridicaData->all());
+            if (array_key_exists('ruc',$personaJuridicaData)){
+                $personaJuridicaAux= $this->personaJuridicaRepository->obtenerPersonaJuridicaPorRuc($personaJuridicaData['ruc']);
+                if ($id != $personaJuridicaAux->id){
+                    $validator = ['ruc'=>'El ruc ya está siendo usado por otro cliente juridico'];
+                    return (new ValidationResource($validator))->response()->setStatusCode(422);
+                }
+            }
+         
+            DB::beginTransaction();
+            $personaJuridica= $this->personaJuridicaRepository->obtenerPorId($id);
+            if (!$personaJuridica){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Cliente juridico no encontrado');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            
+            $this->personaJuridicaRepository->setModel($personaJuridica);
+            $this->personaJuridicaRepository->actualiza($personaJuridicaDataArray);
+            
+            $personaJuridica = $this->personaJuridicaRepository->obtenerModelo();
+            DB::commit();
+
+            $personaJuridicaResource =  new PersonaJuridicaResource($personaJuridica);
+            $responseResourse = new ResponseResource(null);
+            
+            $responseResourse->title('Cliente juridico actualizado exitosamente');       
+            $responseResourse->body($personaJuridicaResource);
+            return $responseResourse;   
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
+    }
     public function store(Request $personaJuridicaData){
         try{   
             // $validator = \Validator::make($personaJuridicaData->all(), 
@@ -89,7 +125,7 @@ class PersonaJuridicaController extends Controller
             }
             // $this->facturaRepository->loadComprobantePagoRelationship($factura);
             // $this->facturaRepository->loadPersonaJuridicaRelationship($factura);      
-            $personaJuridicaResource =  new ProductoResource($personaJuridica);  
+            $personaJuridicaResource =  new PersonaJuridicaResource($personaJuridica);  
             $responseResource = new ResponseResource(null);
             $responseResource->title('Mostrar persona juridica');  
             $responseResource->body($personaJuridicaResource);

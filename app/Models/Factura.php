@@ -11,7 +11,6 @@ class Factura extends Model
     
   
     protected $fillable = [
-      'id',
       'idComprobantePago',
       'idCliente',
       'igv',

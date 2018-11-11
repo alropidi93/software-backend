@@ -17,10 +17,10 @@ class FacturaResource extends JsonResource
         return [
             
             'type'          => 'Factura',
-            'id'            => $this->id,
+            'id'            => $this->idComprobantePago,
             'attributes'    => [
-                'idComprobantePago' => new ComprobantePagoResource($this->whenLoaded('comprobantePago')),
-                'idCliente' => new PersonaJuridicaResource($this->whenLoaded('personaJuridica')),           
+                'comprobantePago' => new ComprobantePagoResource($this->whenLoaded('comprobantePago')),
+                'cliente' => new PersonaJuridicaResource($this->whenLoaded('personaJuridica')),           
                 'igv' => $this->igv,
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,

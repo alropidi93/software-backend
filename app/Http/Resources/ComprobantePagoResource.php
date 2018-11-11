@@ -19,7 +19,7 @@ class ComprobantePagoResource extends JsonResource
             'type'          => 'Comprobante de Pago',
             'id'            => $this->id,
             'attributes'    => [
-                'cajero' => new UsuarioResource($this->whenLoaded('cajero')),
+                'cajero' => new UsuarioResource($this->whenLoaded('usuario')),
                 'subtotal' => $this->subtotal,                
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,

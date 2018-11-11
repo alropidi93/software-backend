@@ -30,6 +30,8 @@ Route::resource('solicitudesCompra', 'SolicitudCompraController');
 Route::resource('lineasSolicitudCompra', 'LineaSolicitudCompraController');
 Route::resource('pedidosTransferencia', 'PedidoTransferenciaController');
 Route::resource('almacen', 'AlmacenController');
+Route::resource('clientesJuridicos', 'PersonaJuridicaController');
+Route::resource('factura', 'FacturaController');
 
 Route::get('busqueda/proveedores','ProveedorController@busquedaPorFiltro');
 Route::get('usuariosSinTipo', 'UsuarioController@listarUsuariosSinTipo');
