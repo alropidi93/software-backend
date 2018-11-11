@@ -51,7 +51,8 @@ class FacturaController extends Controller
     public function store(Request $facturaData){
         try{   
             $validator = \Validator::make($facturaData->all(), 
-                            ['idCliente' => 'required' ]);
+                               ['subtotal' => 'required'],
+                               ['igv' => 'required']);
 
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);

@@ -2,41 +2,99 @@
 namespace App\Repositories;
 use App\Models\Factura;
 use App\Models\ComprobantePago;
-use App\Models\Usuario;
-use App\Models\PersonaJuridica;
-use App\Models\Categoria;
+use App\Http\Helpers\DateFormat;
 	
 class FacturaRepository extends BaseRepository {
-    protected $cliente;
-    protected $comprobantePago;
-    
-    /** 
-     * Create a new ProductoRepository instance.
-     * @param  App\Models\Producto $producto
-     * @param  App\Models\TipoProducto $tipoProducto
-     * @param  App\Models\Proveedor $proveedor
-     * @return void
+    /**
+     * The PersonaNatural instance.
+     *
+     * @var App\Models\PersonaNatural
      */
-    public function __construct(Factura $factura, ComprobantePago $comprobantePago,PersonaJuridica $personaJuridica) 
-    {
-        $this->model = $factura;
-        $this->comprobantePago = $comprobantePago;
-        $this->personaJuridica = $personaJuridica;
-       
-        
-    }
+    protected $comprobantePago;
 
     /**
-     * Save data from the array
-     *
-     * @return App\Models\Model
+     * Create a new UsuarioRepository instance.
+     * @param  App\Models\Usuario $usuario
+     * @param  App\Models\PersonaNatural $personaNatural
+     * @param  App\Models\TipoUsuario $tipoUsuario
+     * @param  App\Models\Tienda $tienda
+     * @return void
      */
-    public function guarda($dataArray)
-    {
-        $dataArray['deleted'] =false;
+    public function __construct(Boleta $factura=null, ComprobantePago $comprobantePago=null){
+        $this->model = $factura;
+        $this->comprobantePago = $comprobantePago;
+    }
 
-        return $this->model = $this->model->create($dataArray);
-        
+    protected function setComprobantePagoData($dataComprobantePago){
+        $this->comprobantePago['subtotal'] =  $dataComprobantePago['subtotal'];
+        $this->comprobantePago['deleted'] =  false; //default value
+    }
+
+    protected function setFacturaData($dataFactura){
+        $this->model['igv'] =  $dataFactura['igv'];
+        $this->model['deleted'] =  false; //default value
+    }
+
+    protected function saveComprobantePago(){
+        $this->comprobantePago->save();    
+    }
+
+    protected function attachFacturaToComprobantePago($comprobantePago, $factura){
+        return $comprobantePago->factura()->save($factura);
+    }
+
+    public function guarda($dataArray){
+        $this->setComprobantePagoData($dataArray); //set data only in its ComprobantePago model
+        $this->saveComprobantePago(); //saving in database
+        $this->setFacturaData($dataArray);// set data only in its Usuario model
+        $this->attachFacturaToComprobantePago($this->comprobantePago,$this->model);
+        $this->model->comprobantePago;//loading comprobantePago
+    }
+
+    public function actualiza($dataArray){
+        //persona natural no tiene atributos con el mismo nombre de atributos del usuario que se vayan a actualizar
+        //deleted, created_at y updated_at son comunes, pero estos jamas se actualizaran por acá
+        $this->comprobantePago->update($dataArray);
+        $this->model->update($dataArray); //set data only in its ComprobantePago model
+    }
+
+    // public function actualizaSoloBoleta($dataArray){
+    //     //persona natural no tiene atributos con el mismo nombre de atributos del usuario que se vayan a actualizar
+    //     //deleted, created_at y updated_at son comunes, pero estos jamas se actualizaran por acá
+    //     if (array_key_exists('igv',$dataArray))
+    //         $this->model->update($dataArray); //set data only in its PersonaNatural model
+    // }
+
+    
+    public function listarFacturas(){
+        $lista = $this->model->where('deleted',false)->get();
+        foreach ($lista as $key => $factura) {
+            $factura->comprobantePago;
+        }
+        return $lista;
+    }
+    public function obtenerFacturaPorId($id){
+        $factura = $this->model->where('idComprobantePago',$id)->where('deleted',false)->first();
+        if($factura) $factura->comprobantePago;
+        return $factura;
+    }
+
+    protected function setComprobantePagoModel($comprobantePago){
+        $this->comprobantePago = $comprobantePago;
+    }
+
+    public function setModelFactura($factura){
+        $this->model = $factura;
+        $comprobantePago = $factura->comprobantePago;
+        if($factura->comprobantePago)
+            $this->comprobantePago =  $comprobantePago;
+    }
+    
+    public function softDelete(){
+        $this->comprobatePago->deleted = true;
+        $this->comprobatePago->save();
+        $this->model->deleted = true;
+        $this->model->save();
     }
 
     public function loadComprobantePagoRelationship($factura=null){
