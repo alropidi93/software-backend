@@ -5,21 +5,8 @@ use App\Models\PersonaNatural;
 use App\Http\Helpers\DateFormat;
 	
 class BoletaRepository extends BaseRepository {
-    /**
-     * The PersonaNatural instance.
-     *
-     * @var App\Models\PersonaNatural
-     */
     protected $comprobantePago;
 
-    /**
-     * Create a new UsuarioRepository instance.
-     * @param  App\Models\Usuario $usuario
-     * @param  App\Models\PersonaNatural $personaNatural
-     * @param  App\Models\TipoUsuario $tipoUsuario
-     * @param  App\Models\Tienda $tienda
-     * @return void
-     */
     public function __construct(Boleta $boleta=null, ComprobantePago $comprobantePago=null){
         $this->model = $boleta;
         $this->comprobantePago = $comprobantePago;
@@ -31,7 +18,7 @@ class BoletaRepository extends BaseRepository {
     }
 
     protected function setBoletaData($dataBoleta){
-        $this->model['igv'] =  bcrypt($dataBoleta['igv']);
+        $this->model['igv'] = $dataBoleta['igv'];
         $this->model['deleted'] =  false; //default value
     }
 
@@ -65,7 +52,6 @@ class BoletaRepository extends BaseRepository {
     //         $this->model->update($dataArray); //set data only in its PersonaNatural model
     // }
 
-    
     public function listarBoletas(){
         $lista = $this->model->where('deleted',false)->get();
         foreach ($lista as $key => $boleta) {
@@ -73,6 +59,7 @@ class BoletaRepository extends BaseRepository {
         }
         return $lista;
     }
+
     public function obtenerBoletaPorId($id){
         $boleta = $this->model->where('idComprobantePago',$id)->where('deleted',false)->first();
         if($boleta) $boleta->comprobantePago;
@@ -89,11 +76,30 @@ class BoletaRepository extends BaseRepository {
         if($boleta->comprobantePago)
             $this->comprobantePago =  $comprobantePago;
     }
-    
+
     public function softDelete(){
         $this->comprobatePago->deleted = true;
         $this->comprobatePago->save();
         $this->model->deleted = true;
         $this->model->save();
+    }
+
+    public function loadPersonaNaturalRelationship($boleta=null){
+        if (!$boleta){
+            $this->model = $this->model->load([
+                'personaNatural'=>function($query){
+                    $query->where('deleted', false); 
+                }
+            ]);
+        }else{       
+            $this->model =$boleta->load([
+                'personaNatural'=>function($query){
+                    $query->where('deleted', false); 
+                }
+            ]);
+        }
+        if ($this->model->personaNatural){
+            $this->personaNatural = $this->model->personaNatural;
+        }
     }
 }

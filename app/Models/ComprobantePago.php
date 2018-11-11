@@ -20,5 +20,12 @@ class ComprobantePago extends Model
     public function usuario() {
       return $this->belongsTo('App\Models\Usuario','idCajero','id');
     }
+      
+    public function boleta() {
+      return $this->belongsTo('App\Models\Boleta','idComprobantePago','id');
+    }
+    public function factura() {
+      return $this->belongsTo('App\Models\Factura','idComprobantePago','id');
+    }
     
 }

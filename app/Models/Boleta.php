@@ -19,6 +19,7 @@ class Boleta extends Model
     public function comprobantePago() {
       return $this->belongsTo('App\Models\ComprobantePago','idComprobantePago','id');
     }
+    
     public function personaNatural() {
       return $this->belongsTo('App\Models\PersonaNatural','idCliente','id');
     }

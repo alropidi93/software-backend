@@ -35,7 +35,10 @@ class BoletaController extends Controller
     public function index(){
         try{
             $boletas = $this->boletaRepository->listarBoletas();
-           
+            foreach ($boletas as $key => $boleta) {
+                $this->boletaRepository->loadComprobantePagoRelationship($boleta);
+                $this->boletaRepository->loadPersonaNaturalRelationship($boleta);                
+            }
             $boletasResource =  new BoletasResource($boletas); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de boletas');  
@@ -67,6 +70,9 @@ class BoletaController extends Controller
             $this->boletaRepository->guarda($boletaData->all());
             $boletaCreated = $this->boletaRepository->obtenerModelo();
             DB::commit();   
+
+            $this->boletaRepository->loadComprobantePagoRelationship($boletaCreated);
+            $this->boletaRepository->loadPersonaNaturalRelationship($boletaCreated);
             
             $boletaResource =  new BoletaResource($boletaCreated);
             $responseResourse = new ResponseResource(null);
@@ -96,6 +102,8 @@ class BoletaController extends Controller
                 return $notFoundResource->response()->setStatusCode(404);
             }
             $this->boletaRepository->setModelboleta($boleta);
+            $this->boletaRepository->loadComprobantePagoRelationship($boleta);
+            $this->boletaRepository->loadPersonaNaturalRelationship($boleta);
             $boletaResource =  new BoletaResource($boleta);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Mostrar boleta');  
@@ -104,17 +112,6 @@ class BoletaController extends Controller
         }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $boletaData, $id){
-        //NO SE DEBE MODIFICAR UNA BOLETA
     }
 
     /**
