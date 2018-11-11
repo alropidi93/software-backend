@@ -99,7 +99,7 @@ class FacturaRepository extends BaseRepository {
 
     public function loadComprobantePagoRelationship($factura=null){
     
-        if (!$producto){
+        if (!$factura){
             $this->model = $this->model->load([
                 'comprobantePago'=>function($query){
                     $query->where('deleted', false); 
@@ -127,7 +127,7 @@ class FacturaRepository extends BaseRepository {
 
     public function loadPersonaJuridicaRelationship($factura=null){
     
-        if (!$producto){
+        if (!$factura){
             $this->model = $this->model->load([
                 'personaJuridica'=>function($query){
                     $query->where('deleted', false); 
