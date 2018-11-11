@@ -17,7 +17,7 @@ class ComprobantePago extends Model
       'deleted'     
     ];
 
-    public function cajero() {
+    public function usuario() {
       return $this->belongsTo('App\Models\Usuario','idCajero','id');
     }
     

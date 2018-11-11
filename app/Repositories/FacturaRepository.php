@@ -45,6 +45,9 @@ class FacturaRepository extends BaseRepository {
             $this->model = $this->model->load([
                 'comprobantePago'=>function($query){
                     $query->where('deleted', false); 
+                },
+                'comprobantePago.usuario'=>function($query){
+                    $query->where('usuario.deleted', false); 
                 }
             ]);
         }
@@ -53,6 +56,9 @@ class FacturaRepository extends BaseRepository {
             $this->model =$factura->load([
                 'comprobantePago'=>function($query){
                     $query->where('deleted', false); 
+                },
+                'comprobantePago.usuario'=>function($query){
+                    $query->where('usuario.deleted', false); 
                 }
             ]);
         }

@@ -38,7 +38,18 @@ class PersonaJuridicaRepository extends BaseRepository {
         return $this->model = $this->model->create($dataArray);
         
     }
-
+    public function setPersonaJuridicaModel($personaJuridica){
+        $this->model =  $personaJuridica;
+    }
+    
+    public function obtenerPersonaJuridicaPorRuc($ruc){
+        $personaJuridica = $this->personaJuridica->where('ruc',$ruc)->where('deleted',false)->first();
+        if($personaJuridica){
+            $this->setPersonaJuridicaModel($personaJuridica);
+            return $personaJuridica;
+        }
+        return null;
+    }
    
 
 }
