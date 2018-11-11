@@ -357,12 +357,19 @@ class UsuarioController extends Controller
                         $this->usuarioRepository->loadTiendaCargoJefeTiendaRelationship();
                     }
                     else if ($usuario->esJefeDeAlmacen()){
-                        $this->usuarioRepository->loadTiendaCargoJefeAlmacenRelationship();
+                                                                      
+                        if ($usuario->esJefeDeAlmacenCentral()){
+                            $this->usuarioRepository->loadAlmacenCargoJefeAlmacenCentralRelationship();
+                        }
+                        else{
+                            $this->usuarioRepository->loadTiendaCargoJefeAlmacenRelationship();
+                        }
+                        
                     }
                     else if (!$usuario->esAdmin()){
                         $this->usuarioRepository->loadTiendasCargoTrabajadorRelationship();
                     }
-                    
+                                        
                     $this->usuarioRepository->loadTipoUsuarioRelationship();
                     $usuarioResource =  new UsuarioResource($usuario);
                     $responseResourse = new ResponseResource(null);
