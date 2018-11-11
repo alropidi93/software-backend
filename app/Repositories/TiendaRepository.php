@@ -44,6 +44,7 @@ class TiendaRepository extends BaseRepository {
         $dataArray['deleted'] =false;
         $this->model = $this->model->create($dataArray);
         $this->almacen->nombre =  $dataArray['nombre'];
+        $this->almacen->distrito =  $dataArray['distrito'];
         $this->almacen->deleted =  false;
         $this->model->almacen()->save($this->almacen);
         return $this->model;

@@ -25,6 +25,7 @@ class PersonaNaturalResource extends JsonResource
                 'genero' => $this->genero,
                 'email' => $this->email,
                 'direccion' => $this->direccion,
+                'telefono' => $this->telefono,
                 'fechaNac' => $this->fechaNac,
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,

@@ -18,6 +18,7 @@ class PersonaNatural extends Model
       'email',
       'fechaNac',
       'direccion',
+      'telefono',
       'deleted',
       'dni'
     ];
