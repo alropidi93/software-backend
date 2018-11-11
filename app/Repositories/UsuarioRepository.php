@@ -219,6 +219,19 @@ class UsuarioRepository extends BaseRepository {
             ])->get();
         }   
     }
+    public function loadAlmacenCargoJefeAlmacenCentralRelationship($usuario=null){
+        if (!$usuario){
+            $this->model->load([
+                'almacenCentral' => function ($query) {
+                    $query->where('deleted', false);
+                }])->get();
+        }else{
+            $usuario->load([
+                'almacenCentral' => function ($query) {
+                    $query->where('deleted', false);
+                }])->get();
+        }   
+    }
 
     public function obtenerUsuarioPorId($id){
         $user = $this->model->where('idPersonaNatural',$id)->where('deleted',false)->first();
