@@ -17,7 +17,7 @@ class PersonaJuridicaRepository extends BaseRepository {
      * @param  App\Models\Proveedor $proveedor
      * @return void
      */
-    public function __construct(Factura $factura) 
+    public function __construct(PersonaJuridica $personaJuridica) 
     {
         $this->model = $personaJuridica;
         // $this->comprobantePago = $comprobantePago;

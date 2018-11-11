@@ -112,7 +112,7 @@ class PersonaJuridicaController extends Controller
                 $notFoundResource->notFound(['id'=>$id]);
                 return $notFoundResource->response()->setStatusCode(404);;
             }
-            $this->personaJuridicaRepository->setModel($factura);
+            $this->personaJuridicaRepository->setModel($personaJuridica);
             $this->personaJuridicaRepository->softDelete();
 
             $responseResource = new ResponseResource(null);
