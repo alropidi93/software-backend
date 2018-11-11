@@ -8,7 +8,6 @@ class Tienda extends Model
 {
     protected $table = 'tienda';
     public $timestamps = true;
-    
   
     protected $fillable = [
       'id',
@@ -30,7 +29,6 @@ class Tienda extends Model
       return $this->belongsTo('App\Models\Usuario','idJefeAlmacen','idPersonaNatural');
     }
 
-
     public function trabajadores(){
       return $this->belongsToMany('App\Models\Usuario','usuarioxtienda',
         'idTienda','idUsuario')->withPivot('deleted','miembroPrincipal','created_at','updated_at');
@@ -38,13 +36,5 @@ class Tienda extends Model
 
     public function almacen() {
       return $this->hasOne('App\Models\Almacen','idTienda','id');
-    }
-
-
-
-  
-  
-  
-    
-  
+    }  
 }
