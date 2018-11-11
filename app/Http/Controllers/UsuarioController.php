@@ -338,8 +338,6 @@ class UsuarioController extends Controller
     }
 
     public function login (Request $request){
-    
-
         try {
             $validator = \Validator::make($request->all(),
                     ['email' => 'required|email',
@@ -347,40 +345,38 @@ class UsuarioController extends Controller
     
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
-                
             }
             $usuario= $this->usuarioRepository->obtenerUsuarioPorEmail($request['email']);
           
-          
-       
             if ($usuario != null ) {
                 $this->usuarioRepository->setModel($usuario);
                 $password = $this->usuarioRepository->getPassword();
                 if (Hash::check($request['password'], $password)){
                     Log:info("paso el login");
-                    if($usuario->esJefeDeTienda()){
-                        
+                    if($usuario->esJefeDeTienda()){              
                         $this->usuarioRepository->loadTiendaCargoJefeTiendaRelationship();
                     }
                     else if ($usuario->esJefeDeAlmacen()){
-                        
-                        
-                        $this->usuarioRepository->loadTiendaCargoJefeAlmacenRelationship();
+                                                                      
+                        if ($usuario->esJefeDeAlmacenCentral()){
+                            $this->usuarioRepository->loadAlmacenCargoJefeAlmacenCentralRelationship();
+                        }
+                        else{
+                            $this->usuarioRepository->loadTiendaCargoJefeAlmacenRelationship();
+                        }
                         
                     }
                     else if (!$usuario->esAdmin()){
                         $this->usuarioRepository->loadTiendasCargoTrabajadorRelationship();
                     }
-                    
+                                        
                     $this->usuarioRepository->loadTipoUsuarioRelationship();
                     $usuarioResource =  new UsuarioResource($usuario);
                     $responseResourse = new ResponseResource(null);
                     $responseResourse->title('Usuario logueado exitosamente');       
                     $responseResourse->body($usuarioResource);       
                     return $responseResourse;
-                } 
-                
-                
+                }
             }
           
             Log::info("No paso el login");
@@ -388,7 +384,6 @@ class UsuarioController extends Controller
             $errorResource->title('Error de logueo');       
             $errorResource->message('Credenciales no válidas');       
             return $errorResource->response()->setStatusCode(400);
-         
         } catch(\Exception $e) {
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }

@@ -32,7 +32,6 @@ class TiendaRepository extends BaseRepository {
         $this->almacen = $almacen;
         $this->jefeDeTienda = $jefeDeTienda;
         $this->jefeDeAlmacen = $jefeDeAlmacen;
-
     }
 
     /**
@@ -43,29 +42,25 @@ class TiendaRepository extends BaseRepository {
     public function guarda($dataArray)
     {
         $dataArray['deleted'] =false;
-
         $this->model = $this->model->create($dataArray);
         $this->almacen->nombre =  $dataArray['nombre'];
+        $this->almacen->distrito =  $dataArray['distrito'];
         $this->almacen->deleted =  false;
         $this->model->almacen()->save($this->almacen);
         return $this->model;
-        
     }
 
     public function attachJefeTienda(){
-           
         $this->model->jefeDeTienda()->associate($this->jefeDeTienda);
         $this->model->save();
     }
 
     public function attachJefeAlmacen(){
-           
         $this->model->jefeDeAlmacen()->associate($this->jefeDeAlmacen);
         $this->model->save();
     }
 
     public function attachTrabajador($trabajador, $data=null){
-           
         if (!$data)
             $this->model->trabajadores()->save($trabajador,['deleted' => false, 'miembroPrincipal' => true]);
         else
@@ -80,7 +75,6 @@ class TiendaRepository extends BaseRepository {
         else{
             $tienda->load('jefeDeTienda');
         }
-        
     }
 
     public function loadJefeDeAlmacenRelationship($tienda=null){
@@ -98,8 +92,7 @@ class TiendaRepository extends BaseRepository {
         }
         else{
             $tienda->load('almacen');
-        }
-        
+        }   
     }
 
     public function setJefeDeTiendaModel($usuario){

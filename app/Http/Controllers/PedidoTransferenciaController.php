@@ -797,10 +797,12 @@ class PedidoTransferenciaController extends Controller {
                     $pedidoTransferencia->idAlmacenD = $almacenCentral->id;
                     $nuevoPedidoTransferenciaArray = $pedidoTransferenciaService->nuevaInstancia($pedidoTransferencia,3);
                     $nuevasListasArray = $pedidoTransferenciaService->nuevasLineasPedidoTransferencia($lineasPedidoTransferencia);
+
+                    $nuevoPedidoTransferenciaArray['aceptoJTO'] = true;
+                    $nuevoPedidoTransferenciaArray['aceptoJAD'] = false;
+                    $nuevoPedidoTransferenciaArray['aceptoJTD'] = false;
                     
                     $this->pedidoTransferenciaRepository->guarda($nuevoPedidoTransferenciaArray);
-                    
-                
                     
                     $list_collection = new Collection($nuevasListasArray);
                             

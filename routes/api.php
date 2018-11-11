@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 Route::resource('tiendas', 'TiendaController');
 Route::resource('productos', 'ProductoController');
 Route::resource('unidades', 'UnidadMedidaController');
+Route::resource('clientesNaturales', 'PersonaNaturalController');
 Route::resource('usuarios', 'UsuarioController');
 Route::resource('movimientos', 'MovimientoController');
 Route::resource('proveedores', 'ProveedorController');
@@ -29,6 +30,8 @@ Route::resource('solicitudesCompra', 'SolicitudCompraController');
 Route::resource('lineasSolicitudCompra', 'LineaSolicitudCompraController');
 Route::resource('pedidosTransferencia', 'PedidoTransferenciaController');
 Route::resource('almacen', 'AlmacenController');
+Route::resource('clientesJuridicos', 'PersonaJuridicaController');
+Route::resource('factura', 'FacturaController');
 
 Route::get('busqueda/proveedores','ProveedorController@busquedaPorFiltro');
 Route::get('usuariosSinTipo', 'UsuarioController@listarUsuariosSinTipo');
