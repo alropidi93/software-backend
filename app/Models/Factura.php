@@ -21,7 +21,7 @@ class Factura extends Model
     public function comprobantePago() {
       return $this->belongsTo('App\Models\ComprobantePago','idComprobantePago','id');
     }
-    public function cliente() {
+    public function personaJuridica() {
       return $this->belongsTo('App\Models\PersonaJuridica','idCliente','id');
     }
 }
