@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\PedidoTransferencia;
 use App\Models\Usuario;
+use App\Models\Almacen;
 use App\Repositories\PedidoTransferenciaRepository;
 use App\Repositories\LineaPedidoTransferenciaRepository;
 use App\Repositories\SolicitudCompraRepository;
@@ -463,6 +464,14 @@ class PedidoTransferenciaController extends Controller {
     public function evaluarPedidoTransferencia($idPedidoTransferencia,Request $data)
     {
         try{
+            ini_set("max_execution_time", 1000 );
+            $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia);
+            
+            // $pedidoTransferencia->load('lineasPedidoTransferencia');
+            // return $pedidoTransferencia;
+            $almacenService = new AlmacenService;
+            return $almacen = $almacenService->obtenerAlmacenCercanoConStock(Almacen::find(2),1,$pedidoTransferencia->lineasPedidoTransferencia);
+          
             $dataArray=$data->all();
             $dataArray= Algorithm::quitNullValuesFromArray($dataArray);
             $validator = \Validator::make($dataArray, 
