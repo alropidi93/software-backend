@@ -19,8 +19,8 @@ class FacturaResource extends JsonResource
             'type'          => 'Factura',
             'id'            => $this->id,
             'attributes'    => [
-                'idComprobantePago' => $this->idComprobantePago,
-                'idCliente' => $this->idCliente,                
+                'idComprobantePago' => new ComprobantePagoResource($this->whenLoaded('comprobantePago')),
+                'idCliente' => new PersonaJuridicaResource($this->whenLoaded('personaJuridica')),           
                 'igv' => $this->igv,
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
