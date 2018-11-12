@@ -532,7 +532,7 @@ class PedidoTransferenciaController extends Controller {
             $almacenCentral = null;
             //Para los de fase 1
             if ($pedidoTransferencia->estaEnPrimerIntento()){
-                return 34;
+                
                 $tienda = $this->pedidoTransferenciaRepository->getTiendaDeAlmacenDestino();
                 /* Validaciones de fase 1(es igual que para fase 2)*/
                 if (!$tienda){
