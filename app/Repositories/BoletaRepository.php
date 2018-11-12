@@ -2,6 +2,7 @@
 namespace App\Repositories;
 use App\Models\Boleta;
 use App\Models\PersonaNatural;
+use App\Models\ComprobantePago;
 use App\Http\Helpers\DateFormat;
 	
 class BoletaRepository extends BaseRepository {

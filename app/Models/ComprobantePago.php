@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ComprobantePago extends Model
 {
-    protected $table = 'comprobanteDePago';
+    protected $table = 'comprobantePago';
     public $timestamps = true;
-    
   
     protected $fillable = [
       'id',
@@ -18,14 +17,15 @@ class ComprobantePago extends Model
     ];
 
     public function usuario() {
-      return $this->belongsTo('App\Models\Usuario','idCajero','id');
+      return $this->belongsTo('App\Models\Usuario','idCajero','idPersonaNatural');
     }
       
     public function boleta() {
-      return $this->belongsTo('App\Models\Boleta','idComprobantePago','id');
+      return $this->hasOne('App\Models\Boleta','idComprobantePago','id');
     }
+
     public function factura() {
-      return $this->belongsTo('App\Models\Factura','idComprobantePago','id');
+      return $this->hasOne('App\Models\Factura','idComprobantePago','id');
     }
     
 }

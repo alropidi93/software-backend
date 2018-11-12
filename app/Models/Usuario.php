@@ -51,6 +51,9 @@ class Usuario extends Model
         return $this->hasOne('App\Models\Tienda','idJefeAlmacen','idPersonaNatural');
     }
 
+    public function comprobantesPago(){
+        return $this->hasMany('App\Models\ComprobantePago', 'idCajero', 'idPersonaNatural');
+    }
     
 
     // public function tienda() {

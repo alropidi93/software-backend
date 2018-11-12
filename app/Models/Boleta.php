@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Boleta extends Model
 {
     protected $table = 'boleta';
+    protected $primaryKey = 'idComprobantePago';
     public $timestamps = true;
+    public $incrementing = false;
 
     protected $fillable = [
       'idComprobantePago',
@@ -19,7 +21,7 @@ class Boleta extends Model
     public function comprobantePago() {
       return $this->belongsTo('App\Models\ComprobantePago','idComprobantePago','id');
     }
-    
+
     public function personaNatural() {
       return $this->belongsTo('App\Models\PersonaNatural','idCliente','id');
     }

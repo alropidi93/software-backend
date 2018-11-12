@@ -31,6 +31,7 @@ Route::resource('lineasSolicitudCompra', 'LineaSolicitudCompraController');
 Route::resource('pedidosTransferencia', 'PedidoTransferenciaController');
 Route::resource('almacen', 'AlmacenController');
 Route::resource('clientesJuridicos', 'PersonaJuridicaController');
+Route::resource('comprobanteDePago', 'ComprobantePagoController');
 Route::resource('factura', 'FacturaController');
 Route::resource('boleta', 'BoletaController');
 

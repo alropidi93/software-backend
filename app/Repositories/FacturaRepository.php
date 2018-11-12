@@ -20,7 +20,7 @@ class FacturaRepository extends BaseRepository {
      * @param  App\Models\Tienda $tienda
      * @return void
      */
-    public function __construct(Boleta $factura=null, ComprobantePago $comprobantePago=null){
+    public function __construct(Factura $factura=null, ComprobantePago $comprobantePago=null){
         $this->model = $factura;
         $this->comprobantePago = $comprobantePago;
     }
