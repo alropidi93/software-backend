@@ -2,6 +2,7 @@
 namespace App\Repositories;
 use App\Models\ComprobantePago;
 use App\Models\Usuario;
+use App\Models\LineaDeVenta;
 	
 class ComprobantePagoRepository extends BaseRepository {
     protected $cajero;
@@ -86,6 +87,10 @@ class ComprobantePagoRepository extends BaseRepository {
 
     public function setCajeroModel($usuario){
         $this->cajero = $usuario;       
+    }
+
+    public function setComprobantePagoModel($comprobantePago){
+        $this->model = $comprobantePago;       
     }
 
     // public function checkIfOwnModelTiendaHasJefeTienda(){

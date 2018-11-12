@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ComprobantePago;
 use App\Models\Usuario;
+use App\Models\LineaDeVenta;
 use App\Repositories\ComprobantePagoRepository;
 use App\Repositories\LineaDeVentaRepository;
 use App\Repositories\UsuarioRepository;
@@ -19,11 +20,12 @@ use App\Http\Resources\ErrorResource;
 use Illuminate\Support\Facades\DB;
 use App\Http\Helpers\Algorithm;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Collection;
 
 class ComprobantePagoController extends Controller
 {
     protected $comprobantePagoRepository;
-    protected $lineasDeVenta;
+    // protected $lineasDeVenta;
     
     public function __construct(ComprobantePagoRepository $comprobantePagoRepository, LineaDeVentaRepository $lineaDeVentaRepository){
         ComprobantePagoResource::withoutWrapping();

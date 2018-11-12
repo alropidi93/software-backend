@@ -6,25 +6,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Resources\BoletaResource;
 use App\Http\Resources\BoletasResource;
+use App\Http\Resources\LineaDeVentaResource;
+use App\Http\Resources\LineaspDeVentaResource;
 use App\Http\Resources\ExceptionResource;
 use App\Http\Resources\NotFoundResource;
 use App\Http\Resources\ErrorResource;
 use App\Http\Resources\ValidationResource;
 use App\Http\Resources\ResponseResource;
 use App\Models\Boleta;
+use App\Models\LineaDeVenta;
 use App\Repositories\BoletaRepository;
+use App\Repositories\ComprobantePagoRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Helpers\Algorithm;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Collection;
 
 class BoletaController extends Controller
 {
     protected $boletaRepository;
+    protected $comprobantePagoRepository;
+    // protected $lineasDeVenta;
 
-    public function __construct(BoletaRepository $boletaRepository){
+    public function __construct(BoletaRepository $boletaRepository, ComprobantePagoRepository $comprobantePagoRepository){
         BoletaResource::withoutWrapping();
         $this->boletaRepository = $boletaRepository;
+        $this->comprobantePagoRepository = $comprobantePagoRepository;
     }
 
     /**
@@ -59,7 +67,8 @@ class BoletaController extends Controller
         try{
             $validator = \Validator::make($boletaData->all(), 
                             ['subtotal' => 'required'],
-                            ['igv' => 'required']);
+                            ['igv' => 'required',
+                            'lineasDeVenta'=>  'required']);
 
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
@@ -68,8 +77,17 @@ class BoletaController extends Controller
             DB::beginTransaction();
             $this->boletaRepository->guarda($boletaData->all());
             $boletaCreated = $this->boletaRepository->obtenerModelo();
+            $comprobantePago = $this->comprobantePagoRepository->guarda($boletaData->all());
+            $list = $boletaData['lineasDeVenta'];
+            $list_collection = new Collection($list);
+            foreach ($list_collection as $key => $elem) {
+                $this->comprobantePagoRepository->setLineaDeVentaData($elem);
+                $this->comprobantePagoRepository->attachLineaDeVentaWithOwnModels();
+            }
             DB::commit();
-            $this->boletaRepository->loadPersonaNaturalRelationship();
+            $this->boletaRepository->loadPersonaNaturalRelationship($boletaCreated);
+            // $this->comprobantePagoRepository->setComprobantePagoModel($comprobantePago);
+            $this->comprobantePagoRepository->loadLineasDeVentaRelationship($comprobantePago);
             $boletaResource =  new BoletaResource($boletaCreated);
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Boleta creada exitosamente');       
@@ -99,6 +117,7 @@ class BoletaController extends Controller
             }
             $this->boletaRepository->setModelBoleta($boleta);
             $this->boletaRepository->loadPersonaNaturalRelationship();
+            $this->comprobantePagoRepository->loadLineasDeVentaRelationship();
             $boletaResource =  new BoletaResource($boleta);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Mostrar boleta');  
