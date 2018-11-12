@@ -28,7 +28,7 @@ class ComprobantePago extends Model
       return $this->hasOne('App\Models\Factura','idComprobantePago','id');
     }
 
-    public function lineasVenta() {
-      return $this->hasMany('App\Models\LineaVenta','idComprobantePago','id');
+    public function lineasDeVenta() {
+      return $this->hasMany('App\Models\LineaDeVenta','idComprobantePago','id');
     } 
 }

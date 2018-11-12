@@ -15,7 +15,7 @@ class LineasDeVentaResource extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'listaLineasDeVenta' => LineaVentaResource::collection($this->collection),
+            'listaLineasDeVenta' => LineaDeVentaResource::collection($this->collection),
         ];
     }
 }

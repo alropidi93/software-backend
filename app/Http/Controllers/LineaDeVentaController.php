@@ -17,6 +17,7 @@ use App\Http\Resources\ErrorResource;
 use Illuminate\Support\Facades\DB;
 use App\Http\Helpers\Algorithm;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Collection;
 
 class LineaDeVentaController extends Controller
 {
