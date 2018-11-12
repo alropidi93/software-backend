@@ -254,14 +254,6 @@ class PedidoTransferenciaController extends Controller {
                 $notFoundResource->notFound(['idTienda'=>$tienda->id]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
-            
-            
-            $dataArray['idAlmacenO']=$almacen->id;
-            $almacenService =  new AlmacenService;
-            $almacenCercano= $almacenService->obtenerAlmacenCercanoConStockAlt($almacen,1,$data['lineasPedidoTransferencia']);
-            $dataArray['idAlmacenD']=$almacenCercano->id;
-            $dataArray['fase']=1;
-            
             $idUsuario =  $data['idUsuario'];
             $usuario = $this->pedidoTransferenciaRepository->getUsuarioById($idUsuario);
             
@@ -271,7 +263,7 @@ class PedidoTransferenciaController extends Controller {
                 $notFoundResource->notFound(['id' => $idUsuario]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
-            //return $this->pedidoTransferenciaRepository->usuarioEsJefeDeAlmacenDe($tienda);
+
             $this->pedidoTransferenciaRepository->setUsuarioModel($usuario);
            
             if (!($this->pedidoTransferenciaRepository->usuarioEsJefeDeAlmacenDe($tienda))){
@@ -282,22 +274,105 @@ class PedidoTransferenciaController extends Controller {
                 return $errorResource->response()->setStatusCode(400);
             }
             
+            DB::beginTransaction();
+
+            // /*-------------------------------*/
+            // $almacenCercano = $almacenService->obtenerAlmacenCercanoConStock($almacenOrigen,2,$lineasPedidoTransferencia);
+            // if(!$almacenCercano){
+            //     $almacenService = new AlmacenService;
+            //     $almacenCentral = $this->pedidoTransferenciaRepository->getAlmacenCentral();
+            //     /*##############################*/
+            //     if (!$almacenService->tieneStock($almacenCentral,$lineasPedidoTransferencia)){
+            //         //si el almacen central no tiene stock se envia de frente la solicitud de compra
+            //         $text= "Pedido de transferencia denegado por el sistema en el intento {$pedidoTransferencia->fase}, se crearán o acumularán las respectivas lineas por producto en la solicitud de compra, ya que el almacen central no tiene stock para alguno(s) de los productos";
+            //         $solicitud = $this->enviarSolicitudCompra($dataArray,$text);
+            //         DB::commit();
+            //         $solicitudCompraResource =  new SolicitudCompraResource($solicitud);
+            //         $responseResource->title($text);  
+            //         $responseResource->body($solicitudCompraResource);
+            //         return $responseResource; //Esta es una salida de emergencia
+            //     }
+            //     else{
+            //         $text= "Pedido de transferencia denegado por el jefe de tienda en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al almacén central directamente, ya que no había almacen cercanos con stock para alguno(s) de los productos";
+            //         $pedidoTransferencia->idAlmacenD = $almacenCentral->id;
+            //         $nuevaFase = 3;//nos pasamos de frente a la fase 3
+                   
+            //     }
+                
+            // }
+            // else{
+            //     $text= "Pedido de transferencia denegado por el jefe de tienda en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
+            //     $pedidoTransferencia->idAlmacenD = $almacenCercano->id;
+            // }
+            
+            
+            // $nuevoPedidoTransferenciaArray = $pedidoTransferenciaService->nuevaInstancia($pedidoTransferencia,$nuevaFase);
+            // $nuevasListasArray = $pedidoTransferenciaService->nuevasLineasPedidoTransferencia($lineasPedidoTransferencia);
+            
+            // $nuevoPedidoTransferenciaArray['aceptoJTO'] = true;
+            // $nuevoPedidoTransferenciaArray['aceptoJAD'] = false;
+            // $nuevoPedidoTransferenciaArray['aceptoJTD'] = false;
+            // //return $nuevoPedidoTransferenciaArray;
+            // $this->pedidoTransferenciaRepository->guarda($nuevoPedidoTransferenciaArray);
+            
         
-          
+            
+            // $list_collection = new Collection($nuevasListasArray);
+                    
+            // foreach ($list_collection as $key => $elem) {
+                
+            //     $this->pedidoTransferenciaRepository->setLineaPedidoTransferenciaData($elem);
+            //     $this->pedidoTransferenciaRepository->attachLineaPedidoTransferenciaWithOwnModels();
+                            
+            // }
+            
+            // $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+            /*------------*/
+
+            $dataArray['idAlmacenO']=$almacen->id;
+            
+            $almacenService =  new AlmacenService;
+            $list = $data['lineasPedidoTransferencia'];
+            $list_collection = new Collection($list);
+            
+            $almacenCercano= $almacenService->obtenerAlmacenCercanoConStockAlt($almacen,1,$data['lineasPedidoTransferencia']);
+            if(!$almacenCercano){
+                
+                $almacenCentral = $this->pedidoTransferenciaRepository->getAlmacenCentral();
+                
+                if (!$almacenService->tieneStock($almacenCentral,$list_collection)){
+                    //si el almacen central no tiene stock se envia de frente la solicitud de compra
+                    $text= "Pedido de transferencia no creado por no haber stock en ningún almacén, se crea la solicitud de compra directamente";
+                    $solicitud = $this->enviarSolicitudCompra($dataArray,$text);
+                    DB::commit();
+                    $solicitudCompraResource =  new SolicitudCompraResource($solicitud);
+                    $responseResource->title($text);  
+                    $responseResource->body($solicitudCompraResource);
+                    return $responseResource; //Esta es una salida de emergencia
+                }
+                else{
+                    $text= "Pedido de transferencia creado directamente en fase 3 para el almacen central, por no haber un almacen cercano";
+                  
+                    $dataArray['idAlmacenD']=$almacenCentral->id;
+                    $dataArray['fase']=3;
+                   
+                }
+                
+            }
+            else{
+                $dataArray['idAlmacenD']=$almacenCercano->id;
+                $dataArray['fase']=1;
+                $text='Pedido de transferencia creado exitosamente';
+            }
+            
             // inicializacion de los flags
             // $dataArray['aceptoJTO'] = false;
             // $dataArray['aceptoJAD'] = false;
             // $dataArray['aceptoJTD'] = false;
-
-            
-          
-            DB::beginTransaction();
             
             $this->pedidoTransferenciaRepository->guarda($dataArray);
             $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-            $list = $data['lineasPedidoTransferencia'];
-            $list_collection = new Collection($list);
-                      
+            
             foreach ($list_collection as $key => $elem) {
                 
                 $this->pedidoTransferenciaRepository->setLineaPedidoTransferenciaData($elem);
@@ -306,12 +381,11 @@ class PedidoTransferenciaController extends Controller {
             }
             
             DB::commit();
-            
-                
+                       
             //return $this->pedidoTransferenciaRepository->obtenerModelo();
             $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship();
             $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship();
-            $this->pedidoTransferenciaRepository->loadAlmacenDestino2Relationship();
+            //$this->pedidoTransferenciaRepository->loadAlmacenDestino2Relationship();
             $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
             //return $this->campaignRepository->getModel();
             $pedidoTransferenciaCreado = $this->pedidoTransferenciaRepository->obtenerModelo();
@@ -321,7 +395,7 @@ class PedidoTransferenciaController extends Controller {
             $responseResource = new ResponseResource(null);
             
             
-            $responseResource->title('Pedido de transferencia creado exitosamente');       
+            $responseResource->title($text);       
             $responseResource->body($pedidoTransferenciaResource);       
             return $responseResource;
         }
@@ -652,6 +726,7 @@ class PedidoTransferenciaController extends Controller {
                     }
                     $almacenService = new AlmacenService;
                     $pedidoTransferenciaService = new PedidoTransferenciaService;
+                    /*-------------------------------*/
                     $almacenCercano = $almacenService->obtenerAlmacenCercanoConStock($almacenOrigen,2,$lineasPedidoTransferencia);
                     if(!$almacenCercano){
                         $almacenService = new AlmacenService;
@@ -702,6 +777,7 @@ class PedidoTransferenciaController extends Controller {
                     }
                     
                     $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                    /*------------*/
                     DB::commit();
                     $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
                     $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship();
