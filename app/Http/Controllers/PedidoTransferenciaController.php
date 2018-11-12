@@ -884,7 +884,8 @@ class PedidoTransferenciaController extends Controller {
                 
                 $almacenCentral = $this->pedidoTransferenciaRepository->getAlmacenDestino();
                 $almacenService  = new AlmacenService;
-
+                $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
+                
                 
                 /*##############################*/
                 if (!$almacenService->tieneStock($almacenCentral,$lineasPedidoTransferencia)){
