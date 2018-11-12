@@ -5,6 +5,9 @@ use App\Models\LineaPedidoTransferencia;
 use App\Models\Transferencia;
 use App\Models\Almacen;
 use App\Models\Usuario;
+use App\Models\TipoStock;
+use App\Models\ProductoXAlmacen;
+use Illuminate\Support\Facades\Log;
 	
 class PedidoTransferenciaRepository extends BaseRepository {
     protected $lineaPedidoTransferencia;
@@ -13,6 +16,7 @@ class PedidoTransferenciaRepository extends BaseRepository {
     protected $almacenOrigen;
     protected $almacenDestino;
     protected $usuario;
+    protected $tipoStock;
     protected $lineasPedidoTransferencia;
     //protected $aceptoJTO;
     //protected $aceptoJAD;
@@ -22,11 +26,12 @@ class PedidoTransferenciaRepository extends BaseRepository {
      * Create a new PedidoTransferencia instance.
      * @return void
      */
-    public function __construct(PedidoTransferencia $pedidoTransferencia, LineaPedidoTransferencia $lineaPedidoTransferencia, Transferencia $transferencia=null,Almacen $almacen=null,Usuario $usuario=null, $aceptoJTO= false, $aceptoJAD= false, $aceptoJTD=false){
+    public function __construct(PedidoTransferencia $pedidoTransferencia, LineaPedidoTransferencia $lineaPedidoTransferencia, Transferencia $transferencia=null,Almacen $almacen=null,Usuario $usuario=null, TipoStock $tipoStock, $aceptoJTO= false, $aceptoJAD= false, $aceptoJTD=false){
         $this->model = $pedidoTransferencia;
         $this->lineaPedidoTransferencia = $lineaPedidoTransferencia;
         $this->transferencia = $transferencia;
         $this->almacen = $almacen;
+        $this->tipoStock = $tipoStock;
         $this->almacenOrigen = null;
         $this->almacenDestino = null;
         $this->usuario = $usuario;
@@ -225,7 +230,14 @@ class PedidoTransferenciaRepository extends BaseRepository {
 
     public function getAlmacenById($idAlmacen){
         
-        return $this->almacen->where('id',$idAlmacen)->where('deleted',false)->first();
+        return $this->almacen->where('id',$idAlmacen)->where('deleted',false)
+        ->where(function($query){
+            $query->where('nombre','<>','Central')
+            ->whereHas('tienda',function($q){
+                $q->where('tienda.deleted',false);
+            });
+        })->orWhere('nombre','Central')
+        ->first();
     }
 
     
@@ -381,16 +393,37 @@ class PedidoTransferenciaRepository extends BaseRepository {
             return false;
         }
         $usuario = $this->usuario;
+       
         $tiendaDeLaQueEsJefe = $usuario->tiendaCargoJefeTienda()->where('deleted',false)->first();
-        return $tiendaDeLaQueEsJefe->id == $tienda->id;
+        if($tiendaDeLaQueEsJefe){
+            return $tiendaDeLaQueEsJefe->id == $tienda->id;
+        }
+        else{
+            return false;
+        }
+        
     }
 
     public function usuarioEsJefeDeAlmacenDe($tienda){
         if(!$this->usuario  || !$tienda){
             return false;
         }
+
         $usuario = $this->usuario;
+   
+        Log::info(json_encode($usuario));
+        Log::info(json_encode($tienda));
+        Log::info(json_encode($usuario->tiendasCargoJefeAlmacen));
+        
+        
         $tiendaDeLaQueEsJefe = $usuario->tiendaCargoJefeAlmacen()->where('deleted',false)->first();;
+        Log::info(json_encode($tiendaDeLaQueEsJefe));
+        if($tiendaDeLaQueEsJefe){
+            return $tiendaDeLaQueEsJefe->id == $tienda->id;
+        }
+        else{
+            return false;
+        }
         return $tiendaDeLaQueEsJefe->id == $tienda->id;
     }
 
@@ -402,5 +435,55 @@ class PedidoTransferenciaRepository extends BaseRepository {
         $usuario = $this->usuario;
         $almacenDelQueEsJefe = $usuario->almacenCentral()->where('deleted',false)->first();;
         return $almacenDelQueEsJefe->id == $almacen->id;
+    }
+
+    public function actualizaSumaRestaStocks($almacenOrigen, $almacenDestino, $lineasPedidoTransferencia){
+        $tipoStock = $this->tipoStock->where('key',1)->where('deleted',false)->first();//obtenemos el tipo principal de stock
+        foreach ($lineasPedidoTransferencia as $key => $lt) {
+            $cantidad =  $lt->cantidad;
+            $productoxalmacenOrigen =  ProductoXAlmacen::where('idAlmacen',$almacenOrigen->id)
+                            ->where('idProducto',$lt->idProducto)
+                            ->where('idTipoStock',$tipoStock->id)
+                            ->where('deleted',false)->first();
+            Log::info(json_encode($productoxalmacenOrigen));
+            Log::info($almacenDestino->id);
+            Log::info("ID producto: ".$lt->idProducto);
+      
+            Log::info($tipoStock->id);
+            $productoxalmacenDestino =  ProductoXAlmacen::where('idAlmacen',$almacenDestino->id)
+                ->where('idProducto',$lt->idProducto)
+                ->where('idTipoStock',$tipoStock->id)
+                ->where('deleted',false)->first();
+            Log::info(json_encode($productoxalmacenDestino));
+
+            $nuevaCantidadOrigen = $productoxalmacenOrigen->cantidad + $cantidad;
+            $nuevaCantidadDestino = $productoxalmacenDestino->cantidad - $cantidad;    
+
+            Log::info("Vieja cantidad origen: ".strval($productoxalmacenOrigen->cantidad));
+            Log::info("Cantidad a sumar: ". strval($cantidad));
+            Log::info("Nueva cantidad origen: ". strval($nuevaCantidadOrigen));
+            
+            Log::info("Vieja cantidad destino: ".strval($productoxalmacenDestino->cantidad));
+            Log::info("Cantidad a restar: ".strval($cantidad));
+            Log::info("Nueva cantidad destino: ".strval($nuevaCantidadDestino));
+            
+                            
+            $this->actualizarStock($lt->idProducto,$almacenOrigen->id,$tipoStock->id,$nuevaCantidadOrigen);
+            $this->actualizarStock($lt->idProducto,$almacenDestino->id,$tipoStock->id,$nuevaCantidadDestino);
+        }
+    }
+
+    public function actualizarStock($idProducto, $idAlmacen,$idTipoStock, $cantidad){
+        Log::info("ID producto: ".$idProducto);
+        Log::info($idAlmacen);
+        Log::info($idTipoStock);
+        Log::info($cantidad);
+        $productoxalmacen =  ProductoXAlmacen::where('idAlmacen',$idAlmacen)
+                            ->where('idProducto',$idProducto)
+                            ->where('idTipoStock',$idTipoStock)
+                            ->where('deleted',false)
+                            ->update(['cantidad'=>$cantidad]);
+        Log::info(json_encode($productoxalmacen));
+        Log::info("actualizado");
     }
 }
