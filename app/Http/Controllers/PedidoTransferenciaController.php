@@ -628,13 +628,15 @@ class PedidoTransferenciaController extends Controller {
                     
                 }
                 else{
+                    
                     if ($usuario->esJefeDeAlmacenAsignado()){
                         $this->pedidoTransferenciaRepository->actualiza(['aceptoJAD'=>false]);
                         $text= "Pedido de transferencia denegado por el jefe de almacen en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
 
                     }
                     
-
+                    
+                    $nuevaFase=2;
                     $dataArray['estado']='Denegado';
                     $dataArray['deleted']=false;
                     $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
@@ -666,9 +668,10 @@ class PedidoTransferenciaController extends Controller {
                             return $responseResource; //Esta es una salida de emergencia
                         }
                         else{
-                            $text= "Pedido de transferencia denegado por el jefe de tienda en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al almaceén central directamente, ya que no había almacen cercanos con stock para alguno(s) de los productos";
+                            $text= "Pedido de transferencia denegado por el jefe de tienda en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al almacén central directamente, ya que no había almacen cercanos con stock para alguno(s) de los productos";
                             $pedidoTransferencia->idAlmacenD = $almacenCentral->id;
-                            $nuevoPedidoTransferenciaArray['fase'] = 3;//nos pasamos de frente a la fase 3
+                            $nuevaFase = 3;//nos pasamos de frente a la fase 3
+                           
                         }
                         
                     }
@@ -678,12 +681,13 @@ class PedidoTransferenciaController extends Controller {
                     }
                     
                     
-                    $nuevoPedidoTransferenciaArray = $pedidoTransferenciaService->nuevaInstancia($pedidoTransferencia,2);
+                    $nuevoPedidoTransferenciaArray = $pedidoTransferenciaService->nuevaInstancia($pedidoTransferencia,$nuevaFase);
                     $nuevasListasArray = $pedidoTransferenciaService->nuevasLineasPedidoTransferencia($lineasPedidoTransferencia);
                     
                     $nuevoPedidoTransferenciaArray['aceptoJTO'] = true;
                     $nuevoPedidoTransferenciaArray['aceptoJAD'] = false;
                     $nuevoPedidoTransferenciaArray['aceptoJTD'] = false;
+                    //return $nuevoPedidoTransferenciaArray;
                     $this->pedidoTransferenciaRepository->guarda($nuevoPedidoTransferenciaArray);
                     
                 

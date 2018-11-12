@@ -55,7 +55,7 @@ class AlmacenService {
         
         $num_elements=  count($almacenesDisponibles)-1;
         if ($rank > $num_elements){
-            $rank = $num_elements;
+            return null;
         }
         $list_ids = $almacenesDisponibles->pluck('id');
         $list_ids =  $list_ids->all();
@@ -94,10 +94,10 @@ class AlmacenService {
         });
 
         $almacenesDisponibles = $almacenesDisponibles->values();    
-       
+        
         $num_elements=  count($almacenesDisponibles)-1;
         if ($rank > $num_elements){
-            $rank = $num_elements;
+            return null;
         }
         $list_ids = $almacenesDisponibles->pluck('id');
         $list_ids =  $list_ids->all();
