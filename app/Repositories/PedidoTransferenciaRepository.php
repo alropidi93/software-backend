@@ -257,7 +257,7 @@ class PedidoTransferenciaRepository extends BaseRepository {
 
     public function attachTransferenciaWithOwnModels()
     {
-        
+         
         $this->model->transferencia()->save($this->transferencia);
         
     }

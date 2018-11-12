@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PedidoTransferencia;
+use App\Models\Transferencia;
 use App\Models\Usuario;
 use App\Models\Almacen;
 use App\Repositories\PedidoTransferenciaRepository;
@@ -477,7 +478,7 @@ class PedidoTransferenciaController extends Controller {
         try{
             ini_set("max_execution_time", 1000 );
             
-
+            
 
             $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia);
             
@@ -530,6 +531,7 @@ class PedidoTransferenciaController extends Controller {
             $this->pedidoTransferenciaRepository->setLineasPedidoTransferenciaByOwnModel();
             $this->pedidoTransferenciaRepository->setUsuarioModel($usuario);
             $almacenCentral = null;
+            
             //Para los de fase 1
             if ($pedidoTransferencia->estaEnPrimerIntento()){
                 
@@ -631,22 +633,15 @@ class PedidoTransferenciaController extends Controller {
                         $text= "Pedido de transferencia denegado por el jefe de almacen en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
 
                     }
-                    else{
-                        $text= "Pedido de transferencia denegado por el jefe de tienda en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
-                    }
+                    
 
                     $dataArray['estado']='Denegado';
                     $dataArray['deleted']=false;
                     $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
                     $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
-                    //$this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
                     $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-                    
-                    
                     $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
-                    
                     $almacenOrigen = $this->pedidoTransferenciaRepository->getAlmacenById($pedidoTransferencia->idAlmacenO);
-     
                     if (!$almacenOrigen){
                         $notFoundResource = new NotFoundResource(null);
                         $notFoundResource->title('Almacen no encontrado');
@@ -658,12 +653,11 @@ class PedidoTransferenciaController extends Controller {
                     $almacenCercano = $almacenService->obtenerAlmacenCercanoConStock($almacenOrigen,2,$lineasPedidoTransferencia);
                     if(!$almacenCercano){
                         $almacenService = new AlmacenService;
-                    
                         $almacenCentral = $this->pedidoTransferenciaRepository->getAlmacenCentral();
                         /*##############################*/
                         if (!$almacenService->tieneStock($almacenCentral,$lineasPedidoTransferencia)){
                             //si el almacen central no tiene stock se envia de frente la solicitud de compra
-                            $text= "Pedido de transferencia denegado por el sistema en el intento {$pedidoTransferencia->fase}, se crearán o acumularán las respectivas lineas por producto en la solicitud de compra, ya que el almacen central no tiene stock de alguno(s) de los productos";
+                            $text= "Pedido de transferencia denegado por el sistema en el intento {$pedidoTransferencia->fase}, se crearán o acumularán las respectivas lineas por producto en la solicitud de compra, ya que el almacen central no tiene stock para alguno(s) de los productos";
                             $solicitud = $this->enviarSolicitudCompra($dataArray,$text);
                             DB::commit();
                             $solicitudCompraResource =  new SolicitudCompraResource($solicitud);
@@ -671,12 +665,20 @@ class PedidoTransferenciaController extends Controller {
                             $responseResource->body($solicitudCompraResource);
                             return $responseResource; //Esta es una salida de emergencia
                         }
+                        else{
+                            $text= "Pedido de transferencia denegado por el jefe de tienda en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al almaceén central directamente, ya que no había almacen cercanos con stock para alguno(s) de los productos";
+                            $pedidoTransferencia->idAlmacenD = $almacenCentral->id;
+                            $nuevoPedidoTransferenciaArray['fase'] = 3;//nos pasamos de frente a la fase 3
+                        }
                         
                     }
-                    $pedidoTransferencia->idAlmacenD = $almacenCercano->id;
+                    else{
+                        $text= "Pedido de transferencia denegado por el jefe de tienda en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
+                        $pedidoTransferencia->idAlmacenD = $almacenCercano->id;
+                    }
+                    
                     
                     $nuevoPedidoTransferenciaArray = $pedidoTransferenciaService->nuevaInstancia($pedidoTransferencia,2);
-                    
                     $nuevasListasArray = $pedidoTransferenciaService->nuevasLineasPedidoTransferencia($lineasPedidoTransferencia);
                     
                     $nuevoPedidoTransferenciaArray['aceptoJTO'] = true;
@@ -799,25 +801,27 @@ class PedidoTransferenciaController extends Controller {
 
                 }
                 else{
+                    
                     if ($usuario->esJefeDeAlmacenAsignado()){
                         $this->pedidoTransferenciaRepository->actualiza(['aceptoJAD'=>false]);
                         Log::info(json_encode($pedidoTransferencia));
-                        $text= "Pedido de transferencia denegado por el jefe de almacen en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
+                        $text= "Pedido de transferencia denegado por el jefe de almacen en el intento {$pedidoTransferencia->fase}";
 
                     }
                     else{
-                        $text= "Pedido de transferencia denegado por el jefe de tienda en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
+                        
+                        $text= "Pedido de transferencia denegado por el jefe de tienda en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al almacen central";
                     }
                     $dataArray['estado']='Denegado';
                     $dataArray['deleted']=false;
                     $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
                     $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
-                    //$this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
+                    
                     $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-                    //$text= "Pedido de transferencia denegado en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al almacen central";
+                    
                     $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
                     $almacenOrigen = $this->pedidoTransferenciaRepository->getAlmacenById($pedidoTransferencia->idAlmacenO);
-     
+                    
                     if (!$almacenOrigen){
                         $notFoundResource = new NotFoundResource(null);
                         $notFoundResource->title('Almacen no encontrado');
@@ -825,13 +829,16 @@ class PedidoTransferenciaController extends Controller {
                         return $notFoundResource->response()->setStatusCode(404);
                     }
                     $almacenService = new AlmacenService;
-                    
                     $almacenCentral = $this->pedidoTransferenciaRepository->getAlmacenCentral();
                     /*##############################*/
+                    
                     if (!$almacenService->tieneStock($almacenCentral,$lineasPedidoTransferencia)){
                         //si el almacen central no tiene stock se envia de frente la solicitud de compra
-                        $text= "Pedido de transferencia denegado por el sistema en el intento {$pedidoTransferencia->fase}, se crearán o acumularán las respectivas lineas por producto en la solicitud de compra, ya que el almacen central no tiene stock de alguno(s) de los productos";
+                        
+                        $text= "Pedido de transferencia denegado por el sistema en el intento {$pedidoTransferencia->fase}, se crearán o acumularán las respectivas lineas por producto en la solicitud de compra, ya que el almacen central no tiene stock para alguno(s) de los productos";
+                        
                         $solicitud = $this->enviarSolicitudCompra($dataArray,$text);
+                   
                         DB::commit();
                         $solicitudCompraResource =  new SolicitudCompraResource($solicitud);
                         $responseResource->title($text);  
@@ -874,14 +881,19 @@ class PedidoTransferenciaController extends Controller {
             }
             //Para los de fase 3
             else if ($pedidoTransferencia->estaEnTercerIntento()){
+                
                 $almacenCentral = $this->pedidoTransferenciaRepository->getAlmacenDestino();
                 $almacenService  = new AlmacenService;
 
                 
                 /*##############################*/
                 if (!$almacenService->tieneStock($almacenCentral,$lineasPedidoTransferencia)){
+                    $dataArray['estado']='Aceptado';
+                    $dataArray['deleted']=false;
+                    $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
+                    $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
                     
-                    $text= "Pedido de transferencia denegado por el sistema en el intento {$pedidoTransferencia->fase}, se crearán o acumularán las respectivas lineas por producto en la solicitud de compra, ya que el almacen central no tiene stock de alguno(s) de los productos";
+                    $text= "Pedido de transferencia denegado por el sistema en el intento {$pedidoTransferencia->fase}, se crearán o acumularán las respectivas lineas por producto en la solicitud de compra, ya que el almacen central no tiene stock para alguno(s) de los productos";
                     $solicitud = $this->enviarSolicitudCompra($dataArray,$text);
                     DB::commit();
                     $solicitudCompraResource =  new SolicitudCompraResource($solicitud);
@@ -933,6 +945,11 @@ class PedidoTransferenciaController extends Controller {
                     
                 }
                 else{
+                    $dataArray['estado']='Denegado';
+                    $dataArray['deleted']=false;
+                    $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
+                    $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
+                    
                     $text= "Pedido de transferencia denegado por el jefe del almacen central en el intento {$pedidoTransferencia->fase}, se crearán o acumularán las respectivas lineas por producto en la solicitud de compra";
                     $solicitud = $this->enviarSolicitudCompra($dataArray,$text);
                     DB::commit();
@@ -955,22 +972,19 @@ class PedidoTransferenciaController extends Controller {
     protected function enviarSolicitudCompra($dataArray,$text){
         
        
-        $dataArray['estado']='Denegado';
-        $dataArray['deleted']=false;
-        $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
-        $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
+        
         $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-                            
+                              
         $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
-        $almacenOrigen = $this->pedidoTransferenciaRepository->getAlmacenById($pedidoTransferencia->idAlmacenO);
+        // $almacenOrigen = $this->pedidoTransferenciaRepository->getAlmacenById($pedidoTransferencia->idAlmacenO);
 
-        if (!$almacenOrigen){
-            $notFoundResource = new NotFoundResource(null);
-            $notFoundResource->title('Almacen no encontrado');
-            $notFoundResource->notFound(['idAlmacen'=>$pedidoTransferencia->idAlmacenO]);
-            return $notFoundResource->response()->setStatusCode(404);
-        }
-                            
+        // if (!$almacenOrigen){
+        //     $notFoundResource = new NotFoundResource(null);
+        //     $notFoundResource->title('Almacen no encontrado');
+        //     $notFoundResource->notFound(['idAlmacen'=>$pedidoTransferencia->idAlmacenO]);
+        //     return $notFoundResource->response()->setStatusCode(404);
+        // }
+                        
         $solicitud = $this->solicitudCompraRepository->obtenerSolicitudDisponible();
         if (!$solicitud){
             $solicitud=  $this->solicitudCompraRepository->crearNueva();
