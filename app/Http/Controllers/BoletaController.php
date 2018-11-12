@@ -35,6 +35,9 @@ class BoletaController extends Controller
     public function index(){
         try{
             $boletas = $this->boletaRepository->listarBoletas();
+            foreach($boletas as $key => $boleta){
+                $this->boletaRepository->loadPersonaNaturalRelationship($boleta);
+            }
             $boletasResource =  new BoletasResource($boletas); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de boletas');  
@@ -66,7 +69,7 @@ class BoletaController extends Controller
             $this->boletaRepository->guarda($boletaData->all());
             $boletaCreated = $this->boletaRepository->obtenerModelo();
             DB::commit();
-            
+            $this->boletaRepository->loadPersonaNaturalRelationship();
             $boletaResource =  new BoletaResource($boletaCreated);
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Boleta creada exitosamente');       
@@ -95,6 +98,7 @@ class BoletaController extends Controller
                 return $notFoundResource->response()->setStatusCode(404);
             }
             $this->boletaRepository->setModelBoleta($boleta);
+            $this->boletaRepository->loadPersonaNaturalRelationship();
             $boletaResource =  new BoletaResource($boleta);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Mostrar boleta');  
@@ -123,7 +127,7 @@ class BoletaController extends Controller
             }
             $this->boletaRepository->setModelboleta($boleta);
             $this->boletaRepository->softDelete();
-            
+
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Boleta eliminada');  
             $responseResourse->body(['id' => $id]);

@@ -14,11 +14,13 @@ class BoletaRepository extends BaseRepository {
     }
 
     protected function setComprobantePagoData($dataComprobantePago){
+        $this->comprobantePago['idCajero'] =  $dataComprobantePago['idCajero'];
         $this->comprobantePago['subtotal'] =  $dataComprobantePago['subtotal'];
         $this->comprobantePago['deleted'] =  false; //default value
     }
 
     protected function setBoletaData($dataBoleta){
+        $this->model['idCliente'] = $dataBoleta['idCliente'];
         $this->model['igv'] = $dataBoleta['igv'];
         $this->model['deleted'] =  false; //default value
     }

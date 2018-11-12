@@ -69,6 +69,7 @@ class ComprobantePagoController extends Controller
             DB::beginTransaction();
             $comprobantePago = $this->comprobantePagoRepository->guarda($comprobantePagoData->all());
             DB::commit();
+            $this->comprobantePagoRepository->loadCajeroRelationship($comprobantePago);
             
             $comprobantePagoResource =  new ComprobantePagoResource($comprobantePago);
             $responseResourse = new ResponseResource(null);

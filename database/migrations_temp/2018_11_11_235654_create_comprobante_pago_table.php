@@ -14,10 +14,13 @@ class CreateComprobantePagoTable extends Migration
     public function up()
     {
         Schema::create('comprobantePago', function (Blueprint $table) {
-        $table->increments('id');
-        $table->double('subtotal');
-        $table->boolean('deleted');
+            $table->increments('id');
+            $table->integer('idCajero')->nullable();
+            $table->double('subtotal');
+            $table->boolean('deleted');
             $table->timestamps();
+
+            $table->foreign('idCajero')->references('idPersonaNatural')->on('usuario')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
