@@ -275,65 +275,12 @@ class PedidoTransferenciaController extends Controller {
             }
             
             DB::beginTransaction();
-
-            // /*-------------------------------*/
-            // $almacenCercano = $almacenService->obtenerAlmacenCercanoConStock($almacenOrigen,2,$lineasPedidoTransferencia);
-            // if(!$almacenCercano){
-            //     $almacenService = new AlmacenService;
-            //     $almacenCentral = $this->pedidoTransferenciaRepository->getAlmacenCentral();
-            //     /*##############################*/
-            //     if (!$almacenService->tieneStock($almacenCentral,$lineasPedidoTransferencia)){
-            //         //si el almacen central no tiene stock se envia de frente la solicitud de compra
-            //         $text= "Pedido de transferencia denegado por el sistema en el intento {$pedidoTransferencia->fase}, se crearán o acumularán las respectivas lineas por producto en la solicitud de compra, ya que el almacen central no tiene stock para alguno(s) de los productos";
-            //         $solicitud = $this->enviarSolicitudCompra($dataArray,$text);
-            //         DB::commit();
-            //         $solicitudCompraResource =  new SolicitudCompraResource($solicitud);
-            //         $responseResource->title($text);  
-            //         $responseResource->body($solicitudCompraResource);
-            //         return $responseResource; //Esta es una salida de emergencia
-            //     }
-            //     else{
-            //         $text= "Pedido de transferencia denegado por el jefe de tienda en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al almacén central directamente, ya que no había almacen cercanos con stock para alguno(s) de los productos";
-            //         $pedidoTransferencia->idAlmacenD = $almacenCentral->id;
-            //         $nuevaFase = 3;//nos pasamos de frente a la fase 3
-                   
-            //     }
-                
-            // }
-            // else{
-            //     $text= "Pedido de transferencia denegado por el jefe de tienda en el intento {$pedidoTransferencia->fase}, se generó un nuevo pedido de transferencia al segundo almacén más cercano";
-            //     $pedidoTransferencia->idAlmacenD = $almacenCercano->id;
-            // }
-            
-            
-            // $nuevoPedidoTransferenciaArray = $pedidoTransferenciaService->nuevaInstancia($pedidoTransferencia,$nuevaFase);
-            // $nuevasListasArray = $pedidoTransferenciaService->nuevasLineasPedidoTransferencia($lineasPedidoTransferencia);
-            
-            // $nuevoPedidoTransferenciaArray['aceptoJTO'] = true;
-            // $nuevoPedidoTransferenciaArray['aceptoJAD'] = false;
-            // $nuevoPedidoTransferenciaArray['aceptoJTD'] = false;
-            // //return $nuevoPedidoTransferenciaArray;
-            // $this->pedidoTransferenciaRepository->guarda($nuevoPedidoTransferenciaArray);
-            
-        
-            
-            // $list_collection = new Collection($nuevasListasArray);
-                    
-            // foreach ($list_collection as $key => $elem) {
-                
-            //     $this->pedidoTransferenciaRepository->setLineaPedidoTransferenciaData($elem);
-            //     $this->pedidoTransferenciaRepository->attachLineaPedidoTransferenciaWithOwnModels();
-                            
-            // }
-            
-            // $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-            /*------------*/
-
             $dataArray['idAlmacenO']=$almacen->id;
             
             $almacenService =  new AlmacenService;
             $list = $data['lineasPedidoTransferencia'];
             $list_collection = new Collection($list);
+            
             
             $almacenCercano= $almacenService->obtenerAlmacenCercanoConStockAlt($almacen,1,$data['lineasPedidoTransferencia']);
             if(!$almacenCercano){
@@ -341,11 +288,34 @@ class PedidoTransferenciaController extends Controller {
                 $almacenCentral = $this->pedidoTransferenciaRepository->getAlmacenCentral();
                 
                 if (!$almacenService->tieneStock($almacenCentral,$list_collection)){
+                    $dataArray['idAlmacenD']=null;
+                    $dataArray['fase']=null;
+                    $dataArray['JTO']=$dataArray['JAD']=$dataArray['JTD']=false;
+                    
+                    $this->pedidoTransferenciaRepository->guarda($dataArray);
+                    $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
+                    $this->pedidoTransferenciaRepository->setModel($pedidoTransferencia);
+                    foreach ($list_collection as $key => $elem) {
+                        
+                        $this->pedidoTransferenciaRepository->setLineaPedidoTransferenciaData($elem);
+                        $this->pedidoTransferenciaRepository->attachLineaPedidoTransferenciaWithOwnModels();
+                                    
+                    }
+                    $this->pedidoTransferenciaRepository->setLineasPedidoTransferenciaByOwnModel();
+                    $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
+                    $transferenciaData['estado']='Denegado';
+                    $transferenciaData['deleted']=false;
+                    $this->pedidoTransferenciaRepository->setTransferenciaData($transferenciaData);
+                    $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
+            
                     //si el almacen central no tiene stock se envia de frente la solicitud de compra
-                    $text= "Pedido de transferencia no creado por no haber stock en ningún almacén, se crea la solicitud de compra directamente";
-                    $solicitud = $this->enviarSolicitudCompra($dataArray,$text);
+                    $text= "Solicitud de compra creada directamente, aunque tambien se creo uno pedido de tranferencia y su respectiva transferencia con almacen destino vacío";
+                    
+                    $solicitud = $this->enviarSolicitudCompra($dataArray,$text, $lineasPedidoTransferencia);
+                    
                     DB::commit();
                     $solicitudCompraResource =  new SolicitudCompraResource($solicitud);
+                    $responseResource = new ResponseResource(null);
                     $responseResource->title($text);  
                     $responseResource->body($solicitudCompraResource);
                     return $responseResource; //Esta es una salida de emergencia
@@ -735,7 +705,7 @@ class PedidoTransferenciaController extends Controller {
                         if (!$almacenService->tieneStock($almacenCentral,$lineasPedidoTransferencia)){
                             //si el almacen central no tiene stock se envia de frente la solicitud de compra
                             $text= "Pedido de transferencia denegado por el sistema en el intento {$pedidoTransferencia->fase}, se crearán o acumularán las respectivas lineas por producto en la solicitud de compra, ya que el almacen central no tiene stock para alguno(s) de los productos";
-                            $solicitud = $this->enviarSolicitudCompra($dataArray,$text);
+                            return $solicitud = $this->enviarSolicitudCompra($dataArray,$text,$lineasPedidoTransferencia);
                             DB::commit();
                             $solicitudCompraResource =  new SolicitudCompraResource($solicitud);
                             $responseResource->title($text);  
@@ -917,7 +887,7 @@ class PedidoTransferenciaController extends Controller {
                         
                         $text= "Pedido de transferencia denegado por el sistema en el intento {$pedidoTransferencia->fase}, se crearán o acumularán las respectivas lineas por producto en la solicitud de compra, ya que el almacen central no tiene stock para alguno(s) de los productos";
                         
-                        $solicitud = $this->enviarSolicitudCompra($dataArray,$text);
+                        $solicitud = $this->enviarSolicitudCompra($dataArray,$text,$lineasPedidoTransferencia);
                    
                         DB::commit();
                         $solicitudCompraResource =  new SolicitudCompraResource($solicitud);
@@ -975,7 +945,7 @@ class PedidoTransferenciaController extends Controller {
                     $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
                     
                     $text= "Pedido de transferencia denegado por el sistema en el intento {$pedidoTransferencia->fase}, se crearán o acumularán las respectivas lineas por producto en la solicitud de compra, ya que el almacen central no tiene stock para alguno(s) de los productos";
-                    $solicitud = $this->enviarSolicitudCompra($dataArray,$text);
+                    $solicitud = $this->enviarSolicitudCompra($dataArray,$text,$lineasPedidoTransferencia);
                     DB::commit();
                     $solicitudCompraResource =  new SolicitudCompraResource($solicitud);
                     $responseResource->title($text);  
@@ -1026,13 +996,14 @@ class PedidoTransferenciaController extends Controller {
                     
                 }
                 else{
+                    $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
                     $dataArray['estado']='Denegado';
                     $dataArray['deleted']=false;
                     $this->pedidoTransferenciaRepository->setTransferenciaData($dataArray);
                     $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
                     
                     $text= "Pedido de transferencia denegado por el jefe del almacen central en el intento {$pedidoTransferencia->fase}, se crearán o acumularán las respectivas lineas por producto en la solicitud de compra";
-                    $solicitud = $this->enviarSolicitudCompra($dataArray,$text);
+                    $solicitud = $this->enviarSolicitudCompra($dataArray,$text,$lineasPedidoTransferencia);
                     DB::commit();
                     $solicitudCompraResource =  new SolicitudCompraResource($solicitud);
                     $responseResource->title($text);  
@@ -1050,22 +1021,9 @@ class PedidoTransferenciaController extends Controller {
     
     }
 
-    protected function enviarSolicitudCompra($dataArray,$text){
+    protected function enviarSolicitudCompra($dataArray,$text,$lineasPedidoTransferencia){
         
-       
-        
-        $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-                              
-        $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
-        // $almacenOrigen = $this->pedidoTransferenciaRepository->getAlmacenById($pedidoTransferencia->idAlmacenO);
-
-        // if (!$almacenOrigen){
-        //     $notFoundResource = new NotFoundResource(null);
-        //     $notFoundResource->title('Almacen no encontrado');
-        //     $notFoundResource->notFound(['idAlmacen'=>$pedidoTransferencia->idAlmacenO]);
-        //     return $notFoundResource->response()->setStatusCode(404);
-        // }
-                        
+            
         $solicitud = $this->solicitudCompraRepository->obtenerSolicitudDisponible();
         if (!$solicitud){
             $solicitud=  $this->solicitudCompraRepository->crearNueva();
@@ -1074,11 +1032,14 @@ class PedidoTransferenciaController extends Controller {
         }
         $this->lineaSolicitudCompraRepository->setSolicitudCompraModel($solicitud);
         foreach ($lineasPedidoTransferencia as $key => $lpt) {
+            
             $producto = $this->lineaSolicitudCompraRepository->getProductoById($lpt->idProducto);
             $lineaSolicitudCompra = $this->lineaSolicitudCompraRepository->attachOrAccumulateLineaSolicitudCompra($producto,$lpt->cantidad);
             $this->lineaPedidoTransferenciaRepository->setModel($lpt);
+             
             $this->lineaPedidoTransferenciaRepository->attachLineaSolicitudTransferencia($lineaSolicitudCompra);
             $this->lineaSolicitudCompraRepository->loadProductoRelationship($lineaSolicitudCompra);
+            
         }
         $this->solicitudCompraRepository->setModel($solicitud);
         $this->solicitudCompraRepository->loadLineasSolicitudCompraRelationship();
