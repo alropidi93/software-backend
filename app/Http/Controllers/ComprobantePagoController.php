@@ -72,15 +72,30 @@ class ComprobantePagoController extends Controller
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
-
+            $idUsuario =  $data['idUsuario']; //id del cajero en caso tenga
+            if($idUsuario){
+                $usuario = $this->comprobantePagoRepository->getUsuarioById($idUsuario);
+                if (!$usuario){
+                    $notFoundResource = new NotFoundResource(null);
+                    $notFoundResource->title('No existe este usuario');
+                    $notFoundResource->notFound(['id' => $idUsuario]);
+                    return $notFoundResource->response()->setStatusCode(404);
+                }
+                $this->pedidoTransferenciaRepository->setUsuarioModel($usuario);
+            }
+            
             DB::beginTransaction();
-            $comprobantePago = $this->comprobantePagoRepository->guarda($comprobantePagoData->all());
+            $this->comprobantePagoRepository->guarda($comprobantePagoData->all());
+            $comprobantePago = $this->comprobantePagoRepository->obtenerModelo();
+            $this->comprobantePagoRepository->setModel($comprobantePago);
             $list = $data['lineasDeVenta'];
             $list_collection = new Collection($list);
             foreach ($list_collection as $key => $elem) {
                 $this->comprobantePagoRepository->setLineaDeVentaData($elem);
                 $this->comprobantePagoRepository->attachLineaDeVentaWithOwnModels();
             }
+            $this->comprobantePagoRepository->setLineasDeVentaByOwnModel();
+            $lineaslineasDeVenta = $this->comprobantePagoRepository->obtenerLineasDeVentaFromOwnModel();
             DB::commit();
 
             $this->comprobantePagoRepository->loadCajeroRelationship($comprobantePago);

@@ -80,6 +80,10 @@ class ComprobantePagoRepository extends BaseRepository {
         $ans = $this->model->lineasDeVenta()->save($this->lineaDeVenta);
     }
 
+    public function obtenerLineasDeVentaFromOwnModel(){
+        return $this->lineasDeVenta;
+    }
+
     public function setLineasDeVentaByOwnModel(){
         $this->lineasDeVenta = $this->model->lineasDeVenta;
         unset($this->model->lineasDeVenta);
@@ -91,6 +95,10 @@ class ComprobantePagoRepository extends BaseRepository {
 
     public function setComprobantePagoModel($comprobantePago){
         $this->model = $comprobantePago;       
+    }
+
+    public function getUsuarioById($idUsuario){
+        return $this->usuario->where('idPersonaNatural',$idUsuario)->where('deleted',false)->first();
     }
 
     // public function checkIfOwnModelTiendaHasJefeTienda(){
