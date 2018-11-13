@@ -109,6 +109,7 @@ class LineaSolicitudCompraRepository extends BaseRepository{
             }
             
         }
+        return $this->model;
 
     }
 }
