@@ -96,7 +96,8 @@ class LineaSolicitudCompraController extends Controller
                 $notFoundResource->notFound(['id'=>$id]);
                 return $notFoundResource->response()->setStatusCode(404);;
             }
-            $this->lineaSolicitudCompraRepository->loadProveedoresRelationship($lineaSolicitudCompra);
+            $this->lineaSolicitudCompraRepository->loadProveedorRelationship($lineaSolicitudCompra);
+            $this->lineaSolicitudCompraRepository->loadProductoRelationship($lineaSolicitudCompra);
             $lineaSolicitudCompraResource =  new LineaSolicitudCompraResource($lineaSolicitudCompra);  
             $responseResource = new ResponseResource(null);
             $responseResource->title('Mostrar linea de solicitud de compra');  

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ComprobantePago;
 use App\Models\Usuario;
-use App\Models\LineaDeVenta;
 use App\Repositories\ComprobantePagoRepository;
 use App\Repositories\LineaDeVentaRepository;
 use App\Repositories\UsuarioRepository;
@@ -25,10 +24,11 @@ use Illuminate\Support\Collection;
 class ComprobantePagoController extends Controller
 {
     protected $comprobantePagoRepository;
-    // protected $lineasDeVenta;
+    protected $lineasDeVenta;
     
     public function __construct(ComprobantePagoRepository $comprobantePagoRepository, LineaDeVentaRepository $lineaDeVentaRepository){
         ComprobantePagoResource::withoutWrapping();
+        // LineaDeVentaResource::withoutWrapping(); // no tiene similar en pedido trans contro
         $this->comprobantePagoRepository = $comprobantePagoRepository;
         $this->lineaDeVentaRepository = $lineaDeVentaRepository;
     }
@@ -72,7 +72,7 @@ class ComprobantePagoController extends Controller
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
-            $idUsuario =  $data['idUsuario']; //id del cajero en caso tenga
+            $idUsuario =  $comprobantePagoData['idUsuario']; //id del cajero en caso tenga
             if($idUsuario){
                 $usuario = $this->comprobantePagoRepository->getUsuarioById($idUsuario);
                 if (!$usuario){
@@ -87,21 +87,22 @@ class ComprobantePagoController extends Controller
             DB::beginTransaction();
             $this->comprobantePagoRepository->guarda($comprobantePagoData->all());
             $comprobantePago = $this->comprobantePagoRepository->obtenerModelo();
-            $this->comprobantePagoRepository->setModel($comprobantePago);
-            $list = $data['lineasDeVenta'];
+
+            $list = $comprobantePagoData['lineasDeVenta'];
             $list_collection = new Collection($list);
+
             foreach ($list_collection as $key => $elem) {
                 $this->comprobantePagoRepository->setLineaDeVentaData($elem);
                 $this->comprobantePagoRepository->attachLineaDeVentaWithOwnModels();
             }
-            $this->comprobantePagoRepository->setLineasDeVentaByOwnModel();
-            $lineaslineasDeVenta = $this->comprobantePagoRepository->obtenerLineasDeVentaFromOwnModel();
             DB::commit();
-
-            $this->comprobantePagoRepository->loadCajeroRelationship($comprobantePago);
-            $this->comprobantePagoRepository->loadLineasDeVentaRelationship();
             
-            $comprobantePagoResource =  new ComprobantePagoResource($comprobantePago);
+            $comprobantePagoCreado = $this->comprobantePagoRepository->obtenerModelo();
+            $this->comprobantePagoRepository->loadLineasDeVentaRelationship($comprobantePagoCreado);
+
+            $this->comprobantePagoRepository->loadCajeroRelationship($comprobantePagoCreado); //agregado por Luis
+            
+            $comprobantePagoResource =  new ComprobantePagoResource($comprobantePagoCreado);
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Comprobante de pago creado exitosamente');       
             $responseResourse->body($comprobantePagoResource);       
@@ -131,7 +132,8 @@ class ComprobantePagoController extends Controller
 
             $this->comprobantePagoRepository->setModel($comprobantePago);
             $this->comprobantePagoRepository->loadCajeroRelationship();
-            $this->comprobantePagoRepository->loadLineasDeVentaRelationship();
+            $this->comprobantePagoRepository->loadLineasDeVentaRelationship(); //no tiene similar en pedido trans contr
+
             $comprobantePagoResource =  new ComprobantePagoResource($comprobantePago);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Mostrar comprobante de pago');  

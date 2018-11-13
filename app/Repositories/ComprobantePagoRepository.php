@@ -14,7 +14,7 @@ class ComprobantePagoRepository extends BaseRepository {
      * @param  App\Models\Tienda $tienda
      * @return void
      */
-    public function __construct(ComprobantePago $comprobantePago, Usuario $cajero, LineaDeVenta $lineaDeVenta)  
+    public function __construct(ComprobantePago $comprobantePago, Usuario $cajero=null, LineaDeVenta $lineaDeVenta)  
     {
         $this->model = $comprobantePago;
         $this->lineaDeVenta = $lineaDeVenta;
@@ -23,8 +23,7 @@ class ComprobantePagoRepository extends BaseRepository {
 
     public function guarda($dataArray){
         $dataArray['deleted'] =false;
-        $this->model = $this->model->create($dataArray);
-        return $this->model;
+        return $this->model = $this->model->create($dataArray);
     }
 
     public function attachCajero(){
@@ -34,10 +33,20 @@ class ComprobantePagoRepository extends BaseRepository {
 
     public function loadCajeroRelationship($comprobantePago=null){
         if (!$comprobantePago){
-            $this->model->load('usuario');
+            $this->model = $this->model->load([
+                'usuario'=>function($query){
+                    $query->where('usuario.deleted', false);
+                }
+            ]); 
+        }else{   
+            $this->model =$comprobantePago->load([
+                'usuario'=>function($query){
+                    $query->where('usuario.deleted', false); 
+                }
+            ]);   
         }
-        else{
-            $tienda->load('usuario');
+        if ($this->model->cajero && !$comprobantePago){
+            $this->cajero = $this->model->cajero;
         }
     }
 
@@ -50,7 +59,7 @@ class ComprobantePagoRepository extends BaseRepository {
                 'lineasDeVenta.producto'=>function($query){
                     $query->where('producto.deleted', false);
                 },
-                'lineasDeVenta.producto.categoria'=>function($query){
+                'lineasDeVenta.producto.categoria'=>function($query){ //esta parte no es tan necesaria para este request
                     $query->where('categoria.deleted', false);
                 }
             ]);
@@ -62,7 +71,7 @@ class ComprobantePagoRepository extends BaseRepository {
                 'lineasDeVenta.producto'=>function($query){
                     $query->where('producto.deleted', false);
                 },
-                'lineasDeVenta.producto.categoria'=>function($query){
+                'lineasDeVenta.producto.categoria'=>function($query){//esta parte no es tan necesaria para este request
                     $query->where('categoria.deleted', false);
                 }
             ]);   
@@ -89,22 +98,16 @@ class ComprobantePagoRepository extends BaseRepository {
         unset($this->model->lineasDeVenta);
      }
 
-    public function setCajeroModel($usuario){
+    public function setUsuarioModel($usuario){
         $this->cajero = $usuario;       
     }
 
     public function setComprobantePagoModel($comprobantePago){
+        //no tiene similar en pedido transferencia repo
         $this->model = $comprobantePago;       
     }
 
     public function getUsuarioById($idUsuario){
-        return $this->usuario->where('idPersonaNatural',$idUsuario)->where('deleted',false)->first();
+        return $this->cajero->where('idPersonaNatural',$idUsuario)->where('deleted',false)->first();
     }
-
-    // public function checkIfOwnModelTiendaHasJefeTienda(){
-    //     return strval($this->model->jefeDeTienda()->where('usuario.deleted',false)
-    //             ->whereHas('personaNatural', function ($query){
-    //                 $query->where('personaNatural.deleted',false);
-    //             })->exists());
-    // }
 }

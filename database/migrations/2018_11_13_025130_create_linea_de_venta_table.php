@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateBoletaTable extends Migration
+class CreateLineaDeVentaTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,18 @@ class CreateBoletaTable extends Migration
      */
     public function up()
     {
-        Schema::create('boleta', function (Blueprint $table) {
-            $table->integer('idComprobantePago')->primary();
-            $table->integer('idCliente');
-            $table->double('igv');
+        Schema::create('lineaDeVenta', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('idProducto');
+            $table->integer('cantidad');
+            $table->integer('idComprobantePago');
+            $table->integer('idCotizacion')->nullable();
+            
             $table->boolean('deleted');
-            
             $table->timestamps();
-            
+
+            $table->foreign('idProducto')->references('id')->on('producto')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('idComprobantePago')->references('id')->on('comprobantePago')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('idCliente')->references('id')->on('personaNatural')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
@@ -33,6 +35,6 @@ class CreateBoletaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('boleta');
+        Schema::dropIfExists('lineaDeVenta');
     }
 }

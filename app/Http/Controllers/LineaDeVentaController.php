@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\LineaDeVenta;
 use App\Repositories\LineaDeVentaRepository;
-use App\Repositories\UsuarioRepository;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\LineaDeVentaResource;
 use App\Http\Resources\LineasDeVentaResource;
@@ -21,7 +20,7 @@ use Illuminate\Support\Collection;
 
 class LineaDeVentaController extends Controller
 {
-    protected $lineaDeVentaRepository;
+    // protected $lineaDeVentaRepository;
 
     public function __construct(LineaDeVentaRepository $lineaDeVentaRepository){
         LineaDeVentaResource::withoutWrapping();
@@ -57,6 +56,7 @@ class LineaDeVentaController extends Controller
         try{
             $validator = \Validator::make($lineaDeVentaData->all(), 
                             ['idProducto' => 'required',
+                            // 'idComprobantePago' => 'required',
                             'cantidad' => 'required']);
 
             if ($validator->fails()) {
@@ -67,6 +67,7 @@ class LineaDeVentaController extends Controller
             $lineaDeVenta = $this->lineaDeVentaRepository->guarda($lineaDeVentaData->all());
             DB::commit();
 
+            $this->lineaDeVentaRepository->loadProductoRelationship($lineaDeVenta);
             $lineaDeVentaResource =  new LineaDeVentaResource($lineaDeVenta);
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Linea de venta creada exitosamente');       
@@ -94,7 +95,8 @@ class LineaDeVentaController extends Controller
                 $notFoundResource->notFound(['id'=>$id]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
-            $this->lineaDeVentaRepository->setModel($lineaDeVenta);
+            $this->lineaDeVentaRepository->loadProductoRelationship($lineaDeVenta);
+            // $this->lineaDeVentaRepository->setModel($lineaDeVenta);
            
             $lineaDeVentaResource =  new LineaDeVentaResource($lineaDeVenta);  
             $responseResourse = new ResponseResource(null);

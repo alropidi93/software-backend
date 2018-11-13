@@ -19,7 +19,6 @@ class LineaDeVentaResource extends JsonResource
             'attributes'    => [
                 'cantidad' => $this->cantidad,
                 'producto' => new ProductoResource($this->whenLoaded('producto')),
-                // 'comprobantePago' => new ComprobantePagoResource($this->whenLoaded('comprobantePago')),
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,

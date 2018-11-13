@@ -4,23 +4,52 @@ use App\Models\Boleta;
 use App\Models\PersonaNatural;
 use App\Models\ComprobantePago;
 use App\Http\Helpers\DateFormat;
-	
+use Illuminate\Support\Collection;
+    
+//CHECKED AGAINST USUARIO REPOSITORY
 class BoletaRepository extends BaseRepository {
     protected $comprobantePago;
+    protected $personaNatural; //cliente
+    protected $comprobantePagoRepository;
+    protected $lineaDeVentaRepository;
+    protected $lineasDeVenta;
 
-    public function __construct(Boleta $boleta=null, ComprobantePago $comprobantePago=null){
+    public function __construct(Boleta $boleta=null, ComprobantePago $comprobantePago=null, PersonaNatural $personaNatural=null, ComprobantePagoRepository $comprobantePagoRepository=null, LineaDeVentaRepository $lineaDeVentaRepository=null){
         $this->model = $boleta;
         $this->comprobantePago = $comprobantePago;
+        $this->personaNatural = $personaNatural;
+        $this->comprobantePagoRepository = $comprobantePagoRepository;
+        $this->lineaDeVentaRepository = $lineaDeVentaRepository;
+    }
+
+    public function setLineaDeVentaData($dataLineaDeVenta){
+        $this->comprobantePagoRepository->setLineaDeVentaData($dataLineaDeVenta);
+    }
+
+    public function attachLineaDeVentaWithOwnModels(){
+        $this->comprobantePagoRepository->attachLineaDeVentaWithOwnModels();
+    }
+
+    public function loadLineasDeVentaRelationship(){
+        $this->comprobantePagoRepository->loadLineasDeVentaRelationship();
     }
 
     protected function setComprobantePagoData($dataComprobantePago){
-        $this->comprobantePago['idCajero'] =  $dataComprobantePago['idCajero'];
+        $this->comprobantePago['idCajero'] = array_key_exists('idCajero',$dataComprobantePago)? $dataComprobantePago['idCajero']:null;
         $this->comprobantePago['subtotal'] =  $dataComprobantePago['subtotal'];
         $this->comprobantePago['deleted'] =  false; //default value
+        // $list = $dataComprobantePago['lineasDeVenta'];
+        // $this->$lineasDeVenta = $list;
+        //must save lineas de venta
+        // $list_collection = new Collection($list);
+        // foreach ($list_collection as $key => $elem) {
+        //     $this->comprobantePagoRepository->setLineaDeVentaData($elem);
+        //     $this->comprobantePagoRepository->attachLineaDeVentaWithOwnModels();
+        // }
     }
 
     protected function setBoletaData($dataBoleta){
-        $this->model['idCliente'] = $dataBoleta['idCliente'];
+        $this->model['idCliente'] = array_key_exists('idCliente',$dataBoleta)? $dataBoleta['idCliente']:null;
         $this->model['igv'] = $dataBoleta['igv'];
         $this->model['deleted'] =  false; //default value
     }
@@ -33,12 +62,21 @@ class BoletaRepository extends BaseRepository {
         return $comprobantePago->boleta()->save($boleta);
     }
 
+    public function getUsuarioById($idUsuario){
+        return $this->personaNatural->where('id',$idUsuario)->where('deleted',false)->first();
+    }
+
     public function guarda($dataArray){
-        $this->setComprobantePagoData($dataArray); //set data only in its ComprobantePago model
-        $this->saveComprobantePago(); //saving in database
-        $this->setBoletaData($dataArray);// set data only in its Usuario model
-        $this->attachBoletaToComprobantePago($this->comprobantePago,$this->model);
-        $this->model->comprobantePago;//loading comprobantePago
+        $dataArray['deleted'] =false;
+        return $this->model = $this->model->create($dataArray);
+        // $this->setComprobantePagoData($dataArray); //set data only in its ComprobantePago model
+        // $this->saveComprobantePago(); //saving in database
+        // $this->comprobantePagoRepository->setLineasDeVentaByOwnModel();
+        // $this->setBoletaData($dataArray);// set data only in its boleta model
+        // $this->attachBoletaToComprobantePago($this->comprobantePago,$this->model);
+        // $this->model->comprobantePago;//loading comprobantePago
+        // $dataArray['deleted'] =false;
+        // return $this->model = $this->model->create($dataArray);
     }
 
     public function actualiza($dataArray){
@@ -54,6 +92,18 @@ class BoletaRepository extends BaseRepository {
     //     if (array_key_exists('igv',$dataArray))
     //         $this->model->update($dataArray); //set data only in its PersonaNatural model
     // }
+
+    public function loadPersonaNaturalRelationship($personaNatural=null){
+        if (!$personaNatural){
+            $this->model->load(['personaNatural' => function ($query) {
+                $query->where('deleted', false);
+            }]);
+        }else{
+            $personaNatural->load(['personaNatural' => function ($query) {
+                $query->where('deleted', false);
+            }]);
+        }
+    }
 
     public function listarBoletas(){
         $lista = $this->model->where('deleted',false)->get();
@@ -73,6 +123,10 @@ class BoletaRepository extends BaseRepository {
         $this->comprobantePago = $comprobantePago;
     }
 
+    public function getComprobantePagoModel(){
+        return $this->comprobantePago;
+    }
+
     public function setModelBoleta($boleta){
         $this->model = $boleta;
         $comprobantePago = $boleta->comprobantePago;
@@ -80,29 +134,14 @@ class BoletaRepository extends BaseRepository {
             $this->comprobantePago =  $comprobantePago;
     }
 
+    public function setPersonaNaturalModel($personaNatural){
+        $this->personaNatural =  $personaNatural;
+    }
+
     public function softDelete(){
         $this->comprobatePago->deleted = true;
         $this->comprobatePago->save();
         $this->model->deleted = true;
         $this->model->save();
-    }
-
-    public function loadPersonaNaturalRelationship($boleta=null){
-        if (!$boleta){
-            $this->model = $this->model->load([
-                'personaNatural'=>function($query){
-                    $query->where('deleted', false); 
-                }
-            ]);
-        }else{       
-            $this->model =$boleta->load([
-                'personaNatural'=>function($query){
-                    $query->where('deleted', false); 
-                }
-            ]);
-        }
-        if ($this->model->personaNatural){
-            $this->personaNatural = $this->model->personaNatural;
-        }
     }
 }
