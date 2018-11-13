@@ -66,17 +66,19 @@ class BoletaRepository extends BaseRepository {
         return $this->personaNatural->where('id',$idUsuario)->where('deleted',false)->first();
     }
 
+    /**
+     * guarda los datos del comprobante de pago, pero queda pendiente guardar las lineas de venta que pertenecen
+     * al COMPROBANTE DE PAGO
+     */
     public function guarda($dataArray){
-        $dataArray['deleted'] =false;
-        return $this->model = $this->model->create($dataArray);
-        // $this->setComprobantePagoData($dataArray); //set data only in its ComprobantePago model
-        // $this->saveComprobantePago(); //saving in database
-        // $this->comprobantePagoRepository->setLineasDeVentaByOwnModel();
-        // $this->setBoletaData($dataArray);// set data only in its boleta model
-        // $this->attachBoletaToComprobantePago($this->comprobantePago,$this->model);
-        // $this->model->comprobantePago;//loading comprobantePago
         // $dataArray['deleted'] =false;
         // return $this->model = $this->model->create($dataArray);
+        $this->setComprobantePagoData($dataArray); //set data only in its ComprobantePago model
+        $this->saveComprobantePago(); //saving in database
+        // $this->comprobantePagoRepository->setLineasDeVentaByOwnModel();
+        $this->setBoletaData($dataArray);// set data only in its boleta model
+        $this->attachBoletaToComprobantePago($this->comprobantePago,$this->model);
+        $this->model->comprobantePago;//loading comprobantePago
     }
 
     public function actualiza($dataArray){
