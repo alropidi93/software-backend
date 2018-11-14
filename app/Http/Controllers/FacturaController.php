@@ -49,6 +49,7 @@ class FacturaController extends Controller
             $facturas = $this->facturaRepository->listarFacturas();
             foreach($facturas as $key => $factura){
                 $this->facturaRepository->loadPersonaJuridicaRelationship($factura);
+                $this->comprobantePagoRepository->loadCajeroRelationship($factura->comprobantePago);
                 $this->comprobantePagoRepository->loadLineasDeVentaRelationship($factura->comprobantePago);
             }
             $facturasResource =  new FacturasResource($facturas); 
@@ -150,6 +151,7 @@ class FacturaController extends Controller
             $this->facturaRepository->loadPersonaJuridicaRelationship(); //para su cliente
             $comprobantePago = $this->facturaRepository->obtenerComprobantePago();   
             $this->comprobantePagoRepository->setModel($comprobantePago); 
+            $this->comprobantePagoRepository->loadCajeroRelationship($factura->comprobantePago);
             $this->comprobantePagoRepository->loadLineasDeVentaRelationship();
             // $this->comprobantePagoRepository->loadLineasDeVentaRelationship();
             $facturaResource =  new FacturaResource($factura);  
