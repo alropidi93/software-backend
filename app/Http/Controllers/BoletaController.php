@@ -80,7 +80,8 @@ class BoletaController extends Controller
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
-            $idCliente = $boletaDataArray['idCliente'];
+            // $idCliente = $boletaDataArray['idCliente'];
+            $idCliente = array_key_exists('idCliente', $boletaDataArray)? $boletaDataArray['idCliente']:null;
             $personaNatural = $this->boletaRepository->getUsuarioById($idCliente);
             if($personaNatural){
                 $this->boletaRepository->setPersonaNaturalModel($personaNatural);
