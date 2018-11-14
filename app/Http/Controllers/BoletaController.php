@@ -50,6 +50,7 @@ class BoletaController extends Controller
             foreach($boletas as $key => $boleta){
                 $this->boletaRepository->loadPersonaNaturalRelationship($boleta);
                 // $comprobantePago = $this->boletaRepository->obtenerComprobantePago();
+                $this->comprobantePagoRepository->loadCajeroRelationship($boleta->comprobantePago);
                 $this->comprobantePagoRepository->loadLineasDeVentaRelationship($boleta->comprobantePago);
             }
             $boletasResource =  new BoletasResource($boletas); 
@@ -142,6 +143,7 @@ class BoletaController extends Controller
             $this->boletaRepository->loadPersonaNaturalRelationship();
 
             //se deben mostrar las lineas de venta del comprobante de pago que le pertenece a la boleta
+            $this->comprobantePagoRepository->loadCajeroRelationship($boleta->comprobantePago);
             $this->comprobantePagoRepository->loadLineasDeVentaRelationship($boleta->comprobantePago);
             
             $boletaResource =  new BoletaResource($boleta);  
