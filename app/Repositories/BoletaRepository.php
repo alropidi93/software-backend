@@ -148,4 +148,15 @@ class BoletaRepository extends BaseRepository {
         $this->model->deleted = true;
         $this->model->save();
     }
+    /*Alvaro's change*/
+    public function obtenerComprobantePago($boleta = null){
+        if ($boleta){
+            return $boleta->comprobantePago;
+        }
+        else{
+            return $this->model->comprobantePago;
+        }
+
+    }
+    /*Alvaro's change END*/
 }

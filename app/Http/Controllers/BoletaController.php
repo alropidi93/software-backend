@@ -90,13 +90,19 @@ class BoletaController extends Controller
             $this->boletaRepository->guarda($boletaDataArray); //aqui(im not sure) se envian las lineas para guardarlas en el comprobante de pago
             // $this->comprobantePagoRepository->guarda($boletaDataArray);
             $boleta = $this->boletaRepository->obtenerModelo();
-
+            /*Alvaro's change*/
+            $comprobantePago = $this->boletaRepository->obtenerComprobantePago();
+            /*Alvaro's change END*/
             $list = $boletaData['lineasDeVenta'];
             $list_collection = new Collection($list);
-            
+            /*Alvaro's change*/
+            $this->comprobantePagoRepository->setModel($comprobantePago); 
+            /*Alvaro's change END*/   
             foreach ($list_collection as $key => $elem) {
                 $this->comprobantePagoRepository->setLineaDeVentaData($elem);
                 $this->comprobantePagoRepository->attachLineaDeVentaWithOwnModels();
+                
+
                 // $this->boletaRepository->setLineaDeVentaData($elem); //it will call the same method but on comprobantePagoRepository
                 // $this->boletaRepository->attachLineaDeVentaWithOwnModels(); //it will also call the same method but on comprobantePagoRepository
             }
