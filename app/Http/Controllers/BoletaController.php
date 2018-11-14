@@ -49,6 +49,8 @@ class BoletaController extends Controller
             $boletas = $this->boletaRepository->listarBoletas();
             foreach($boletas as $key => $boleta){
                 $this->boletaRepository->loadPersonaNaturalRelationship($boleta);
+                $comprobantePago = $this->boletaRepository->obtenerComprobantePago();            
+                $this->comprobantePagoRepository->loadLineasDeVentaRelationship($comprobantePago);
             }
             $boletasResource =  new BoletasResource($boletas); 
             $responseResourse = new ResponseResource(null);
@@ -142,6 +144,7 @@ class BoletaController extends Controller
 
             $this->boletaRepository->setModelBoleta($boleta);
             $this->boletaRepository->loadPersonaNaturalRelationship(); //para su cliente
+            $this->comprobantePagoRepository->loadLineasDeVentaRelationship();
             // $this->comprobantePagoRepository->loadLineasDeVentaRelationship();
             $boletaResource =  new BoletaResource($boleta);  
             $responseResourse = new ResponseResource(null);
@@ -169,10 +172,10 @@ class BoletaController extends Controller
                 $notFoundResource->notFound(['id'=>$id]);
                 return $notFoundResource->response()->setStatusCode(404);;
             }
-            $this->boletaRepository->setModelboleta($boleta);
+            $this->boletaRepository->setModelBoleta($boleta);
             $this->boletaRepository->softDelete();
 
-            $responseResourse = new ResponseResource(null);
+            $responseResourse = new ResponseResource($boleta);
             $responseResourse->title('Boleta eliminada');  
             $responseResourse->body(['id' => $id]);
             DB::commit();

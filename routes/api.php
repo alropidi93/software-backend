@@ -34,6 +34,7 @@ Route::resource('clientesJuridicos', 'PersonaJuridicaController');
 Route::resource('comprobanteDePago', 'ComprobantePagoController');
 Route::resource('factura', 'FacturaController');
 Route::resource('boleta', 'BoletaController');
+Route::resource('cotizacion', 'CotizacionController');
 
 Route::get('busqueda/proveedores','ProveedorController@busquedaPorFiltro');
 Route::get('usuariosSinTipo', 'UsuarioController@listarUsuariosSinTipo');
