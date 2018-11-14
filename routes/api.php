@@ -42,6 +42,7 @@ Route::get('busqueda/proveedores','ProveedorController@busquedaPorFiltro');
 Route::get('usuariosSinTipo', 'UsuarioController@listarUsuariosSinTipo');
 Route::get('busqueda/productos', 'ProductoController@busquedaPorFiltro');
 Route::get('busqueda/tiendas', 'TiendaController@busquedaPorFiltro');
+Route::get('busqueda/cotizacionesPorDocumento','CotizacionController@busquedaPorDocumento');
 Route::post('asignarTipoUsuario/{idUsuario}', 'UsuarioController@asignarRol');
 
 
