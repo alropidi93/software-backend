@@ -36,6 +36,7 @@ Route::resource('factura', 'FacturaController');
 Route::resource('boleta', 'BoletaController');
 Route::resource('cotizacion', 'CotizacionController');
 
+Route::get('busqueda/clienteNaturalPorDni','PersonaNaturalController@busquedaPorDni');
 Route::get('busqueda/proveedores','ProveedorController@busquedaPorFiltro');
 Route::get('usuariosSinTipo', 'UsuarioController@listarUsuariosSinTipo');
 Route::get('busqueda/productos', 'ProductoController@busquedaPorFiltro');

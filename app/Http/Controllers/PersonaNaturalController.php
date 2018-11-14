@@ -191,4 +191,34 @@ class PersonaNaturalController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
     }
+
+    public function busquedaPorDni(){
+        try{
+            $filter = Input::get('filterBy');
+            $value = strtolower(Input::get('value'));
+            $responseResource = new ResponseResource(null);
+            if (!$filter || !$value){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de búsqueda');
+                $errorResource->message('Parámetros inválidos para la búsqueda');
+                return $errorResource->response()->setStatusCode(400);
+            }
+            switch ($filter) {
+                case 'dni':      
+                    $personasNaturales = $this->personaNaturalRepository->buscarPorFiltro($filter, $value); //busqueda generica en BaseRepository
+                    $personasNaturalesResource =  new PersonasNaturalesResource($personasNaturales);
+                    $responseResource->title('Clientes naturales encontrados por DNI');
+                    $responseResource->body($personasNaturalesResource);
+                    break;
+                default:
+                    $errorResource = new ErrorResource(null);
+                    $errorResource->title('Error de búsqueda');
+                    $errorResource->message('Valor de filtro inválido');
+                    return $errorResource->response()->setStatusCode(400);
+            }
+            return $responseResource; 
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
 }
