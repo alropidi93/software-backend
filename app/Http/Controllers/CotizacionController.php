@@ -168,5 +168,5 @@ class CotizacionController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
     }
-    }
+    
 }
