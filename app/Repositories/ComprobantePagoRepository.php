@@ -30,7 +30,7 @@ class ComprobantePagoRepository extends BaseRepository {
         $this->model->usuario()->associate($this->cajero);
         $this->model->save();
     }
-
+       
     public function loadCajeroRelationship($comprobantePago=null){
         if (!$comprobantePago){
             $this->model = $this->model->load([
