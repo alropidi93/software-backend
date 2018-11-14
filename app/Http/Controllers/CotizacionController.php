@@ -28,7 +28,6 @@ class CotizacionController extends Controller
     
     public function __construct(CotizacionRepository $cotizacionRepository, LineaDeVentaRepository $lineaDeVentaRepository){
         CotizacionResource::withoutWrapping();
-        // LineaDeVentaResource::withoutWrapping(); // no tiene similar en pedido trans contro
         $this->cotizacionRepository = $cotizacionRepository;
         $this->lineaDeVentaRepository = $lineaDeVentaRepository;
     }
@@ -66,6 +65,7 @@ class CotizacionController extends Controller
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
+            
             $idUsuario = array_key_exists('idCajero', $cotizacionData)? $cotizacionData['idCajero']:null;
             if($idUsuario){
                 $usuario = $this->cotizacionRepository->getUsuarioById($idUsuario);
@@ -93,6 +93,7 @@ class CotizacionController extends Controller
             
             $cotizacionCreada = $this->cotizacionRepository->obtenerModelo();
             $this->cotizacionRepository->loadLineasDeVentaRelationship($cotizacionCreada);
+            
             $this->cotizacionRepository->loadCajeroRelationship($cotizacionCreada);
                       
             $cotizacionResource =  new CotizacionResource($cotizacionCreada);

@@ -21,6 +21,10 @@ class LineaDeVenta extends Model
         return $this->belongsTo('App\Models\ComprobantePago','idComprobantePago','id');
     }
 
+    public function cotizacion(){
+        return $this->belongsTo('App\Models\Cotizacion', 'idCotizacion', 'id');
+    }
+
     public function producto() {
         return $this->belongsTo('App\Models\Producto','idProducto','id');
     }

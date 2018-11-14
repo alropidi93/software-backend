@@ -72,7 +72,8 @@ class ComprobantePagoController extends Controller
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
-            $idUsuario =  $comprobantePagoData['idUsuario']; //id del cajero en caso tenga
+            
+            $idUsuario = array_key_exists('idCajero', $comprobantePagoData)? $comprobantePagoData['idCajero']:null;
             if($idUsuario){
                 $usuario = $this->comprobantePagoRepository->getUsuarioById($idUsuario);
                 if (!$usuario){
