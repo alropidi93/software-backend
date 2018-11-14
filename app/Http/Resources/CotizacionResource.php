@@ -18,9 +18,11 @@ class CotizacionResource extends JsonResource
             'type'          => 'Cotizacion',
             'id'            => $this->id,
             'attributes'    => [
-                'cajero' => new UsuarioResource($this->whenLoaded('usuario')),
+                'nombre' => $this->nombre,
+                'documento' => $this->documento,
                 'subtotal' => $this->subtotal,
                 'lineasDeVenta' => new LineasDeVentaResource($this->whenLoaded('lineasDeVenta')),
+                'cajero' => new UsuarioResource($this->whenLoaded('usuario')),
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,

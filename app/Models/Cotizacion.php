@@ -13,6 +13,8 @@ class Cotizacion extends Model
       'id',
       'idCajero',
       'subtotal',
+      'nombre',
+      'documento',
       'deleted'     
     ];
 

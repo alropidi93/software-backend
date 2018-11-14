@@ -43,6 +43,7 @@ class CotizacionController extends Controller
             $cotizaciones = $this->cotizacionRepository->obtenerTodos();
             foreach ($cotizaciones as $key => $cotizacion) {
               $this->cotizacionRepository->loadLineasDeVentaRelationship($cotizacion);
+              $this->cotizacionRepository->loadCajeroRelationship($cotizacion);
             }
             $cotizacionesResource =  new CotizacionesResource($cotizaciones);  
             $responseResourse = new ResponseResource(null);
@@ -65,7 +66,7 @@ class CotizacionController extends Controller
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
-            $idUsuario =  $cotizacionData['idUsuario']; //id del cajero en caso tenga
+            $idUsuario = array_key_exists('idCajero', $cotizacionData)? $cotizacionData['idCajero']:null;
             if($idUsuario){
                 $usuario = $this->cotizacionRepository->getUsuarioById($idUsuario);
                 if (!$usuario){
@@ -92,6 +93,7 @@ class CotizacionController extends Controller
             
             $cotizacionCreada = $this->cotizacionRepository->obtenerModelo();
             $this->cotizacionRepository->loadLineasDeVentaRelationship($cotizacionCreada);
+            $this->cotizacionRepository->loadCajeroRelationship($cotizacionCreada);
                       
             $cotizacionResource =  new CotizacionResource($cotizacionCreada);
             $responseResourse = new ResponseResource(null);
@@ -123,6 +125,7 @@ class CotizacionController extends Controller
 
             $this->cotizacionRepository->setModel($cotizacion);
             $this->cotizacionRepository->loadLineasDeVentaRelationship(); //no tiene similar en pedido trans contr
+            $this->cotizacionRepository->loadCajeroRelationship($cotizacionCreada);
 
             $cotizacionResource =  new CotizacionResource($cotizacion);  
             $responseResourse = new ResponseResource(null);
