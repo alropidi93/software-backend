@@ -81,7 +81,7 @@ class ComprobantePagoController extends Controller
                     $notFoundResource->notFound(['id' => $idUsuario]);
                     return $notFoundResource->response()->setStatusCode(404);
                 }
-                $this->pedidoTransferenciaRepository->setUsuarioModel($usuario);
+                $this->comprobantePagoRepository->setUsuarioModel($usuario);
             }
             
             DB::beginTransaction();
