@@ -142,43 +142,35 @@ class CotizacionController extends Controller
     public function update($id,Request $cotizacionData)
     {
         try{
-            $cotizacionDataArray= Algorithm::quitNullValuesFromArray($cotizacionData->all());
-            if (array_key_exists('dni',$cotizacionData)){
-                $usuarioAux= $this->usuarioRepository->obtenerUsuarioPorDni($usuarioData['dni']);
-                if ($id != $usuarioDataAux->id){
-                    $validator = ['dni'=>'El dni ya está siendo usado por otro usuario'];
-                    return (new ValidationResource($validator))->response()->setStatusCode(422);
-                }
-            }
-    
-         
+            $cotizacionDataArray= Algorithm::quitNullValuesFromArray($cotizacionData->all());             
             DB::beginTransaction();
-            $usuario= $this->usuarioRepository->obtenerUsuarioPorId($id);
-            if (!$usuario){
+            $cotizacion= $this->cotizacionRepository->obtenerPorId($id);
+            if (!$cotizacion){
                 $notFoundResource = new NotFoundResource(null);
-                $notFoundResource->title('Usuario no encontrado');
+                $notFoundResource->title('Cotizacion no encontrada');
                 $notFoundResource->notFound(['id'=>$id]);
                 return $notFoundResource->response()->setStatusCode(404);
+            }            
+            $this->cotizacionRepository->setCotizacionModel($cotizacion);            
+            $this->cotizacionRepository->actualiza($cotizacionDataArray);            
+            $cotizacion = $this->cotizacionRepository->obtenerModelo();
+            $list = $cotizacionDataArray['lineasDeVenta'];
+            $list_collection = new Collection($list);
+
+            foreach ($list_collection as $key => $elem) {
+                $this->cotizacionRepository->setLineaDeVentaData($elem);
+                $this->cotizacionRepository->attachLineaDeVentaWithOwnModels();
             }
-            
-            $this->usuarioRepository->setModelUsuario($usuario);
-            
-            $this->usuarioRepository->actualiza($usuarioDataArray);
-            
-            $usuario = $this->usuarioRepository->obtenerModelo();
             DB::commit();
-            $this->usuarioRepository->loadTipoUsuarioRelationship();
-
-            $usuarioResource =  new UsuarioResource($usuario);
-            $responseResourse = new ResponseResource(null);
+            $this->cotizacionRepository->setModel($cotizacion);
+            $this->cotizacionRepository->loadLineasDeVentaRelationship();
+            $this->cotizacionRepository->loadCajeroRelationship($cotizacion);
+            $cotizacionResource =  new CotizacionResource($cotizacion);
+            $responseResourse = new ResponseResource(null);            
+            $responseResourse->title('Cotizacion actualizada exitosamente');       
+            $responseResourse->body($cotizacionResource);     
             
-            $responseResourse->title('Usuario actualizado exitosamente');       
-            $responseResourse->body($usuarioResource);     
-            
-            return $responseResourse;
-
-
-            
+            return $responseResourse;            
         }
         catch(\Exception $e){
             DB::rollback();
