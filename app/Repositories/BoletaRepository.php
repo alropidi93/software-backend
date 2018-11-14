@@ -59,44 +59,25 @@ class BoletaRepository extends BaseRepository {
         return $this->personaNatural->where('id',$idUsuario)->where('deleted',false)->first();
     }
 
-    /**
-     * guarda los datos del comprobante de pago, pero queda pendiente guardar las lineas de venta que pertenecen
-     * al COMPROBANTE DE PAGO
-     */
+   
     public function guarda($dataArray){
-        // $dataArray['deleted'] =false;
-        // return $this->model = $this->model->create($dataArray);
-        $this->setComprobantePagoData($dataArray); //set data only in its ComprobantePago model
-        $this->saveComprobantePago(); //saving in database
-        // $this->comprobantePagoRepository->setLineasDeVentaByOwnModel();
+        
+        $this->saveComprobantePago(); //saving in database        
         $this->setBoletaData($dataArray);// set data only in its boleta model
         $this->attachBoletaToComprobantePago($this->comprobantePago,$this->model);
         $this->model->comprobantePago;//loading comprobantePago
         $this->comprobantePagoRepository->setComprobantePagoModel($this->model->comprobantePago);
         $list = $dataArray['lineasDeVenta'];
-        //$this->$lineasDeVenta = $list;
-        //must save lineas de venta
-        $list_collection = new Collection($list);
-        foreach ($list_collection as $key => $elem) {
-             $this->comprobantePagoRepository->setLineaDeVentaData($elem);
-             $this->comprobantePagoRepository->attachLineaDeVentaWithOwnModels();
-        }
+        
     }
 
     public function actualiza($dataArray){
-        //persona natural no tiene atributos con el mismo nombre de atributos del usuario que se vayan a actualizar
-        //deleted, created_at y updated_at son comunes, pero estos jamas se actualizaran por acá
+        
         $this->comprobantePago->update($dataArray);
         $this->model->update($dataArray); //set data only in its ComprobantePago model
     }
 
-    // public function actualizaSoloBoleta($dataArray){
-    //     //persona natural no tiene atributos con el mismo nombre de atributos del usuario que se vayan a actualizar
-    //     //deleted, created_at y updated_at son comunes, pero estos jamas se actualizaran por acá
-    //     if (array_key_exists('igv',$dataArray))
-    //         $this->model->update($dataArray); //set data only in its PersonaNatural model
-    // }
-
+   
     public function loadPersonaNaturalRelationship($personaNatural=null){
         if (!$personaNatural){
             $this->model->load(['personaNatural' => function ($query) {
