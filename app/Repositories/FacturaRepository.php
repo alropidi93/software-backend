@@ -1,37 +1,49 @@
 <?php
 namespace App\Repositories;
 use App\Models\Factura;
+use App\Models\PersonaJuridica;
 use App\Models\ComprobantePago;
 use App\Http\Helpers\DateFormat;
-	
+use Illuminate\Support\Collection;
+    
+//CHECKED AGAINST USUARIO REPOSITORY
 class FacturaRepository extends BaseRepository {
-    /**
-     * The PersonaNatural instance.
-     *
-     * @var App\Models\PersonaNatural
-     */
     protected $comprobantePago;
+    protected $personaJuridica; //cliente
+    protected $comprobantePagoRepository;
+    protected $lineaDeVentaRepository;
+    protected $lineasDeVenta;
 
-    /**
-     * Create a new UsuarioRepository instance.
-     * @param  App\Models\Usuario $usuario
-     * @param  App\Models\PersonaNatural $personaNatural
-     * @param  App\Models\TipoUsuario $tipoUsuario
-     * @param  App\Models\Tienda $tienda
-     * @return void
-     */
-    public function __construct(Factura $factura=null, ComprobantePago $comprobantePago=null){
+    public function __construct(Factura $factura=null, ComprobantePago $comprobantePago=null, PersonaJuridica $personaJuridica=null, ComprobantePagoRepository $comprobantePagoRepository=null, LineaDeVentaRepository $lineaDeVentaRepository=null){
         $this->model = $factura;
         $this->comprobantePago = $comprobantePago;
+        $this->personaJuridica = $personaJuridica;
+        $this->comprobantePagoRepository = $comprobantePagoRepository;
+        $this->lineaDeVentaRepository = $lineaDeVentaRepository;
+    }
+
+    public function setLineaDeVentaData($dataLineaDeVenta){
+        $this->comprobantePagoRepository->setLineaDeVentaData($dataLineaDeVenta);
+    }
+
+    public function attachLineaDeVentaWithOwnModels(){
+        $this->comprobantePagoRepository->attachLineaDeVentaWithOwnModels();
+    }
+
+    public function loadLineasDeVentaRelationship(){
+        $this->comprobantePagoRepository->loadLineasDeVentaRelationship();
     }
 
     protected function setComprobantePagoData($dataComprobantePago){
+        $this->comprobantePago['idCajero'] = array_key_exists('idCajero',$dataComprobantePago)? $dataComprobantePago['idCajero']:null;
         $this->comprobantePago['subtotal'] =  $dataComprobantePago['subtotal'];
         $this->comprobantePago['deleted'] =  false; //default value
+       
     }
 
     protected function setFacturaData($dataFactura){
-        $this->model['igv'] =  $dataFactura['igv'];
+        $this->model['idCliente'] = array_key_exists('idCliente',$dataFactura)? $dataFactura['idCliente']:null;
+        $this->model['igv'] = $dataFactura['igv'];
         $this->model['deleted'] =  false; //default value
     }
 
@@ -43,29 +55,41 @@ class FacturaRepository extends BaseRepository {
         return $comprobantePago->factura()->save($factura);
     }
 
+    public function getUsuarioById($idUsuario){
+        return $this->personaJuridica->where('id',$idUsuario)->where('deleted',false)->first();
+    }
+
+   
     public function guarda($dataArray){
-        $this->setComprobantePagoData($dataArray); //set data only in its ComprobantePago model
-        $this->saveComprobantePago(); //saving in database
-        $this->setFacturaData($dataArray);// set data only in its Usuario model
+        
+        $this->saveComprobantePago(); //saving in database        
+        $this->setFacturaData($dataArray);// set data only in its boleta model
         $this->attachFacturaToComprobantePago($this->comprobantePago,$this->model);
         $this->model->comprobantePago;//loading comprobantePago
+        return $this->comprobantePagoRepository->setComprobantePagoModel($this->model->comprobantePago);
+        $list = $dataArray['lineasDeVenta'];
+        
     }
 
     public function actualiza($dataArray){
-        //persona natural no tiene atributos con el mismo nombre de atributos del usuario que se vayan a actualizar
-        //deleted, created_at y updated_at son comunes, pero estos jamas se actualizaran por acá
+        
         $this->comprobantePago->update($dataArray);
         $this->model->update($dataArray); //set data only in its ComprobantePago model
     }
 
-    // public function actualizaSoloBoleta($dataArray){
-    //     //persona natural no tiene atributos con el mismo nombre de atributos del usuario que se vayan a actualizar
-    //     //deleted, created_at y updated_at son comunes, pero estos jamas se actualizaran por acá
-    //     if (array_key_exists('igv',$dataArray))
-    //         $this->model->update($dataArray); //set data only in its PersonaNatural model
-    // }
+   
+    public function loadPersonaJuridicaRelationship($personaJuridica=null){
+        if (!$personaJuridica){
+            $this->model->load(['personaJuridica' => function ($query) {
+                $query->where('deleted', false);
+            }]);
+        }else{
+            $personaJuridica->load(['personaJuridica' => function ($query) {
+                $query->where('deleted', false);
+            }]);
+        }
+    }
 
-    
     public function listarFacturas(){
         $lista = $this->model->where('deleted',false)->get();
         foreach ($lista as $key => $factura) {
@@ -73,6 +97,7 @@ class FacturaRepository extends BaseRepository {
         }
         return $lista;
     }
+
     public function obtenerFacturaPorId($id){
         $factura = $this->model->where('idComprobantePago',$id)->where('deleted',false)->first();
         if($factura) $factura->comprobantePago;
@@ -83,68 +108,36 @@ class FacturaRepository extends BaseRepository {
         $this->comprobantePago = $comprobantePago;
     }
 
+    public function getComprobantePagoModel(){
+        return $this->comprobantePago;
+    }
+
     public function setModelFactura($factura){
         $this->model = $factura;
         $comprobantePago = $factura->comprobantePago;
         if($factura->comprobantePago)
             $this->comprobantePago =  $comprobantePago;
     }
-    
+
+    public function setPersonaJuridicaModel($personaJuridica){
+        $this->personaJuridica =  $personaJuridica;
+    }
+
     public function softDelete(){
         $this->comprobatePago->deleted = true;
         $this->comprobatePago->save();
         $this->model->deleted = true;
         $this->model->save();
     }
-
-    public function loadComprobantePagoRelationship($factura=null){
-    
-        if (!$factura){
-            $this->model = $this->model->load([
-                'comprobantePago'=>function($query){
-                    $query->where('deleted', false); 
-                },
-                'comprobantePago.usuario'=>function($query){
-                    $query->where('usuario.deleted', false); 
-                }
-            ]);
+    /*Alvaro's change*/
+    public function obtenerComprobantePago($factura = null){
+        if ($factura){
+            return $factura->comprobantePago;
         }
         else{
-            
-            $this->model =$factura->load([
-                'comprobantePago'=>function($query){
-                    $query->where('deleted', false); 
-                },
-                'comprobantePago.usuario'=>function($query){
-                    $query->where('usuario.deleted', false); 
-                }
-            ]);
+            return $this->model->comprobantePago;
         }
-        if ($this->model->comprobantePago){
-            $this->comprobantePago = $this->model->comprobantePago;
-        }
-    }
 
-    public function loadPersonaJuridicaRelationship($factura=null){
-    
-        if (!$factura){
-            $this->model = $this->model->load([
-                'personaJuridica'=>function($query){
-                    $query->where('deleted', false); 
-                }
-            ]);
-        }
-        else{
-            
-            $this->model =$factura->load([
-                'personaJuridica'=>function($query){
-                    $query->where('deleted', false); 
-                }
-            ]);
-        }
-        if ($this->model->personaJuridica){
-            $this->personaJuridica = $this->model->personaJuridica;
-        }
     }
-
+    /*Alvaro's change END*/
 }
