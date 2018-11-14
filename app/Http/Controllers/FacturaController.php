@@ -49,8 +49,7 @@ class FacturaController extends Controller
             $facturas = $this->facturaRepository->listarFacturas();
             foreach($facturas as $key => $factura){
                 $this->facturaRepository->loadPersonaJuridicaRelationship($factura);
-                $comprobantePago = $this->facturaRepository->obtenerComprobantePago();   
-                $this->comprobantePagoRepository->loadLineasDeVentaRelationship();
+                $this->comprobantePagoRepository->loadLineasDeVentaRelationship($factura->comprobantePago);
             }
             $facturasResource =  new FacturasResource($facturas); 
             $responseResourse = new ResponseResource(null);

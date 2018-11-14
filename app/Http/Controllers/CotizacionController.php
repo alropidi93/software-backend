@@ -139,7 +139,54 @@ class CotizacionController extends Controller
     }
 
     
+    public function update($id,Request $cotizacionData)
+    {
+        try{
+            $cotizacionDataArray= Algorithm::quitNullValuesFromArray($cotizacionData->all());
+            if (array_key_exists('dni',$cotizacionData)){
+                $usuarioAux= $this->usuarioRepository->obtenerUsuarioPorDni($usuarioData['dni']);
+                if ($id != $usuarioDataAux->id){
+                    $validator = ['dni'=>'El dni ya está siendo usado por otro usuario'];
+                    return (new ValidationResource($validator))->response()->setStatusCode(422);
+                }
+            }
     
+         
+            DB::beginTransaction();
+            $usuario= $this->usuarioRepository->obtenerUsuarioPorId($id);
+            if (!$usuario){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Usuario no encontrado');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            
+            $this->usuarioRepository->setModelUsuario($usuario);
+            
+            $this->usuarioRepository->actualiza($usuarioDataArray);
+            
+            $usuario = $this->usuarioRepository->obtenerModelo();
+            DB::commit();
+            $this->usuarioRepository->loadTipoUsuarioRelationship();
+
+            $usuarioResource =  new UsuarioResource($usuario);
+            $responseResourse = new ResponseResource(null);
+            
+            $responseResourse->title('Usuario actualizado exitosamente');       
+            $responseResourse->body($usuarioResource);     
+            
+            return $responseResourse;
+
+
+            
+        }
+        catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+        
+    }
 
     
     /**
