@@ -61,7 +61,7 @@ class BoletaRepository extends BaseRepository {
 
    
     public function guarda($dataArray){
-        
+        $this->setComprobantePagoData($dataArray);
         $this->saveComprobantePago(); //saving in database        
         $this->setBoletaData($dataArray);// set data only in its boleta model
         $this->attachBoletaToComprobantePago($this->comprobantePago,$this->model);

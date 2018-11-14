@@ -228,7 +228,7 @@ class PedidoTransferenciaController extends Controller {
                 return $notFoundResource->response()->setStatusCode(404);
             }
                     
-
+            
             $almacen = $this->pedidoTransferenciaRepository->getAlmacenById($data['idAlmacen']);
             
             if (!$almacen){

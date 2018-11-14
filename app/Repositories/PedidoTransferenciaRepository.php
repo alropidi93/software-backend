@@ -230,14 +230,20 @@ class PedidoTransferenciaRepository extends BaseRepository {
 
     public function getAlmacenById($idAlmacen){
         
-        return $this->almacen->where('id',$idAlmacen)->where('deleted',false)
-        ->where(function($query){
-            $query->where('nombre','<>','Central')
-            ->whereHas('tienda',function($q){
-                $q->where('tienda.deleted',false);
-            });
-        })->orWhere('nombre','Central')
-        ->first();
+        $almacenCentral = $this->getAlmacenCentral();
+        if ($idAlmacen == $almacenCentral->id){
+            return $almacenCentral;
+        }
+        else{
+            
+            return $this->almacen->where('id',$idAlmacen)->where('deleted',false)
+                ->whereHas('tienda',function($q){
+                    $q->where('tienda.deleted',false);
+                })->first();
+
+        }
+      
+      
     }
 
     
