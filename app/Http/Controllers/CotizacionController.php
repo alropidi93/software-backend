@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\ComprobantePago;
+use App\Models\Cotizacion;
 use App\Models\Usuario;
-use App\Repositories\ComprobantePagoRepository;
+use App\Repositories\CotizacionRepository;
 use App\Repositories\LineaDeVentaRepository;
 use App\Repositories\UsuarioRepository;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ComprobantePagoResource;
-use App\Http\Resources\ComprobantesPagoResource;
+use App\Http\Resources\CotizacionResource;
+use App\Http\Resources\CotizacionesResource;
 use App\Http\Resources\ExceptionResource;
 use App\Http\Resources\ValidationResource;
 use App\Http\Resources\ResponseResource;
@@ -26,7 +26,7 @@ class CotizacionController extends Controller
     protected $cotizacionRepository;
     protected $lineasDeVenta;
     
-    public function __construct(ComprobantePagoRepository $cotizacionRepository, LineaDeVentaRepository $lineaDeVentaRepository){
+    public function __construct(CotizacionRepository $cotizacionRepository, LineaDeVentaRepository $lineaDeVentaRepository){
         CotizacionResource::withoutWrapping();
         // LineaDeVentaResource::withoutWrapping(); // no tiene similar en pedido trans contro
         $this->cotizacionRepository = $cotizacionRepository;
@@ -47,7 +47,7 @@ class CotizacionController extends Controller
             $cotizacionesResource =  new CotizacionesResource($cotizaciones);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de cotizaciones');  
-            $responseResourse->body($comprobantesPagoResource);
+            $responseResourse->body($cotizacionesResource);
             return $responseResourse;
         }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);
@@ -55,7 +55,7 @@ class CotizacionController extends Controller
     }
 
     
-    public function store(Request $request)
+    public function store(Request $cotizacionData)
     {
         try{
             $validator = \Validator::make($cotizacionData->all(), 
@@ -91,12 +91,12 @@ class CotizacionController extends Controller
             DB::commit();
             
             $cotizacionCreada = $this->cotizacionRepository->obtenerModelo();
-            $this->cotizacionRepository->loadLineasDeVentaRelationship($comprobantePagoCreado);
+            $this->cotizacionRepository->loadLineasDeVentaRelationship($cotizacionCreada);
                       
             $cotizacionResource =  new CotizacionResource($cotizacionCreada);
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Cotizacion creada exitosamente');       
-            $responseResourse->body($comprobantePagoResource);       
+            $responseResourse->body($cotizacionResource);       
             return $responseResourse;
         }catch(\Exception $e){
             DB::rollback();
@@ -124,7 +124,7 @@ class CotizacionController extends Controller
             $this->cotizacionRepository->setModel($cotizacion);
             $this->cotizacionRepository->loadLineasDeVentaRelationship(); //no tiene similar en pedido trans contr
 
-            $cotizacionResource =  new ComprobantePagoResource($cotizacion);  
+            $cotizacionResource =  new CotizacionResource($cotizacion);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Mostrar cotizacion');  
             $responseResourse->body($cotizacionResource);
