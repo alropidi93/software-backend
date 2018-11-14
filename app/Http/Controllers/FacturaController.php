@@ -81,7 +81,8 @@ class FacturaController extends Controller
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
-            $idCliente = $facturaDataArray['idCliente'];
+            //$idCliente = $facturaDataArray['idCliente'];
+            $idCliente = array_key_exists('idCliente', $facturaDataArray)? $facturaDataArray['idCliente']:null;
             $personaJuridica = $this->facturaRepository->getUsuarioById($idCliente);
            
             if($personaJuridica){

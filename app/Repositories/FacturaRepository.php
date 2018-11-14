@@ -61,7 +61,7 @@ class FacturaRepository extends BaseRepository {
 
    
     public function guarda($dataArray){
-        
+        $this->setComprobantePagoData($dataArray);
         $this->saveComprobantePago(); //saving in database        
         $this->setFacturaData($dataArray);// set data only in its boleta model
         $this->attachFacturaToComprobantePago($this->comprobantePago,$this->model);
