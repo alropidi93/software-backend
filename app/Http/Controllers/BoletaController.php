@@ -49,8 +49,8 @@ class BoletaController extends Controller
             $boletas = $this->boletaRepository->listarBoletas();
             foreach($boletas as $key => $boleta){
                 $this->boletaRepository->loadPersonaNaturalRelationship($boleta);
-                $comprobantePago = $this->boletaRepository->obtenerComprobantePago();            
-                $this->comprobantePagoRepository->loadLineasDeVentaRelationship($comprobantePago);
+                // $comprobantePago = $this->boletaRepository->obtenerComprobantePago();
+                $this->comprobantePagoRepository->loadLineasDeVentaRelationship($boleta->comprobantePago);
             }
             $boletasResource =  new BoletasResource($boletas); 
             $responseResourse = new ResponseResource(null);
@@ -80,7 +80,8 @@ class BoletaController extends Controller
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
-            // $idCliente = $boletaDataArray['idCliente'];
+
+            //idCliente no es obligatorio pero hay que verificar si existe en el request enviado
             $idCliente = array_key_exists('idCliente', $boletaDataArray)? $boletaDataArray['idCliente']:null;
             $personaNatural = $this->boletaRepository->getUsuarioById($idCliente);
             if($personaNatural){
@@ -90,8 +91,7 @@ class BoletaController extends Controller
             }
 
             DB::beginTransaction();
-            $this->boletaRepository->guarda($boletaDataArray); //aqui(im not sure) se envian las lineas para guardarlas en el comprobante de pago
-            // $this->comprobantePagoRepository->guarda($boletaDataArray);
+            $this->boletaRepository->guarda($boletaDataArray);
             $boleta = $this->boletaRepository->obtenerModelo();
             /*Alvaro's change*/
             $comprobantePago = $this->boletaRepository->obtenerComprobantePago();
@@ -104,16 +104,11 @@ class BoletaController extends Controller
             foreach ($list_collection as $key => $elem) {
                 $this->comprobantePagoRepository->setLineaDeVentaData($elem);
                 $this->comprobantePagoRepository->attachLineaDeVentaWithOwnModels();
-                
-
-                // $this->boletaRepository->setLineaDeVentaData($elem); //it will call the same method but on comprobantePagoRepository
-                // $this->boletaRepository->attachLineaDeVentaWithOwnModels(); //it will also call the same method but on comprobantePagoRepository
             }
             DB::commit();
             
             $this->boletaRepository->loadPersonaNaturalRelationship();
             $this->comprobantePagoRepository->loadLineasDeVentaRelationship();
-            // $this->boletaRepository->loadLineasDeVentaRelationship();
             $boletaCreated = $this->boletaRepository->obtenerModelo();
             $boletaResource =  new BoletaResource($boletaCreated);
             $responseResourse = new ResponseResource(null);
@@ -144,9 +139,11 @@ class BoletaController extends Controller
             }
 
             $this->boletaRepository->setModelBoleta($boleta);
-            $this->boletaRepository->loadPersonaNaturalRelationship(); //para su cliente
-            $this->comprobantePagoRepository->loadLineasDeVentaRelationship();
-            // $this->comprobantePagoRepository->loadLineasDeVentaRelationship();
+            $this->boletaRepository->loadPersonaNaturalRelationship();
+
+            //se deben mostrar las lineas de venta del comprobante de pago que le pertenece a la boleta
+            $this->comprobantePagoRepository->loadLineasDeVentaRelationship($boleta->comprobantePago);
+            
             $boletaResource =  new BoletaResource($boleta);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Mostrar boleta');  
@@ -187,3 +184,26 @@ class BoletaController extends Controller
         }
     }
 }
+
+
+/*
+                   ▄              ▄
+                  ▌▒█           ▄▀▒▌
+                  ▌▒▒█        ▄▀▒▒▒▐
+                 ▐▄▀▒▒▀▀▀▀▄▄▄▀▒▒▒▒▒▐
+               ▄▄▀▒░▒▒▒▒▒▒▒▒▒█▒▒▄█▒▐
+             ▄▀▒▒▒░░░▒▒▒░░░▒▒▒▀██▀▒▌
+            ▐▒▒▒▄▄▒▒▒▒░░░▒▒▒▒▒▒▒▀▄▒▒▌
+            ▌░░▌█▀▒▒▒▒▒▄▀█▄▒▒▒▒▒▒▒█▒▐
+           ▐░░░▒▒▒▒▒▒▒▒▌██▀▒▒░░░▒▒▒▀▄▌
+           ▌░▒▄██▄▒▒▒▒▒▒▒▒▒░░░░░░▒▒▒▒▌
+          ▌▒▀▐▄█▄█▌▄░▀▒▒░░░░░░░░░░▒▒▒▐
+          ▐▒▒▐▀▐▀▒░▄▄▒▄▒▒▒▒▒▒░▒░▒░▒▒▒▒▌
+          ▐▒▒▒▀▀▄▄▒▒▒▄▒▒▒▒▒▒▒▒░▒░▒░▒▒▐
+           ▌▒▒▒▒▒▒▀▀▀▒▒▒▒▒▒░▒░▒░▒░▒▒▒▌
+           ▐▒▒▒▒▒▒▒▒▒▒▒▒▒▒░▒░▒░▒▒▄▒▒▐
+            ▀▄▒▒▒▒▒▒▒▒▒▒▒░▒░▒░▒▄▒▒▒▒▌
+              ▀▄▒▒▒▒▒▒▒▒▒▒▄▄▄▀▒▒▒▒▄▀
+                ▀▄▄▄▄▄▄▀▀▀▒▒▒▒▒▄▄▀
+                   ▒▒▒▒▒▒▒▒▒▒▀▀
+ */
