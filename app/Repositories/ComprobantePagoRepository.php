@@ -86,6 +86,7 @@ class ComprobantePagoRepository extends BaseRepository {
     }
 
     public function attachLineaDeVentaWithOwnModels(){
+        
         $ans = $this->model->lineasDeVenta()->save($this->lineaDeVenta);
     }
 
