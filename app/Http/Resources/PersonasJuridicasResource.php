@@ -15,7 +15,7 @@ class PersonasJuridicasResource extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'lista Personas Juridicas' => PersonaJuridicaResource::collection($this->collection),
+            'listaPersonasJuridicas' => PersonaJuridicaResource::collection($this->collection),
         ];
     }
 }

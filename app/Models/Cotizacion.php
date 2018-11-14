@@ -24,6 +24,6 @@ class Cotizacion extends Model
       
     
     public function lineasDeVenta() {
-      return $this->hasMany('App\Models\LineaDeVenta','idComprobantePago','id');
+      return $this->hasMany('App\Models\LineaDeVenta','idCotizacion','id'); //TAMARE LE PUSE EL ID EQUIVOCADO
     } 
 }

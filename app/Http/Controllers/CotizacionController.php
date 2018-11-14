@@ -125,8 +125,8 @@ class CotizacionController extends Controller
             }
 
             $this->cotizacionRepository->setModel($cotizacion);
-            $this->cotizacionRepository->loadLineasDeVentaRelationship(); //no tiene similar en pedido trans contr
-            $this->cotizacionRepository->loadCajeroRelationship($cotizacionCreada);
+            $this->cotizacionRepository->loadLineasDeVentaRelationship();
+            $this->cotizacionRepository->loadCajeroRelationship($cotizacion);
 
             $cotizacionResource =  new CotizacionResource($cotizacion);  
             $responseResourse = new ResponseResource(null);

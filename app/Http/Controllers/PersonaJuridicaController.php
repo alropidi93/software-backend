@@ -161,4 +161,34 @@ class PersonaJuridicaController extends Controller
         }
     }
 
+    public function busquedaPorRuc(){
+        try{
+            $filter = Input::get('filterBy');
+            $value = strtolower(Input::get('value'));
+            $responseResource = new ResponseResource(null);
+            if (!$filter || !$value){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de búsqueda');
+                $errorResource->message('Parámetros inválidos para la búsqueda');
+                return $errorResource->response()->setStatusCode(400);
+            }
+            switch ($filter) {
+                case 'ruc':
+                    $personasJuridicas = $this->personaJuridicaRepository->buscarPorFiltro($filter, $value); //busqueda generica en BaseRepository
+                    $personasJuridicasResource =  new PersonasJuridicasResource($personasJuridicas);
+                    $responseResource->title('Clientes jurídicos encontrados por RUC');
+                    $responseResource->body($personasJuridicasResource);
+                    break;
+                default:
+                    $errorResource = new ErrorResource(null);
+                    $errorResource->title('Error de búsqueda');
+                    $errorResource->message('Valor de filtro inválido');
+                    return $errorResource->response()->setStatusCode(400);
+            }
+            return $responseResource; 
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+
 } 
