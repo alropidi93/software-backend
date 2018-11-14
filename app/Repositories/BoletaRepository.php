@@ -38,14 +38,7 @@ class BoletaRepository extends BaseRepository {
         $this->comprobantePago['idCajero'] = array_key_exists('idCajero',$dataComprobantePago)? $dataComprobantePago['idCajero']:null;
         $this->comprobantePago['subtotal'] =  $dataComprobantePago['subtotal'];
         $this->comprobantePago['deleted'] =  false; //default value
-        // $list = $dataComprobantePago['lineasDeVenta'];
-        // $this->$lineasDeVenta = $list;
-        //must save lineas de venta
-        // $list_collection = new Collection($list);
-        // foreach ($list_collection as $key => $elem) {
-        //     $this->comprobantePagoRepository->setLineaDeVentaData($elem);
-        //     $this->comprobantePagoRepository->attachLineaDeVentaWithOwnModels();
-        // }
+       
     }
 
     protected function setBoletaData($dataBoleta){
@@ -79,6 +72,15 @@ class BoletaRepository extends BaseRepository {
         $this->setBoletaData($dataArray);// set data only in its boleta model
         $this->attachBoletaToComprobantePago($this->comprobantePago,$this->model);
         $this->model->comprobantePago;//loading comprobantePago
+        $this->comprobantePagoRepository->setComprobantePagoModel($this->model->comprobantePago);
+        $list = $dataArray['lineasDeVenta'];
+        //$this->$lineasDeVenta = $list;
+        //must save lineas de venta
+        $list_collection = new Collection($list);
+        foreach ($list_collection as $key => $elem) {
+             $this->comprobantePagoRepository->setLineaDeVentaData($elem);
+             $this->comprobantePagoRepository->attachLineaDeVentaWithOwnModels();
+        }
     }
 
     public function actualiza($dataArray){
