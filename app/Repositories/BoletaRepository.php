@@ -43,7 +43,7 @@ class BoletaRepository extends BaseRepository {
 
     protected function setBoletaData($dataBoleta){
         $this->model['idCliente'] = array_key_exists('idCliente',$dataBoleta)? $dataBoleta['idCliente']:null;
-        $this->model['igv'] = $dataBoleta['igv'];
+        $this->model['igv'] = array_key_exists('igv', $dataBoleta)? $dataBoleta['igv']:null;
         $this->model['deleted'] =  false; //default value
     }
 
@@ -59,6 +59,10 @@ class BoletaRepository extends BaseRepository {
         return $this->personaNatural->where('id',$idUsuario)->where('deleted',false)->first();
     }
 
+    public function obtenerBoletaId($id){
+        return $this->model->where('idComprobantePago',$id)->where('deleted',false)->first();
+    }
+
    
     public function guarda($dataArray){
         $this->setComprobantePagoData($dataArray);
@@ -67,12 +71,10 @@ class BoletaRepository extends BaseRepository {
         $this->attachBoletaToComprobantePago($this->comprobantePago,$this->model);
         $this->model->comprobantePago;//loading comprobantePago
         $this->comprobantePagoRepository->setComprobantePagoModel($this->model->comprobantePago);
-        $list = $dataArray['lineasDeVenta'];
-        
     }
 
     public function actualiza($dataArray){
-        
+        $this->setBoletaData($dataArray);
         $this->comprobantePago->update($dataArray);
         $this->model->update($dataArray); //set data only in its ComprobantePago model
     }
@@ -88,6 +90,11 @@ class BoletaRepository extends BaseRepository {
                 $query->where('deleted', false);
             }]);
         }
+    }
+
+    public function attachPersonaNatural(){
+        $this->model->personaNatural()->associate($this->personaNatural);
+        $this->model->save();
     }
 
     public function listarBoletas(){

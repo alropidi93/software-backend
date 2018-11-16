@@ -44,6 +44,7 @@ Route::get('busqueda/productos', 'ProductoController@busquedaPorFiltro');
 Route::get('busqueda/tiendas', 'TiendaController@busquedaPorFiltro');
 Route::post('asignarTipoUsuario/{idUsuario}', 'UsuarioController@asignarRol');
 
+Route::post('boleta/asignarCliente/{idComprobantePago}', 'BoletaController@asignarCliente');
 
 Route::post('tienda/asignarJefeAlmacen/{idTienda}', 'TiendaController@asignarJefeDeAlmacen');
 Route::post('tienda/desasignarJefeAlmacen/{idTienda}' , 'TiendaController@desasignarJefeDeAlmacen');

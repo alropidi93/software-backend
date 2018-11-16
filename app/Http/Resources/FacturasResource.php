@@ -15,7 +15,7 @@ class FacturasResource extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'Facturas' => FacturaResource::collection($this->collection),
+            'facturas' => FacturaResource::collection($this->collection),
         ];
     }
 }

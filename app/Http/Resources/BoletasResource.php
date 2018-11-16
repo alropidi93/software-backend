@@ -15,7 +15,7 @@ class BoletasResource extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'Boletas' => BoletaResource::collection($this->collection),
+            'boletas' => BoletaResource::collection($this->collection),
         ];
     }
 }

@@ -16,9 +16,11 @@ use App\Http\Resources\ValidationResource;
 use App\Http\Resources\ResponseResource;
 use App\Models\Boleta;
 use App\Models\LineaDeVenta;
+use App\Models\PersonaNatural;
 use App\Repositories\BoletaRepository;
 use App\Repositories\ComprobantePagoRepository;
 use App\Repositories\LineaDeVentaRepository;
+use App\Repositories\PersonaNaturalRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Helpers\Algorithm;
@@ -153,6 +155,48 @@ class BoletaController extends Controller
             return $responseResourse;
         }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
+    }
+
+    public function asignarCliente($idComprobantePago, Request $data){
+        try{
+            DB::beginTransaction();
+            $boleta = $this->boletaRepository->obtenerBoletaPorId($idComprobantePago);
+            
+            if (!$boleta){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Boleta no encontrada');
+                $notFoundResource->notFound(['id' => $idComprobantePago]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+
+            $personaNaturalRepository =  new PersonaNaturalRepository(new PersonaNatural);
+            $idCliente = $data['idCliente'];
+            $personaNatural =  $personaNaturalRepository->obtenerPorId($idCliente);
+            
+            if (!$personaNatural){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Cliente no encontrado');
+                $notFoundResource->notFound(['idCliente' => $idCliente]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            
+            $this->boletaRepository->setModel($boleta);
+            $this->boletaRepository->setPersonaNaturalModel($personaNatural);
+            $this->boletaRepository->loadPersonaNaturalRelationship();    
+            $this->boletaRepository->attachPersonaNatural();
+            DB::commit();
+            
+            $boleta =  $this->boletaRepository->obtenerModelo();
+          
+            $boletaResource =  new BoletaResource($boleta);  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Cliente asignado satisfactoriamente');  
+            $responseResourse->body($boletaResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
     }
 
