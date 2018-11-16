@@ -13,6 +13,8 @@ class ComprobantePago extends Model
       'id',
       'idCajero',
       'subtotal',
+      'entrega',
+      'fechaEnt',
       'deleted'     
     ];
 
