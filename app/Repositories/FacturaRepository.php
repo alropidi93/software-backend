@@ -4,6 +4,7 @@ use App\Models\Factura;
 use App\Models\PersonaJuridica;
 use App\Models\ComprobantePago;
 use App\Http\Helpers\DateFormat;
+use App\Http\Helpers\Algorithm;
 use Illuminate\Support\Collection;
     
 //CHECKED AGAINST USUARIO REPOSITORY
@@ -35,7 +36,10 @@ class FacturaRepository extends BaseRepository {
     }
 
     protected function setComprobantePagoData($dataComprobantePago){
+        $dataComprobantePago= Algorithm::quitNullValuesFromArray($dataComprobantePago);
         $this->comprobantePago['idCajero'] = array_key_exists('idCajero',$dataComprobantePago)? $dataComprobantePago['idCajero']:null;
+        $this->comprobantePago['entrega'] = array_key_exists('entrega',$dataComprobantePago)? $dataComprobantePago['entrega']:true;
+        $this->comprobantePago['fechaEnt'] = array_key_exists('fechaEnt',$dataComprobantePago)? $dataComprobantePago['fechaEnt']:null;
         $this->comprobantePago['subtotal'] =  $dataComprobantePago['subtotal'];
         $this->comprobantePago['deleted'] =  false; //default value
        
