@@ -18,6 +18,7 @@ use App\Models\Factura;
 use App\Models\LineaDeVenta;
 use App\Repositories\FacturaRepository;
 use App\Repositories\ComprobantePagoRepository;
+use App\Repositories\PersonaJuridicaRepository;
 use App\Repositories\LineaDeVentaRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -161,6 +162,47 @@ class FacturaController extends Controller
             return $responseResourse;
         }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
+    }
+    public function asignarCliente($idComprobantePago, Request $data){
+        try{
+            DB::beginTransaction();
+            $factura = $this->facturaRepository->obtenerFacturaPorId($idComprobantePago);
+            
+            if (!$factura){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Factura no encontrada');
+                $notFoundResource->notFound(['id' => $idComprobantePago]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+
+            $personaJuridicaRepository =  new PersonaJuridicaRepository(new PersonaJuridica);
+            $idCliente = $data['idCliente'];
+            $personaJuridica =  $personaJuridicaRepository->obtenerPorId($idCliente);
+            
+            if (!$personaJuridica){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Cliente no encontrado');
+                $notFoundResource->notFound(['idCliente' => $idCliente]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            
+            $this->facturaRepository->setModel($factura);
+            $this->facturaRepository->setPersonaJuridicaModel($personaJuridica);
+            $this->facturaRepository->loadPersonaJuridicaRelationship();    
+            $this->facturaRepository->attachPersonaJuridica();
+            DB::commit();
+            
+            $factura =  $this->facturaRepository->obtenerModelo();
+          
+            $facturaResource =  new FacturaResource($factura);  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Cliente asignado satisfactoriamente');  
+            $responseResourse->body($facturaResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
     }
 

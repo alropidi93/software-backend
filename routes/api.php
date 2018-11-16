@@ -46,6 +46,7 @@ Route::get('busqueda/cotizacionesPorDocumento','CotizacionController@busquedaPor
 Route::post('asignarTipoUsuario/{idUsuario}', 'UsuarioController@asignarRol');
 
 Route::post('boleta/asignarCliente/{idComprobantePago}', 'BoletaController@asignarCliente');
+Route::post('factura/asignarCliente/{idComprobantePago}', 'FacturaController@asignarCliente');
 
 Route::post('tienda/asignarJefeAlmacen/{idTienda}', 'TiendaController@asignarJefeDeAlmacen');
 Route::post('tienda/desasignarJefeAlmacen/{idTienda}' , 'TiendaController@desasignarJefeDeAlmacen');
