@@ -4,6 +4,7 @@ use App\Models\Factura;
 use App\Models\PersonaJuridica;
 use App\Models\ComprobantePago;
 use App\Http\Helpers\DateFormat;
+use App\Http\Helpers\Algorithm;
 use Illuminate\Support\Collection;
     
 //CHECKED AGAINST USUARIO REPOSITORY
@@ -35,7 +36,10 @@ class FacturaRepository extends BaseRepository {
     }
 
     protected function setComprobantePagoData($dataComprobantePago){
+        $dataComprobantePago= Algorithm::quitNullValuesFromArray($dataComprobantePago);
         $this->comprobantePago['idCajero'] = array_key_exists('idCajero',$dataComprobantePago)? $dataComprobantePago['idCajero']:null;
+        $this->comprobantePago['entrega'] = array_key_exists('entrega',$dataComprobantePago)? $dataComprobantePago['entrega']:true;
+        $this->comprobantePago['fechaEnt'] = array_key_exists('fechaEnt',$dataComprobantePago)? $dataComprobantePago['fechaEnt']:null;
         $this->comprobantePago['subtotal'] =  $dataComprobantePago['subtotal'];
         $this->comprobantePago['deleted'] =  false; //default value
        
@@ -43,7 +47,7 @@ class FacturaRepository extends BaseRepository {
 
     protected function setFacturaData($dataFactura){
         $this->model['idCliente'] = array_key_exists('idCliente',$dataFactura)? $dataFactura['idCliente']:null;
-        $this->model['igv'] = $dataFactura['igv'];
+        $this->model['igv'] = array_key_exists('igv', $dataFactura)? $dataFactura['igv']:null;
         $this->model['deleted'] =  false; //default value
     }
 
@@ -63,21 +67,25 @@ class FacturaRepository extends BaseRepository {
     public function guarda($dataArray){
         $this->setComprobantePagoData($dataArray);
         $this->saveComprobantePago(); //saving in database        
-        $this->setFacturaData($dataArray);// set data only in its boleta model
+        $this->setFacturaData($dataArray);
         $this->attachFacturaToComprobantePago($this->comprobantePago,$this->model);
         $this->model->comprobantePago;//loading comprobantePago
         return $this->comprobantePagoRepository->setComprobantePagoModel($this->model->comprobantePago);
-        $list = $dataArray['lineasDeVenta'];
+        
         
     }
 
     public function actualiza($dataArray){
-        
+        $this->setFacturaData($dataArray);
         $this->comprobantePago->update($dataArray);
         $this->model->update($dataArray); //set data only in its ComprobantePago model
     }
 
-   
+    public function attachPersonaJuridica(){
+        $this->model->personaJuridica()->associate($this->personaJuridica);
+        $this->model->save();
+    }
+
     public function loadPersonaJuridicaRelationship($personaJuridica=null){
         if (!$personaJuridica){
             $this->model->load(['personaJuridica' => function ($query) {
