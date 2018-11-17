@@ -39,6 +39,7 @@ class UsuarioRepository extends BaseRepository {
         $this->personaNatural['email'] =  $dataPersona['email'];
         $this->personaNatural['fechaNac'] =  DateFormat::spanishDateToEnglishDate($dataPersona['fechaNac']);
         $this->personaNatural['direccion'] =  $dataPersona['direccion'];
+        $this->personaNatural['telefono'] = array_key_exists('telefono',$dataPersona)? $dataPersona['telefono']:null;
         $this->personaNatural['deleted'] =  false; //default value
     }
 
