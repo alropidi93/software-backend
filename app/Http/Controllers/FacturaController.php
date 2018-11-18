@@ -20,6 +20,8 @@ use App\Repositories\FacturaRepository;
 use App\Repositories\ComprobantePagoRepository;
 use App\Repositories\PersonaJuridicaRepository;
 use App\Repositories\LineaDeVentaRepository;
+use App\Repositories\ProductoRepository;
+use App\Repositories\TiendaRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Helpers\Algorithm;
@@ -33,10 +35,12 @@ class FacturaController extends Controller
     protected $comprobantePagoRepository; //no tiene equi
     // protected $lineasDeVenta;
 
-    public function __construct(FacturaRepository $facturaRepository, ComprobantePagoRepository $comprobantePagoRepository, LineaDeVentaRepository $lineaDeVentaRepository){
+    public function __construct(FacturaRepository $facturaRepository, ComprobantePagoRepository $comprobantePagoRepository, LineaDeVentaRepository $lineaDeVentaRepository, TiendaRepository $tiendaRepository, ProductoRepository $productoRepository){
         FacturaResource::withoutWrapping();
         $this->facturaRepository = $facturaRepository;
         $this->comprobantePagoRepository = $comprobantePagoRepository; //no tiene equi
+        $this->tiendaRepository = $tiendaRepository;
+        $this->productoRepository = $productoRepository;
         $this->lineaDeVentaRepository = $lineaDeVentaRepository;
     }
 
