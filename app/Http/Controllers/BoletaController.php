@@ -21,6 +21,8 @@ use App\Repositories\BoletaRepository;
 use App\Repositories\ComprobantePagoRepository;
 use App\Repositories\LineaDeVentaRepository;
 use App\Repositories\PersonaNaturalRepository;
+use App\Repositories\ProductoRepository;
+use App\Repositories\TiendaRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Helpers\Algorithm;
@@ -33,12 +35,16 @@ class BoletaController extends Controller
     protected $boletaRepository;
     protected $comprobantePagoRepository; //no tiene equi
     // protected $lineasDeVenta;
+    protected $tiendaRepository;
+    protected $productoRepository;
 
-    public function __construct(BoletaRepository $boletaRepository, ComprobantePagoRepository $comprobantePagoRepository, LineaDeVentaRepository $lineaDeVentaRepository){
+    public function __construct(BoletaRepository $boletaRepository, ComprobantePagoRepository $comprobantePagoRepository, LineaDeVentaRepository $lineaDeVentaRepository,TiendaRepository $tiendaRepository,ProductoRepository $productoRepository){
         BoletaResource::withoutWrapping();
         $this->boletaRepository = $boletaRepository;
         $this->comprobantePagoRepository = $comprobantePagoRepository; //no tiene equi
         $this->lineaDeVentaRepository = $lineaDeVentaRepository;
+        $this->tiendaRepository = $tiendaRepository;
+        $this->productoRepository = $productoRepository;
     }
 
     /**
@@ -107,6 +113,51 @@ class BoletaController extends Controller
             foreach ($list_collection as $key => $elem) {
                 $this->comprobantePagoRepository->setLineaDeVentaData($elem);
                 $this->comprobantePagoRepository->attachLineaDeVentaWithOwnModels();
+            }
+            //Modificar stock
+            $esParaRecoger=array_key_exists('entrega', $boletaDataArray)? $boletaDataArray['entrega']:false;
+            $idTienda= $boletaData['idTienda'];           
+            $idAlmacen=$this->tiendaRepository->obtenerIdAlmacenConIdTienda($idTienda);
+            if(!$esParaRecoger){ //solo se tiene que restar del Almacen Principal
+               foreach ($list_collection as $key => $elem) {  
+                    $idProducto=$elem['idProducto'];
+                    $cantidad= $elem['cantidad'];
+                    $idTipoStock= 1;
+                    $producto = $this->productoRepository->obtenerPorId($idProducto);
+                    $this->productoRepository->setModel($producto);
+                    $stockAnterior= $this->productoRepository->consultarStock($idProducto,$idAlmacen,$idTipoStock);
+                    $nuevoStock=$stockAnterior - $cantidad;
+                    if($nuevoStock < 0){
+                        $errorResource =  new ErrorResource (null);
+                        $errorResource->title("Error de stock");
+                        $errorResource->message("No hay stock suficiente para concretar la venta");
+                        return $errorResource;
+                    }
+                    $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $nuevoStock);                   
+                }
+            }
+            elseif ($esParaRecoger){ // se tiene que restar del Almacen Principal y añadir al Almacen de Recojos
+                foreach ($list_collection as $key => $elem) {
+                    $idProducto=$productoData['id'];
+                    $cantidad= $elem['cantidad'];
+                    $idTipoStock= 1;
+                    $producto = $this->productoRepository->obtenerPorId($idProducto);
+                    $this->productoRepository->setModel($producto);
+                    $stockAnteriorPrincipal= $this->productoRepository->consultarStock($idProducto,$idAlmacen,$idTipoStock);
+                    $nuevoStockPrincipal=$stockAnteriorPrincipal - $cantidad;
+                    if($nuevoStockPrincipal < 0){
+                        $errorResource =  new ErrorResource (null);
+                        $errorResource->title("Error de stock");
+                        $errorResource->message("No hay stock suficiente para concretar la venta");
+                        return $errorResource;
+                    }
+                    $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $nuevoStockPrincipal); 
+                    //Almacen de Recojo
+                    $idTipoStock= 3;
+                    $stockAnteriorRecojo= $this->productoRepository->consultarStock($idProducto,$idAlmacen,$idTipoStock);
+                    $nuevoStockRecojo=$stockAnteriorRecojo + $cantidad;                    
+                    $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $nuevoStockRecojo); 
+                }
             }
             DB::commit();
             

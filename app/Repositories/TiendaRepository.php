@@ -173,4 +173,9 @@ class TiendaRepository extends BaseRepository {
         $list = $this->model->whereNotNull('idJefeTienda')->whereNotNull('idJefeAlmacen')->where('deleted',false)->get();
         return $list;
     }
+    public function obtenerIdAlmacenConIdTienda($idTienda)
+    {
+        $almacenTienda= $this->almacen->where('idTienda',$idTienda)->first();
+        return $almacenTienda['id'];
+    }
 }
