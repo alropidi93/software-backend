@@ -22,6 +22,7 @@ class SolicitudCompraResource extends JsonResource
             'attributes'    => [
                 'idTienda' => $this->idTienda,
                 'fecha' => $this->fecha,
+                'proveedor' => new ProveedorResource($this->whenLoaded('proveedor')),
                 'lineasSolicitudCompra' => new LineasSolicitudCompraResource($this->whenLoaded('lineasSolicitudCompra')),
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,

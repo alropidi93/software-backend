@@ -13,6 +13,7 @@ class SolicitudCompra extends Model
         'id',
         'fecha',
         'idTienda',
+        'idProveedor',
         'enviado',  
         'deleted'
     ];
@@ -27,5 +28,8 @@ class SolicitudCompra extends Model
 
     public function tienda() {
         return $this->belongsTo('App\Models\Tienda','idTienda','id');   
+    }
+    public function proveedor(){
+        return $this->belongsTo('App\Models\Proveedor','idProveedor','id');
     }
 }
