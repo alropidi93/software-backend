@@ -224,7 +224,7 @@ class ProductoRepository extends BaseRepository {
     public function listarProductosDeAlmacenTest($idAlmacen){
         $productos = $this->model->where('deleted',false)->get();
         foreach ($productos as $key => $producto) {
-            $this->loadAlmacenesRelationship($producto)->where;
+            $this->loadAlmacenesRelationship($producto);
         }
         return $productos;
     }
