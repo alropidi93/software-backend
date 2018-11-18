@@ -224,11 +224,17 @@ class ProductoRepository extends BaseRepository {
 
     public function listarProductosDeAlmacen($idAlmacen){
         /* Muestra los productos que se ofrecen en el almacen indicado */
-        $productos = $this->model->where('deleted',false)->get();
-        foreach ($productos as $key => $producto){
-            $this->loadAlmacenesRelationship($producto);
-        }
-        return $productos;
+        // $productos = $this->model->where('deleted',false)->get();
+        // foreach ($productos as $key => $producto){
+        //     $this->loadAlmacenesRelationship($producto);
+        // }
+        $idTipoStock = 1;
+        $idProducto = 5;
+        $lista = ProductoXAlmacen::where('idAlmacen',$idAlmacen)
+                            ->where('idProducto',$this->model->id)
+                            ->where('idTipoStock',$idTipoStock)
+                            ->where('deleted',false)->get();
+        return $lista;
     }
 
     // public function listarConStockMinimoDeAlmacen($idAlmacen){
