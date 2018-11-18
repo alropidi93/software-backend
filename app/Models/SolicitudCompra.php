@@ -13,7 +13,7 @@ class SolicitudCompra extends Model
         'id',
         'fecha',
         'idTienda',
-        'enviado',
+        'enviado',  
         'deleted'
     ];
 

@@ -231,6 +231,22 @@ class ProductoRepository extends BaseRepository {
         return $productos;
     }
 
+    // public function listarConStockMinimoDeAlmacen($idAlmacen){
+    //     $productos =$this->model->where('deleted',false)->with(['almacenes' => function ($query) {
+    //         $query->where('almacen.deleted',false)->where('productoxalmacen.deleted',false)
+    //         ->join('tipoStock', 'tipoStock.id', '=', 'productoxalmacen.idTipoStock')
+    //         ->join('producto','producto.id', '=', 'productoxalmacen.idProducto')
+    //         ->where('tipoStock.key',1)->where('tipoStock.deleted',false)
+    //         ->whereRaw('productoxalmacen.cantidad <= producto."stockMin"');
+    //     }])->get();
+    //     $productos->each(function ($producto, $key) {
+    //         $producto->almacenes->each(function ($almacen,$key){
+    //             $this->loadTipoStockRelationShipFromPivotProducto_Almacen($almacen);
+    //         });
+    //     });
+    //     return $productos;
+    // }
+
     public function loadTipoStockRelationShipFromPivotProducto_Almacen($almacen){
         $almacen->pivot->load([
             'tipoStock'=>function($query){
@@ -253,5 +269,27 @@ class ProductoRepository extends BaseRepository {
             });
         });
         return $productos;
+    }
+    
+    public function consultarStock($idProducto, $idAlmacen, $idTipoStock){
+        //begin
+        $productos = $this->model->where('deleted',false)->get(); //obtener lista de productos
+        foreach ($productos as $key => $producto){
+            $this->loadAlmacenesRelationship($producto); //obtener sus almacenes
+        }
+
+        foreach($productos as $key => $prod){
+            if($prod['id'] == $idProducto){
+                $almacenes = $prod['almacenes'];
+                foreach($almacenes as $key => $almacen){
+                    if($almacen['id'] == $idAlmacen){
+                        $pivot = $almacen['pivot'];
+                        if($pivot['idTipoStock'] == $idTipoStock){
+                            return $pivot['cantidad'];
+                        }
+                    }
+                }
+            }
+        }
     }
 }

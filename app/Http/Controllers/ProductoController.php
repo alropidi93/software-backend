@@ -322,6 +322,23 @@ class ProductoController extends Controller
         }
     }
 
+    public function consultarStock($idProducto, Request $data){
+        //$data contiene idalmacen y idtipostock
+        $idAlmacen = $data['idAlmacen'];
+        $idTipoStock = $data['idTipoStock'];
+        try{
+            set_time_limit(1000);
+            $stock =$this->productoRepository->consultarStock($idProducto, $idAlmacen, $idTipoStock);
+            // $stockResource =  new Resource($stock);
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Stock del producto en el almacen indicado');
+            $responseResourse->body($stock);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
+    }
+
     public function listarProductosDeAlmacen($idAlmacen){
         try{
             set_time_limit(1000);
