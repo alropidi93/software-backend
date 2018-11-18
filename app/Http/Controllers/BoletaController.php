@@ -115,15 +115,12 @@ class BoletaController extends Controller
                 $this->comprobantePagoRepository->attachLineaDeVentaWithOwnModels();
             }
             //Modificar stock
-            $esParaRecoger=array_key_exists('entrega', $boletaDataArray)? $boletaDataArray['entrega']:false;
+            $entregaInmediata=array_key_exists('entrega', $boletaDataArray)? $boletaDataArray['entrega']:true;
             $idTienda= $boletaData['idTienda'];
-            return $idTienda;
-            $tiendaTemp = $this->tiendaRepository->obtenerPorId($idTienda);
-            return $tiendaTemp;
-            $this->tiendaRepository->setModel($tiendaTemp);
+            // $tiendaTemp = $this->tiendaRepository->obtenerPorId($idTienda);
             $idAlmacen=$this->tiendaRepository->obtenerIdAlmacenConIdTienda($idTienda);
-            return  $idAlmacen;
-            if(!$esParaRecoger){ //solo se tiene que restar del Almacen Principal
+            // return $idAlmacen;
+            if($entregaInmediata){ //solo se tiene que restar del Almacen Principal
                foreach ($list_collection as $key => $elem) {  
                     $idProducto=$elem['idProducto'];
                     $cantidad= $elem['cantidad'];
@@ -141,9 +138,9 @@ class BoletaController extends Controller
                     $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $nuevoStock);                   
                 }
             }
-            elseif ($esParaRecoger){ // se tiene que restar del Almacen Principal y añadir al Almacen de Recojos
+            elseif (!$entregaInmediata){ // se tiene que restar del Almacen Principal y añadir al Almacen de Recojos
                 foreach ($list_collection as $key => $elem) {
-                    $idProducto=$productoData['id'];
+                    $idProducto=$elem['idProducto'];
                     $cantidad= $elem['cantidad'];
                     $idTipoStock= 1;
                     $producto = $this->productoRepository->obtenerPorId($idProducto);

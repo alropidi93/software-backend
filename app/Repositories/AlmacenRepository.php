@@ -147,6 +147,9 @@ class AlmacenRepository extends BaseRepository{
       
     }
 
+    public function obtenerIdAlmacenConIdTienda($idTienda){
+        return $this->model->where('idTienda',$idTienda)->where('deleted',false)->first();
+    }
     
     
     
