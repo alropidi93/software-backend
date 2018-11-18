@@ -352,6 +352,20 @@ class ProductoController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
     }
+    
+    public function listarProductosDeAlmacenTest($idAlmacen){
+        try{
+            set_time_limit(1000);
+            $productos =$this->productoRepository->listarProductosDeAlmacenTest($idAlmacen);
+            $productosResource =  new ProductosResource($productos);
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Listado de productos de este almacen con información de stock');
+            $responseResourse->body($productosResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
+    }
 
     public function listarConStockMinimo(){
         try{
