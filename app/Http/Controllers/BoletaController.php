@@ -154,11 +154,13 @@ class BoletaController extends Controller
                         $errorResource->message("No hay stock suficiente para concretar la venta");
                         return $errorResource;
                     }
+                    $this->productoRepository->setModel($producto);
                     $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $nuevoStockPrincipal); 
                     //Almacen de Recojo
                     $idTipoStock= 3;
                     $stockAnteriorRecojo= $this->productoRepository->consultarStock($idProducto,$idAlmacen,$idTipoStock);
-                    $nuevoStockRecojo=$stockAnteriorRecojo + $cantidad;                    
+                    $nuevoStockRecojo=$stockAnteriorRecojo + $cantidad;
+                    $this->productoRepository->setModel($producto);
                     $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $nuevoStockRecojo); 
                 }
             }

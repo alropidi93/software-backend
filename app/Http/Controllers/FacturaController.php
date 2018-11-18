@@ -94,7 +94,7 @@ class FacturaController extends Controller
 
             DB::beginTransaction();
             $this->facturaRepository->guarda($facturaDataArray); //aqui(im not sure) se envian las lineas para guardarlas en el comprobante de pago
-            // $this->comprobantePagoRepository->guarda($boletaDataArray);
+            // $this->comprobantePagoRepository->guarda($facturaDataArray);
             $factura = $this->facturaRepository->obtenerModelo();
            
             /*Alvaro's change*/
@@ -109,16 +109,59 @@ class FacturaController extends Controller
             foreach ($list_collection as $key => $elem) {
                 $this->comprobantePagoRepository->setLineaDeVentaData($elem);
                 $this->comprobantePagoRepository->attachLineaDeVentaWithOwnModels();
-                
-
-                // $this->boletaRepository->setLineaDeVentaData($elem); //it will call the same method but on comprobantePagoRepository
-                // $this->boletaRepository->attachLineaDeVentaWithOwnModels(); //it will also call the same method but on comprobantePagoRepository
+            }
+            //Modificar stock
+            $entregaInmediata=array_key_exists('entrega', $facturaDataArray)? $facturaDataArray['entrega']:true;
+            $idTienda= $facturaData['idTienda'];
+            $idAlmacen=$this->tiendaRepository->obtenerIdAlmacenConIdTienda($idTienda);
+            if($entregaInmediata){ //solo se tiene que restar del Almacen Principal
+               foreach ($list_collection as $key => $elem) {  
+                    $idProducto=$elem['idProducto'];
+                    $cantidad= $elem['cantidad'];
+                    $idTipoStock= 1;
+                    $producto = $this->productoRepository->obtenerPorId($idProducto);
+                    $this->productoRepository->setModel($producto);
+                    $stockAnterior= $this->productoRepository->consultarStock($idProducto,$idAlmacen,$idTipoStock);
+                    $nuevoStock=$stockAnterior - $cantidad;
+                    if($nuevoStock < 0){
+                        $errorResource =  new ErrorResource (null);
+                        $errorResource->title("Error de stock");
+                        $errorResource->message("No hay stock suficiente para concretar la venta");
+                        return $errorResource;
+                    }
+                    $this->productoRepository->setModel($producto);
+                    $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $nuevoStock);                   
+                }
+            }
+            elseif (!$entregaInmediata){ // se tiene que restar del Almacen Principal y añadir al Almacen de Recojos
+                foreach ($list_collection as $key => $elem) {
+                    $idProducto=$elem['idProducto'];
+                    $cantidad= $elem['cantidad'];
+                    $idTipoStock= 1;
+                    $producto = $this->productoRepository->obtenerPorId($idProducto);
+                    $this->productoRepository->setModel($producto);
+                    $stockAnteriorPrincipal= $this->productoRepository->consultarStock($idProducto,$idAlmacen,$idTipoStock);
+                    $nuevoStockPrincipal=$stockAnteriorPrincipal - $cantidad;
+                    if($nuevoStockPrincipal < 0){
+                        $errorResource =  new ErrorResource (null);
+                        $errorResource->title("Error de stock");
+                        $errorResource->message("No hay stock suficiente para concretar la venta");
+                        return $errorResource;
+                    }
+                    $this->productoRepository->setModel($producto);
+                    $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $nuevoStockPrincipal); 
+                    //Almacen de Recojo
+                    $idTipoStock= 3;
+                    $stockAnteriorRecojo= $this->productoRepository->consultarStock($idProducto,$idAlmacen,$idTipoStock);
+                    $nuevoStockRecojo=$stockAnteriorRecojo + $cantidad;
+                    $this->productoRepository->setModel($producto);
+                    $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $nuevoStockRecojo); 
+                }
             }
             DB::commit();
             
             $this->facturaRepository->loadPersonaJuridicaRelationship();
             $this->comprobantePagoRepository->loadLineasDeVentaRelationship();
-            // $this->boletaRepository->loadLineasDeVentaRelationship();
             $facturaCreated = $this->facturaRepository->obtenerModelo();
             $facturaResource =  new FacturaResource($facturaCreated);
             $responseResourse = new ResponseResource(null);
