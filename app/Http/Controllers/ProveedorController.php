@@ -12,7 +12,9 @@ use App\Http\Resources\ErrorResource;
 use App\Http\Resources\ValidationResource;
 use App\Http\Resources\ResponseResource;
 use App\Models\Proveedor;
+use App\Models\ProductoXProveedor;
 use App\Repositories\ProveedorRepository;
+use App\Repositories\ProductoRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Helpers\Algorithm;
@@ -22,9 +24,10 @@ class ProveedorController extends Controller
 {
     protected $proveedorRepository;
 
-    public function __construct(ProveedorRepository $proveedorRepository){
+    public function __construct(ProveedorRepository $proveedorRepository, ProductoRepository $productoRepository){
         ProveedorResource::withoutWrapping();
         $this->proveedorRepository = $proveedorRepository;
+        $this->productoRepository = $productoRepository;
     }
 
     /**
@@ -156,6 +159,34 @@ class ProveedorController extends Controller
                     return $errorResource->response()->setStatusCode(400);
             }
             return $responseResource; 
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+
+    public function listarProveedores(Request $productosData){
+        //devuelve una lista de proveedores que ofrezcan los productos en $productosData
+        // $productosData contiene una lista de ids de producto
+        try{
+            $validator = \Validator::make($productosData->all(), 
+                            ['productos' => 'required']);
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
+            $listaProveedores = 40;
+            $productos = $productosData['productos'];
+            //verificar que los productos existan
+            foreach($productos as $key => $producto){
+                $producto = $this->productoRepository->obtenerPorId($producto['idProducto']);
+                if(!$producto){
+                    $errorResource = new ErrorResource(null);
+                    $errorResource->title('Error de búsqueda');
+                    $errorResource->message('Uno de los productos no existe');
+                    return $errorResource->response()->setStatusCode(400);
+                }
+            }
+            //buscar los proveedores
+            return $this->proveedorRepository->listarProveedores($productos);
         }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
