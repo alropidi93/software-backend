@@ -221,6 +221,13 @@ class ProductoRepository extends BaseRepository {
         }
         return $productos;
     }
+    public function listarProductosDeAlmacenTest($idAlmacen){
+        $productos = $this->model->where('deleted',false)->get();
+        foreach ($productos as $key => $producto) {
+            $this->loadAlmacenesRelationship($producto)->where;
+        }
+        return $productos;
+    }
 
     public function listarProductosDeAlmacen($idAlmacen){
         /* Muestra los productos que se ofrecen en el almacen indicado */
@@ -229,7 +236,8 @@ class ProductoRepository extends BaseRepository {
         //     $this->loadAlmacenesRelationship($producto);
         // }
         $idTipoStock = 1;
-        $idProducto = 5;
+        $producto = $this->productoRepository->obtenerPorId($idProducto);
+        $this->productoRepository->setModel($producto);
         $lista = ProductoXAlmacen::where('idAlmacen',$idAlmacen)
                             ->where('idProducto',$this->model->id)
                             ->where('idTipoStock',$idTipoStock)

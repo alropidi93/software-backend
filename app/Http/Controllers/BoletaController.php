@@ -116,8 +116,13 @@ class BoletaController extends Controller
             }
             //Modificar stock
             $esParaRecoger=array_key_exists('entrega', $boletaDataArray)? $boletaDataArray['entrega']:false;
-            $idTienda= $boletaData['idTienda'];           
+            $idTienda= $boletaData['idTienda'];
+            return $idTienda;
+            $tiendaTemp = $this->tiendaRepository->obtenerPorId($idTienda);
+            return $tiendaTemp;
+            $this->tiendaRepository->setModel($tiendaTemp);
             $idAlmacen=$this->tiendaRepository->obtenerIdAlmacenConIdTienda($idTienda);
+            return  $idAlmacen;
             if(!$esParaRecoger){ //solo se tiene que restar del Almacen Principal
                foreach ($list_collection as $key => $elem) {  
                     $idProducto=$elem['idProducto'];
