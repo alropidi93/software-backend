@@ -6,6 +6,7 @@ use App\Models\Proveedor;
 use App\Models\TipoProducto;
 use App\Models\UnidadMedida;
 use App\Models\Categoria;
+use App\Models\Almacen;
 	
 class ProductoRepository extends BaseRepository {
     protected $tipoProducto;
@@ -14,6 +15,7 @@ class ProductoRepository extends BaseRepository {
     protected $categoria;
     protected $proveedores;
     protected $almacenes;
+    protected $almacen;
     /** 
      * Create a new ProductoRepository instance.
      * @param  App\Models\Producto $producto
@@ -21,13 +23,14 @@ class ProductoRepository extends BaseRepository {
      * @param  App\Models\Proveedor $proveedor
      * @return void
      */
-    public function __construct(Producto $producto, TipoProducto $tipoProducto,UnidadMedida $unidadMedida ,Proveedor $proveedor, Categoria $categoria) 
+    public function __construct(Producto $producto, TipoProducto $tipoProducto,UnidadMedida $unidadMedida ,Proveedor $proveedor, Categoria $categoria, Almacen $almacen) 
     {
         $this->model = $producto;
         $this->tipoProducto = $tipoProducto;
         $this->unidadMedida = $unidadMedida;
         $this->proveedor = $proveedor;
         $this->categoria = $categoria;
+        $this->almacen = $almacen;
         
     }
 
@@ -227,6 +230,20 @@ class ProductoRepository extends BaseRepository {
             $this->loadAlmacenesRelationship($producto);
         }
         return $productos;
+    }
+
+    public function listarProductosDeAlmacenTestNuevo($idAlmacen){
+        $almacen = $this->almacen->where('id',$idAlmacen)->where('deleted',false)->first();
+        $productos = $almacen->productos()->where('productoxalmacen.idTipoStock',1)
+            ->where('productoxalmacen.deleted',false)
+            ->where('producto.deleted',false)->get();
+        return $productos;
+        // $productos = $this->model->where('deleted',false)->get();
+        // foreach ($productos as $key => $producto) {
+        //     $this->loadAlmacenesRelationship($producto);
+        // }
+        // return $productos;
+
     }
 
     public function listarProductosDeAlmacen($idAlmacen){
