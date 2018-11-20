@@ -231,35 +231,69 @@ class ProductoRepository extends BaseRepository {
 
     public function listarProductosDeAlmacen($idAlmacen){
         /* Muestra los productos que se ofrecen en el almacen indicado */
-        // $productos = $this->model->where('deleted',false)->get();
-        // foreach ($productos as $key => $producto){
-        //     $this->loadAlmacenesRelationship($producto);
-        // }
-        $idTipoStock = 1;
-        $producto = $this->productoRepository->obtenerPorId($idProducto);
-        $this->productoRepository->setModel($producto);
-        $lista = ProductoXAlmacen::where('idAlmacen',$idAlmacen)
-                            ->where('idProducto',$this->model->id)
-                            ->where('idTipoStock',$idTipoStock)
-                            ->where('deleted',false)->get();
-        return $lista;
+        $productos = $this->model->where('deleted',false)->get();
+        foreach ($productos as $key => $producto) {
+            $this->loadAlmacenesRelationship($producto);
+        }
+        return $productos;
+        // $idTipoStock = 1;
+        // $producto = $this->productoRepository->obtenerPorId($idProducto);
+        // $this->productoRepository->setModel($producto);
+        // $lista = ProductoXAlmacen::where('idAlmacen',$idAlmacen)
+        //                     ->where('idProducto',$this->model->id)
+        //                     ->where('idTipoStock',$idTipoStock)
+        //                     ->where('deleted',false)->get();
+        // return $lista;
     }
 
-    // public function listarConStockMinimoDeAlmacen($idAlmacen){
-    //     $productos =$this->model->where('deleted',false)->with(['almacenes' => function ($query) {
-    //         $query->where('almacen.deleted',false)->where('productoxalmacen.deleted',false)
-    //         ->join('tipoStock', 'tipoStock.id', '=', 'productoxalmacen.idTipoStock')
-    //         ->join('producto','producto.id', '=', 'productoxalmacen.idProducto')
-    //         ->where('tipoStock.key',1)->where('tipoStock.deleted',false)
-    //         ->whereRaw('productoxalmacen.cantidad <= producto."stockMin"');
-    //     }])->get();
-    //     $productos->each(function ($producto, $key) {
-    //         $producto->almacenes->each(function ($almacen,$key){
-    //             $this->loadTipoStockRelationShipFromPivotProducto_Almacen($almacen);
-    //         });
-    //     });
-    //     return $productos;
-    // }
+    public function listarConStockMinimoDeAlmacen($idAlmacen){
+        switch($idAlmacen){
+            case 2:
+                $productos =$this->model->where('deleted',false)->with(['almacenes' => function ($query) {
+                    $query->where('almacen.deleted',false)->where('almacen.id',2)->where('productoxalmacen.deleted',false)
+                    ->join('tipoStock', 'tipoStock.id', '=', 'productoxalmacen.idTipoStock')
+                    ->join('producto','producto.id', '=', 'productoxalmacen.idProducto')
+                    ->where('tipoStock.key',1)->where('tipoStock.deleted',false)
+                    ->whereRaw('productoxalmacen.cantidad <= producto."stockMin"');
+                }])->get();
+                $productos->each(function ($producto, $key) {
+                    $producto->almacenes->each(function ($almacen,$key){
+                        $this->loadTipoStockRelationShipFromPivotProducto_Almacen($almacen);
+                    });
+                });
+                break;
+            case 3:
+                $productos =$this->model->where('deleted',false)->with(['almacenes' => function ($query) {
+                    $query->where('almacen.deleted',false)->where('almacen.id',3)->where('productoxalmacen.deleted',false)
+                    ->join('tipoStock', 'tipoStock.id', '=', 'productoxalmacen.idTipoStock')
+                    ->join('producto','producto.id', '=', 'productoxalmacen.idProducto')
+                    ->where('tipoStock.key',1)->where('tipoStock.deleted',false)
+                    ->whereRaw('productoxalmacen.cantidad <= producto."stockMin"');
+                }])->get();
+                $productos->each(function ($producto, $key) {
+                    $producto->almacenes->each(function ($almacen,$key){
+                        $this->loadTipoStockRelationShipFromPivotProducto_Almacen($almacen);
+                    });
+                });
+                break;
+            case 4:
+                $productos =$this->model->where('deleted',false)->with(['almacenes' => function ($query) {
+                    $query->where('almacen.deleted',false)->where('almacen.id',4)->where('productoxalmacen.deleted',false)
+                    ->join('tipoStock', 'tipoStock.id', '=', 'productoxalmacen.idTipoStock')
+                    ->join('producto','producto.id', '=', 'productoxalmacen.idProducto')
+                    ->where('tipoStock.key',1)->where('tipoStock.deleted',false)
+                    ->whereRaw('productoxalmacen.cantidad <= producto."stockMin"');
+                }])->get();
+                $productos->each(function ($producto, $key) {
+                    $producto->almacenes->each(function ($almacen,$key){
+                        $this->loadTipoStockRelationShipFromPivotProducto_Almacen($almacen);
+                    });
+                });
+                break;
+        }
+        
+        return $productos;
+    }
 
     public function loadTipoStockRelationShipFromPivotProducto_Almacen($almacen){
         $almacen->pivot->load([
