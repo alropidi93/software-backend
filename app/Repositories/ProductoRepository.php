@@ -221,18 +221,8 @@ class ProductoRepository extends BaseRepository {
         }
         return $productos;
     }
-    public function listarProductosDeAlmacenTest2($idAlmacen){
-        $productos = $this->model->where('deleted',false)->get();
-        foreach ($productos as $key => $producto) {
-            $this->loadAlmacenesRelationship($producto);
-        }
-        return $productos;
-    }
-
     public function listarProductosDeAlmacenTest($idAlmacen){
-        $productos = $this->model->where('deleted',false)->whereHas('almacenes',function($query) use ($idAlmacen){
-            $query->where('almacen.id',$idAlmacen)->where('productoxalmacen.idTipoStock',1);
-        })->get();
+        $productos = $this->model->where('deleted',false)->get();
         foreach ($productos as $key => $producto) {
             $this->loadAlmacenesRelationship($producto);
         }
