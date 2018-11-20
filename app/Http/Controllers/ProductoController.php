@@ -356,7 +356,7 @@ class ProductoController extends Controller
     public function listarProductosDeAlmacenTest($idAlmacen){
         try{
             set_time_limit(1000);
-            $productos =$this->productoRepository->listarProductosDeAlmacenTest($idAlmacen);
+            $productos =$this->productoRepository->listarProductosDeAlmacenTestNuevo($idAlmacen);
             $productosResource =  new ProductosResource($productos);
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Listado de productos de este almacen con información de stock');
