@@ -24,6 +24,7 @@ class ProveedorResource extends JsonResource
                 'contacto' => $this->contacto,
                 'direccion' => $this->direccion,
                 'email' => $this->email,
+                'productoxproveedor'=> $this->whenLoaded('pivot'),
                 'telefono' => $this->telefono,
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,

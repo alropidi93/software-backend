@@ -425,8 +425,10 @@ class ProductoController extends Controller
                 $errorResource->message('Proveedor ya fue asignado a producto');
                 return $errorResource->response()->setStatusCode(400);
             }
-            
-            $this->productoRepository->attachProveedor($proveedor);
+            $arrayData =  $data->all();
+            unset($arrayData['idProveedor']);
+            $arrayData['deleted'] = false;
+            $this->productoRepository->attachProveedor($proveedor,$arrayData);
                   
             DB::commit();
             $this->productoRepository->loadProveedoresRelationship();
