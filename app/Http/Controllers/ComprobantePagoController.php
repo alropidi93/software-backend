@@ -211,4 +211,17 @@ class ComprobantePagoController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
     }
+
+    public function reporteVentasCajeros(){
+        try{
+            $ventas = $this->comprobantePagoRepository->reporteVentasCajeros();
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de total de ventas por cajero');  
+            $responseResourse->body($ventas);
+            return $responseResourse;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
 }

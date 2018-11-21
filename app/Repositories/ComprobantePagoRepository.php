@@ -1,5 +1,6 @@
 <?php
 namespace App\Repositories;
+use Illuminate\Support\Facades\DB;
 use App\Models\ComprobantePago;
 use App\Models\Usuario;
 use App\Models\LineaDeVenta;
@@ -8,17 +9,19 @@ class ComprobantePagoRepository extends BaseRepository {
     protected $cajero;
     protected $lineaDeVenta;
     protected $lineasDeVenta;
+    protected $usuarioRepository;
 
     /**
      * Create a new TiendaRepository instance.
      * @param  App\Models\Tienda $tienda
      * @return void
      */
-    public function __construct(ComprobantePago $comprobantePago, Usuario $cajero=null, LineaDeVenta $lineaDeVenta)  
+    public function __construct(ComprobantePago $comprobantePago, Usuario $cajero=null, LineaDeVenta $lineaDeVenta, UsuarioRepository $usuarioRepository)  
     {
         $this->model = $comprobantePago;
         $this->lineaDeVenta = $lineaDeVenta;
         $this->cajero = $cajero;
+        $this->usuarioRepository = $usuarioRepository;
     }
 
     public function guarda($dataArray){
@@ -110,5 +113,18 @@ class ComprobantePagoRepository extends BaseRepository {
 
     public function getUsuarioById($idUsuario){
         return $this->cajero->where('idPersonaNatural',$idUsuario)->where('deleted',false)->first();
+    }
+
+    public function reporteVentasCajeros(){
+        $lista = DB::table('comprobantePago')
+        ->select('idCajero', DB::raw('sum(subtotal) as subtotal'))
+        // ->join('personaNatural', 'personaNatural.id', '=', 'comprobantePago.idCajero')
+        ->groupBy('idCajero')
+        ->get();
+
+        // foreach($lista as $key => $cajero){
+        //     $this->usuarioRepository->loadPersonaNaturalRelationship($cajero);
+        // }
+        return $lista;
     }
 }

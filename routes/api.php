@@ -48,6 +48,8 @@ Route::post('asignarTipoUsuario/{idUsuario}', 'UsuarioController@asignarRol');
 Route::post('boleta/asignarCliente/{idComprobantePago}', 'BoletaController@asignarCliente');
 Route::post('factura/asignarCliente/{idComprobantePago}', 'FacturaController@asignarCliente');
 
+Route::get('comprobantePago/reporteVentasCajeros', 'ComprobantePagoController@reporteVentasCajeros');
+
 Route::post('tienda/asignarJefeAlmacen/{idTienda}', 'TiendaController@asignarJefeDeAlmacen');
 Route::post('tienda/desasignarJefeAlmacen/{idTienda}' , 'TiendaController@desasignarJefeDeAlmacen');
 Route::post('tienda/asignarJefeTienda/{idTienda}' , 'TiendaController@asignarJefeDeTienda');
