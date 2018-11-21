@@ -11,6 +11,7 @@ use App\Repositories\UsuarioRepository;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AlmacenResource;
 use App\Http\Resources\AlmacenesResource;
+use App\Http\Resources\ProductosResource;
 use App\Http\Resources\ExceptionResource;
 use App\Http\Resources\ValidationResource;
 use App\Http\Resources\ResponseResource;
@@ -258,6 +259,31 @@ class AlmacenController extends Controller {
             DB::rollback();
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }  
+    }
+
+    public function listarConStockMinimoDeAlmacen($idAlmacen){
+        try{
+            set_time_limit(1000);
+            $almacen = $this->almacenRepository->obtenerPorId($idAlmacen);
+            
+           
+            if (!$almacen){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Almacen no encontrado');
+                $notFoundResource->notFound(['idAlmacen' => $almacen->id]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            $productos = $this->almacenRepository->listarConStockMinimoDeAlmacen($almacen);
+          
+        
+            $productosResource =  new ProductosResource($productos); 
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Listado de productos cuyo stock principal es menor o igual a su stock mínimo en el almacen indicado');  
+            $responseResourse->body($productosResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }        
     }
  
 }

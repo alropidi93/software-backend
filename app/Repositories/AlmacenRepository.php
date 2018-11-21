@@ -150,6 +150,20 @@ class AlmacenRepository extends BaseRepository{
     public function obtenerIdAlmacenConIdTienda($idTienda){
         return $this->model->where('idTienda',$idTienda)->where('deleted',false)->first();
     }
+
+    public function listarConStockMinimoDeAlmacen($almacen){
+        return $almacen->productos()
+        ->join('tipoStock', 'tipoStock.id', '=', 'productoxalmacen.idTipoStock')
+        ->where('tipoStock.key',1)
+        ->where('tipoStock.deleted',false)
+        ->where('producto.deleted',false)
+        ->wherePivot('deleted',false)
+        ->whereRaw('producto."stockMin" < productoxalmacen.cantidad')
+        ->get();
+
+      
+        return $productos;
+    }
     
     
     

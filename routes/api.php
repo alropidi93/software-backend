@@ -79,7 +79,7 @@ Route::post('almacen/asignarJefeDeAlmacenCentral','AlmacenController@asignarJefe
 
 Route::get('producto/listarConStock','ProductoController@listarConStock');
 Route::get('producto/listarStockMin','ProductoController@listarConStockMinimo');
-Route::get('producto/listarStockMinDeAlmacen/{idAlmacen}','ProductoController@listarConStockMinimoDeAlmacen');
+
 Route::get('producto/listarProductosDeAlmacen/{idAlmacen}','ProductoController@listarProductosDeAlmacen');
 Route::get('producto/listarProductosDeAlmacenTest/{idAlmacen}','ProductoController@listarProductosDeAlmacenTest');
 
@@ -102,4 +102,6 @@ Route::get('pedidoTransferencia/obtenerHistorialPedidosTransferencia/{idPedidoTr
 Route::put('producto/actualizarStock/{idProducto}' , 'ProductoController@modificarStock');
 Route::get('producto/consultarStock/{idProducto}','ProductoController@consultarStock');
 Route::get('proveedor/listarProveedores','ProveedorController@listarProveedores');
+
+Route::get('almacen/listarStockMinDeAlmacen/{idAlmacen}','AlmacenController@listarConStockMinimoDeAlmacen');
 
