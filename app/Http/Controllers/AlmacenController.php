@@ -285,5 +285,30 @@ class AlmacenController extends Controller {
             return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }        
     }
+
+    public function listarConStockDeAlmacen($idAlmacen){
+        try{
+            set_time_limit(1000);
+            $almacen = $this->almacenRepository->obtenerPorId($idAlmacen);
+            
+           
+            if (!$almacen){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Almacen no encontrado');
+                $notFoundResource->notFound(['idAlmacen' => $almacen->id]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            $productos = $this->almacenRepository->listarConStockDeAlmacen($almacen);
+          
+        
+            $productosResource =  new ProductosResource($productos); 
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Listado de productos en el almacen indicado');  
+            $responseResourse->body($productosResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }        
+    }
  
 }

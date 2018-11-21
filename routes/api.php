@@ -104,4 +104,5 @@ Route::get('producto/consultarStock/{idProducto}','ProductoController@consultarS
 Route::get('proveedor/listarProveedores','ProveedorController@listarProveedores');
 
 Route::get('almacen/listarStockMinDeAlmacen/{idAlmacen}','AlmacenController@listarConStockMinimoDeAlmacen');
+Route::get('almacen/listarConStockDeAlmacen/{idAlmacen}','AlmacenController@listarConStockDeAlmacen');
 
