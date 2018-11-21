@@ -192,8 +192,9 @@ class ProductoRepository extends BaseRepository {
         $this->proveedor = $proveedor;
     }
 
-    public function attachProveedor($proveedor){
-        $this->model->proveedores()->save($proveedor , ['deleted'=>false] );
+    public function attachProveedor($proveedor,$pivotData){
+       
+        $this->model->proveedores()->save($proveedor , $pivotData);
         $this->model->save();
     }
 
