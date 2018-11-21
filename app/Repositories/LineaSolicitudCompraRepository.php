@@ -112,4 +112,43 @@ class LineaSolicitudCompraRepository extends BaseRepository{
         return $this->model;
 
     }
+
+
+    public function loadLineaPedidoTransferenciasRelationship($lineaSolicitudCompra=null){
+        if (!$lineaSolicitudCompra){
+            
+            $this->model->load([
+                'lineasPedidoTransferencia' => function ($query) {
+                    $query->where('lineaPedidoDeTransferencia.deleted', false);
+                },
+                'lineasPedidoTransferencia.pedidoTransferencia' => function ($query) {
+                    $query->where('pedidoDeTransferencia.deleted', false);
+                },
+                'lineasPedidoTransferencia.pedidoTransferencia.almacenOrigen' => function ($query) {
+                    $query->where('almacen.deleted', false);
+                },
+                
+
+            ]);
+        }else{
+            
+            $lineaSolicitudCompra->load([
+                'lineasPedidoTransferencia' => function ($query) {
+                    $query->where('lineaPedidoDeTransferencia.deleted', false);
+                },
+                'lineasPedidoTransferencia.pedidoTransferencia' => function ($query) {
+                    $query->where('pedidoDeTransferencia.deleted', false);
+                },
+                'lineasPedidoTransferencia.pedidoTransferencia.almacenOrigen' => function ($query) {
+                    $query->where('almacen.deleted', false);
+                },
+                
+            ]);
+        }
+    }
+
+    public function obtenerDisponibles(){
+        $lineasSolicitudCompra = $this->obtenerTodos();
+        return $lineasSolicitudCompra->where('idProveedor',null);
+    }
 }

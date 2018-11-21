@@ -206,6 +206,7 @@ class PedidoTransferenciaController extends Controller {
 
     public function store(Request $data) 
     {
+        
         ini_set("max_execution_time", 1000 );
         try{
             $dataArray=$data->all();
@@ -223,8 +224,8 @@ class PedidoTransferenciaController extends Controller {
      
             if (!$usuario){
                 $notFoundResource = new NotFoundResource(null);
-                $notFoundResource->title('Almacen no encontrado');
-                $notFoundResource->notFound(['idAlmacen'=>$data['idAlmacen']]);
+                $notFoundResource->title('Usuario no encontrado');
+                $notFoundResource->notFound(['idUsuario'=>$data['idUsuario']]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
                     

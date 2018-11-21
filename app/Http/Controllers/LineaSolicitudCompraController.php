@@ -34,6 +34,7 @@ class LineaSolicitudCompraController extends Controller
             foreach ($lineasSolicitudCompra as $key => $lineaSolicitudCompra) {
                 $this->lineaSolicitudCompraRepository->loadProductoRelationship($lineaSolicitudCompra);
                 $this->lineaSolicitudCompraRepository->loadProveedorRelationship($lineaSolicitudCompra);
+                $this->lineaSolicitudCompraRepository->loadLineaPedidoTransferenciasRelationship($lineaSolicitudCompra);
             }
             $LineasSolicitudCompraResource =  new LineasSolicitudCompraResource($lineasSolicitudCompra);  
             $responseResource = new ResponseResource(null);
@@ -170,6 +171,28 @@ class LineaSolicitudCompraController extends Controller
             DB::commit();
             return $responseResource;
         }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
+    }
+
+
+    public function obtenerDisponibles()
+    {
+        try{
+            $lineasSolicitudCompra = $this->lineaSolicitudCompraRepository->obtenerDisponibles();
+            
+            foreach ($lineasSolicitudCompra as $key => $lineaSolicitudCompra) {
+                $this->lineaSolicitudCompraRepository->loadProductoRelationship($lineaSolicitudCompra);
+                $this->lineaSolicitudCompraRepository->loadProveedorRelationship($lineaSolicitudCompra);
+                $this->lineaSolicitudCompraRepository->loadLineaPedidoTransferenciasRelationship($lineaSolicitudCompra);
+            }
+            $LineasSolicitudCompraResource =  new LineasSolicitudCompraResource($lineasSolicitudCompra);  
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Lista de lineas de solicitud de compra');  
+            $responseResource->body($LineasSolicitudCompraResource);
+            return $responseResource;
+        }
+        catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
     }
