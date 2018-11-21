@@ -158,7 +158,7 @@ class AlmacenRepository extends BaseRepository{
         ->where('tipoStock.deleted',false)
         ->where('producto.deleted',false)
         ->wherePivot('deleted',false)
-        ->whereRaw('producto."stockMin" < productoxalmacen.cantidad')
+        ->whereRaw('producto."stockMin" > productoxalmacen.cantidad')
         ->get();
 
       
