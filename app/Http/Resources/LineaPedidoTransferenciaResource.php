@@ -19,7 +19,7 @@ class LineaPedidoTransferenciaResource extends JsonResource
             'attributes'    => [
                 'cantidad' => $this->cantidad,
                 'producto' => new ProductoResource($this->whenLoaded('producto')),
-                
+                'pedidoTransferencia' => new PedidoTransferenciaResource($this->whenLoaded('pedidoTransferencia')),
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,

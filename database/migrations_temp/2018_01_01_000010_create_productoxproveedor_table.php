@@ -18,6 +18,7 @@ class CreateProductoXProveedorTable extends Migration
         
             $table->integer('idProducto');
             $table->integer('idProveedor');
+            $table->float('precio')->nullable();
         
             $table->boolean('deleted');
             $table->timestamps();

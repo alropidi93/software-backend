@@ -121,6 +121,12 @@ class LineaSolicitudCompraRepository extends BaseRepository{
                 'lineasPedidoTransferencia' => function ($query) {
                     $query->where('lineaPedidoDeTransferencia.deleted', false);
                 },
+                'lineasPedidoTransferencia.pedidoTransferencia' => function ($query) {
+                    $query->where('pedidoDeTransferencia.deleted', false);
+                },
+                'lineasPedidoTransferencia.pedidoTransferencia.almacenOrigen' => function ($query) {
+                    $query->where('almacen.deleted', false);
+                },
                 
 
             ]);
@@ -130,8 +136,19 @@ class LineaSolicitudCompraRepository extends BaseRepository{
                 'lineasPedidoTransferencia' => function ($query) {
                     $query->where('lineaPedidoDeTransferencia.deleted', false);
                 },
+                'lineasPedidoTransferencia.pedidoTransferencia' => function ($query) {
+                    $query->where('pedidoDeTransferencia.deleted', false);
+                },
+                'lineasPedidoTransferencia.pedidoTransferencia.almacenOrigen' => function ($query) {
+                    $query->where('almacen.deleted', false);
+                },
                 
             ]);
         }
+    }
+
+    public function obtenerDisponibles(){
+        $lineasSolicitudCompra = $this->obtenerTodos();
+        return $lineasSolicitudCompra->where('idProveedor',null);
     }
 }
