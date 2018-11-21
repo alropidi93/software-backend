@@ -14,13 +14,15 @@ class AlmacenRepository extends BaseRepository{
     protected $tipoStock;
     protected $productos;
     protected $jefeAlmacenCentral;
+    // protected $productoRepository;
    
-    public function __construct(Almacen $almacen,Producto $producto, TipoStock $tipoStock ,Usuario $jefeAlmacenCentral)
+    public function __construct(Almacen $almacen,Producto $producto, TipoStock $tipoStock ,Usuario $jefeAlmacenCentral, ProductoRepository $productoRepository=null)
     {
         $this->model = $almacen;
         $this->producto = $producto;
         $this->tipoStock = $tipoStock;
         $this->jefeAlmacenCentral = $jefeAlmacenCentral;
+        $this->productoRepository = $productoRepository;
 
     }
     public function setJefeAlmacenCentralModel($usuario){
@@ -152,20 +154,63 @@ class AlmacenRepository extends BaseRepository{
     }
 
     public function listarConStockMinimoDeAlmacen($almacen){
-        return $almacen->productos()
+        $productos = $almacen->productos()
         ->join('tipoStock', 'tipoStock.id', '=', 'productoxalmacen.idTipoStock')
         ->where('tipoStock.key',1)
         ->where('tipoStock.deleted',false)
         ->where('producto.deleted',false)
         ->wherePivot('deleted',false)
-        ->whereRaw('producto."stockMin" > productoxalmacen.cantidad')
+        ->whereRaw('producto."stockMin" >= productoxalmacen.cantidad')
         ->get();
 
+        foreach($productos as $key => $producto){
+            $this->productoRepository->loadTipoProductoRelationship($producto);
+            $this->productoRepository->loadUnidadMedidaRelationship($producto);
+            $this->productoRepository->loadCategoriaRelationship($producto);
+        }
       
         return $productos;
     }
-    
-    
-    
+
+    public function listarConStockDeAlmacen($almacen){
+        $productos = $almacen->productos()
+        ->join('tipoStock', 'tipoStock.id', '=', 'productoxalmacen.idTipoStock')
+        ->where('tipoStock.key',1)
+        ->where('tipoStock.deleted',false)
+        ->where('producto.deleted',false)
+        ->wherePivot('deleted',false)
+        ->get();
+
+        foreach($productos as $key => $producto){
+            $this->productoRepository->loadTipoProductoRelationship($producto);
+            $this->productoRepository->loadUnidadMedidaRelationship($producto);
+            $this->productoRepository->loadCategoriaRelationship($producto);
+        }
+      
+        return $productos;
+    }
 }
+
+
+/*
+                   ▄              ▄
+                  ▌▒█           ▄▀▒▌
+                  ▌▒▒█        ▄▀▒▒▒▐
+                 ▐▄▀▒▒▀▀▀▀▄▄▄▀▒▒▒▒▒▐
+               ▄▄▀▒░▒▒▒▒▒▒▒▒▒█▒▒▄█▒▐
+             ▄▀▒▒▒░░░▒▒▒░░░▒▒▒▀██▀▒▌
+            ▐▒▒▒▄▄▒▒▒▒░░░▒▒▒▒▒▒▒▀▄▒▒▌
+            ▌░░▌█▀▒▒▒▒▒▄▀█▄▒▒▒▒▒▒▒█▒▐
+           ▐░░░▒▒▒▒▒▒▒▒▌██▀▒▒░░░▒▒▒▀▄▌
+           ▌░▒▄██▄▒▒▒▒▒▒▒▒▒░░░░░░▒▒▒▒▌
+          ▌▒▀▐▄█▄█▌▄░▀▒▒░░░░░░░░░░▒▒▒▐
+          ▐▒▒▐▀▐▀▒░▄▄▒▄▒▒▒▒▒▒░▒░▒░▒▒▒▒▌
+          ▐▒▒▒▀▀▄▄▒▒▒▄▒▒▒▒▒▒▒▒░▒░▒░▒▒▐
+           ▌▒▒▒▒▒▒▀▀▀▒▒▒▒▒▒░▒░▒░▒░▒▒▒▌
+           ▐▒▒▒▒▒▒▒▒▒▒▒▒▒▒░▒░▒░▒▒▄▒▒▐
+            ▀▄▒▒▒▒▒▒▒▒▒▒▒░▒░▒░▒▄▒▒▒▒▌
+              ▀▄▒▒▒▒▒▒▒▒▒▒▄▄▄▀▒▒▒▒▄▀
+                ▀▄▄▄▄▄▄▀▀▀▒▒▒▒▒▄▄▀
+                   ▒▒▒▒▒▒▒▒▒▒▀▀
+ */
 
