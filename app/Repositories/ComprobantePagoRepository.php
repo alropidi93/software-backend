@@ -127,4 +127,13 @@ class ComprobantePagoRepository extends BaseRepository {
         // }
         return $lista;
     }
+
+    public function reporteVentasProductos(){
+        $lista = DB::select(DB::raw('select p.id AS "idProducto", p.nombre AS "producto", SUM(lv.cantidad * p.precio) AS "totalVendido"
+        from "producto" p, "lineaDeVenta" lv
+        where p."id" = lv."idProducto" and lv."idCotizacion" is null
+        group by p.id, p.nombre
+        order by "totalVendido" DESC'));
+        return $lista;
+    }
 }
