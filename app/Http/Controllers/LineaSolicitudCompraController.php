@@ -34,6 +34,7 @@ class LineaSolicitudCompraController extends Controller
             foreach ($lineasSolicitudCompra as $key => $lineaSolicitudCompra) {
                 $this->lineaSolicitudCompraRepository->loadProductoRelationship($lineaSolicitudCompra);
                 $this->lineaSolicitudCompraRepository->loadProveedorRelationship($lineaSolicitudCompra);
+                $this->lineaSolicitudCompraRepository->loadLineaPedidoTransferenciasRelationship($lineaSolicitudCompra);
             }
             $LineasSolicitudCompraResource =  new LineasSolicitudCompraResource($lineasSolicitudCompra);  
             $responseResource = new ResponseResource(null);

@@ -112,4 +112,26 @@ class LineaSolicitudCompraRepository extends BaseRepository{
         return $this->model;
 
     }
+
+
+    public function loadLineaPedidoTransferenciasRelationship($lineaSolicitudCompra=null){
+        if (!$lineaSolicitudCompra){
+            
+            $this->model->load([
+                'lineasPedidoTransferencia' => function ($query) {
+                    $query->where('lineaPedidoDeTransferencia.deleted', false);
+                },
+                
+
+            ]);
+        }else{
+            
+            $lineaSolicitudCompra->load([
+                'lineasPedidoTransferencia' => function ($query) {
+                    $query->where('lineaPedidoDeTransferencia.deleted', false);
+                },
+                
+            ]);
+        }
+    }
 }
