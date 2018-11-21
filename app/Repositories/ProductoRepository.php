@@ -264,6 +264,7 @@ class ProductoRepository extends BaseRepository {
     }
 
     public function listarConStockMinimoDeAlmacen($idAlmacen){
+        $productos=null;
         switch($idAlmacen){
             case 2:
                 $productos =$this->model->where('deleted',false)->with(['almacenes' => function ($query) {
@@ -308,6 +309,7 @@ class ProductoRepository extends BaseRepository {
                 });
                 break;
         }
+        
         
         return $productos;
     }

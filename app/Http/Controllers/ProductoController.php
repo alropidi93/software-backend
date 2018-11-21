@@ -370,7 +370,8 @@ class ProductoController extends Controller
     public function listarConStockMinimoDeAlmacen($idAlmacen){
         try{
             set_time_limit(1000);
-            $productos =$this->productoRepository->listarConStockMinimoDeAlmacen($idAlmacen);
+            return $productos =$this->productoRepository->listarConStockMinimoDeAlmacen($idAlmacen);
+        
             $productosResource =  new ProductosResource($productos); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Listado de productos cuyo stock principal es menor o igual a su stock mínimo en el almacen indicado');  
