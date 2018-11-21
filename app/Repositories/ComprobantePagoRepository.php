@@ -116,15 +116,12 @@ class ComprobantePagoRepository extends BaseRepository {
     }
 
     public function reporteVentasCajeros(){
-        $lista = DB::table('comprobantePago')
-        ->select('idCajero', DB::raw('sum(subtotal) as subtotal'))
-        // ->join('personaNatural', 'personaNatural.id', '=', 'comprobantePago.idCajero')
-        ->groupBy('idCajero')
-        ->get();
-
-        // foreach($lista as $key => $cajero){
-        //     $this->usuarioRepository->loadPersonaNaturalRelationship($cajero);
-        // }
+        $lista = DB::select(DB::raw('select pN.id AS "idCajero",  pN.nombre || \' \' || pN.apellidos AS "nombre", SUM(cP.subtotal) AS "totalVendido"
+        from "comprobantePago" cP, "personaNatural" pN
+        where cp."idCajero" = pn."id"
+        group by pN.id, pN.nombre
+        order by pN."id" DESC'));
+        
         return $lista;
     }
 
