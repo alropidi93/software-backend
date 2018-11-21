@@ -40,7 +40,7 @@ class Producto extends Model
 
     public function proveedores(){
         return $this->belongsToMany('App\Models\Proveedor','productoxproveedor',
-        'idProducto','idProveedor')->withPivot('deleted','created_at','updated_at');
+        'idProducto','idProveedor')->withPivot('deleted','precio','created_at','updated_at');
     }
 
     public function almacenes(){
