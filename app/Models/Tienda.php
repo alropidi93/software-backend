@@ -17,6 +17,8 @@ class Tienda extends Model
       'direccion',
       'telefono',
       'deleted',
+      'latitud',
+      'longitud',
       'idJefeTienda',
       'idJefeAlmacen'
     ];
