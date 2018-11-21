@@ -282,6 +282,23 @@ class FacturaController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
     }
+    public function listarFacturasParaRecoger(){
+        try{
+            $facturas = $this->facturaRepository->listarFacturasParaRecoger();
+            foreach($facturas as $key => $factura){
+                $this->facturaRepository->loadPersonaJuridicaRelationship($factura);
+                $this->comprobantePagoRepository->loadCajeroRelationship($factura->comprobantePago);
+                $this->comprobantePagoRepository->loadLineasDeVentaRelationship($factura->comprobantePago);
+            }
+            $facturasResource =  new FacturasResource($facturas); 
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de facturas');  
+            $responseResourse->body($facturasResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
+    }
 }
 
 
