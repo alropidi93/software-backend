@@ -274,8 +274,7 @@ class AlmacenController extends Controller {
                 return $notFoundResource->response()->setStatusCode(404);
             }
             $productos = $this->almacenRepository->listarConStockMinimoDeAlmacen($almacen);
-          
-        
+                  
             $productosResource =  new ProductosResource($productos); 
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Listado de productos cuyo stock principal es menor o igual a su stock mínimo en el almacen indicado');  
