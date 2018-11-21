@@ -285,6 +285,24 @@ class BoletaController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
     }
+    public function listarBoletasParaRecoger(){
+        try{
+            $boletas = $this->boletaRepository->listarBoletasParaRecoger();
+            foreach($boletas as $key => $boleta){
+                $this->boletaRepository->loadPersonaNaturalRelationship($boleta);
+                // $comprobantePago = $this->boletaRepository->obtenerComprobantePago();
+                $this->comprobantePagoRepository->loadCajeroRelationship($boleta->comprobantePago);
+                $this->comprobantePagoRepository->loadLineasDeVentaRelationship($boleta->comprobantePago);
+            }
+            $boletasResource =  new BoletasResource($boletas); 
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de boletas con recojo posterior');  
+            $responseResourse->body($boletasResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
+    }
 }
 
 
