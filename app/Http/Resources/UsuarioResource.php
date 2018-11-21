@@ -23,7 +23,6 @@ class UsuarioResource extends JsonResource
             'id'            => $this->idPersonaNatural,
             'attributes'    => [
                 'password' => $this->password,
-                'idTienda' => $this->idTienda,
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,

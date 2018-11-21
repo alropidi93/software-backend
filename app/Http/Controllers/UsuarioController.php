@@ -352,12 +352,13 @@ class UsuarioController extends Controller
                 $this->usuarioRepository->setModel($usuario);
                 $password = $this->usuarioRepository->getPassword();
                 if (Hash::check($request['password'], $password)){
-                    Log:info("paso el login");
-                    if($usuario->esJefeDeTienda()){              
+                    Log:info("Paso el login");
+                    if($usuario->esJefeDeTienda()){            
+                        Log::info("Es jefe de tienda");  
                         $this->usuarioRepository->loadTiendaCargoJefeTiendaRelationship();
                     }
                     else if ($usuario->esJefeDeAlmacen()){
-                                                                      
+                        Log::info("Es jefe de almacen");                                                
                         if ($usuario->esJefeDeAlmacenCentral()){
                             $this->usuarioRepository->loadAlmacenCargoJefeAlmacenCentralRelationship();
                         }
@@ -367,7 +368,11 @@ class UsuarioController extends Controller
                         
                     }
                     else if (!$usuario->esAdmin()){
+                        Log::info("Es trabajador, no jefe, no admin");  
                         $this->usuarioRepository->loadTiendasCargoTrabajadorRelationship();
+                    }
+                    else{
+                        Log::info("Sería raro que llegue aqui");  
                     }
                                         
                     $this->usuarioRepository->loadTipoUsuarioRelationship();

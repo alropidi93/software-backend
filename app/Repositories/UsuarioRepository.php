@@ -175,22 +175,39 @@ class UsuarioRepository extends BaseRepository {
     public function loadTiendasCargoTrabajadorRelationship($usuario=null){
         if (!$usuario){
             //$this->model->load('tiendasCargoJefeTienda');
-            $this->model->load(['tiendas' => function ($query) {
-                $query->where('tienda.deleted', false);
-            }]);
+            $this->model->load([
+                'tiendas' => function ($query) {
+                    $query->where('tienda.deleted', false);
+                },
+                'tiendas.almacen' => function ($query) {
+                    $query->where('almacen.deleted', false);
+                }
+
+            ]);
         }else{
-            //$usuario->load('tiendasCargoJefeTienda');
-            $usuario->load(['tiendas' => function ($query) {
-                $query->where('tienda.deleted', false);
-            }]);
+            
+            $usuario->load([
+                'tiendas' => function ($query) {
+                    $query->where('tienda.deleted', false);
+                },
+                'tiendas.almacen' => function ($query) {
+                    $query->where('almacen.deleted', false);
+                }
+            ]);
         }
     }
 
     public function loadTiendasCargoJefeAlmacenRelationship($usuario=null){
         if (!$usuario){
-            $this->model->load(['tiendasCargoJefeAlmacen' => function ($query) {
-                $query->where('tienda.deleted', false);
-            }])->get();
+            $this->model->load([
+                'tiendasCargoJefeAlmacen' => function ($query) {
+                    $query->where('tienda.deleted', false);
+                },
+                'tiendasCargoJefeAlmacen.almacen' => function ($query) {
+                    $query->where('almacen.deleted', false);
+                }
+
+            ])->get();
         }else{
             
             $usuario->load(['tiendasCargoJefeAlmacen' => function ($query) {
