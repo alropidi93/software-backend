@@ -1,5 +1,6 @@
 <?php
 namespace App\Repositories;
+use Illuminate\Support\Facades\DB;
 use App\Models\ComprobantePago;
 use App\Models\Usuario;
 use App\Models\LineaDeVenta;
@@ -8,17 +9,19 @@ class ComprobantePagoRepository extends BaseRepository {
     protected $cajero;
     protected $lineaDeVenta;
     protected $lineasDeVenta;
+    protected $usuarioRepository;
 
     /**
      * Create a new TiendaRepository instance.
      * @param  App\Models\Tienda $tienda
      * @return void
      */
-    public function __construct(ComprobantePago $comprobantePago, Usuario $cajero=null, LineaDeVenta $lineaDeVenta)  
+    public function __construct(ComprobantePago $comprobantePago, Usuario $cajero=null, LineaDeVenta $lineaDeVenta, UsuarioRepository $usuarioRepository)  
     {
         $this->model = $comprobantePago;
         $this->lineaDeVenta = $lineaDeVenta;
         $this->cajero = $cajero;
+        $this->usuarioRepository = $usuarioRepository;
     }
 
     public function guarda($dataArray){
@@ -110,5 +113,24 @@ class ComprobantePagoRepository extends BaseRepository {
 
     public function getUsuarioById($idUsuario){
         return $this->cajero->where('idPersonaNatural',$idUsuario)->where('deleted',false)->first();
+    }
+
+    public function reporteVentasCajeros(){
+        $lista = DB::select(DB::raw('select pN.id AS "idCajero",  pN.nombre || \' \' || pN.apellidos AS "nombre", SUM(cP.subtotal) AS "totalVendido"
+        from "comprobantePago" cP, "personaNatural" pN
+        where cp."idCajero" = pn."id"
+        group by pN.id, pN.nombre
+        order by pN."id" DESC'));
+        
+        return $lista;
+    }
+
+    public function reporteVentasProductos(){
+        $lista = DB::select(DB::raw('select p.id AS "idProducto", p.nombre AS "producto", SUM(lv.cantidad * p.precio) AS "totalVendido"
+        from "producto" p, "lineaDeVenta" lv
+        where p."id" = lv."idProducto" and lv."idCotizacion" is null
+        group by p.id, p.nombre
+        order by "totalVendido" DESC'));
+        return $lista;
     }
 }
