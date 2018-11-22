@@ -105,6 +105,16 @@ class FacturaRepository extends BaseRepository {
         }
         return $lista;
     }
+    public function listarFacturasParaRecoger(){
+        $lista =  $this->model->whereHas('comprobantePago', function ($query) {
+            $query->where('entrega', false)->where('deleted',false);
+        })->where('deleted',false)->get();
+        
+        foreach ($lista as $key => $factura) {
+            $factura->comprobantePago;
+        }
+        return $lista;
+    }
 
     public function obtenerFacturaPorId($id){
         $factura = $this->model->where('idComprobantePago',$id)->where('deleted',false)->first();
