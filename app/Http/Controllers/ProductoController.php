@@ -478,4 +478,9 @@ class ProductoController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
     }
+
+
+    public function test(){
+        
+    }
 }

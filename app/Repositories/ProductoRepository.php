@@ -155,13 +155,17 @@ class ProductoRepository extends BaseRepository {
         if (!$producto){
             $this->model = $this->model->load([
                 'proveedores'=>function($query){
-                    $query->where('proveedor.deleted', false)->wherePivot('deleted',false); 
+                    $query->where('proveedor.deleted', false)
+                    ->wherePivot('deleted',false)
+                    ->orderBy('productoxproveedor.precio'); 
                 }
             ]);
         }else{   
             $this->model =$producto->load([
                 'proveedores'=>function($query){
-                    $query->where('proveedor.deleted', false)->wherePivot('deleted',false); 
+                    $query->where('proveedor.deleted', false)->wherePivot('deleted',false)
+                    ->orderBy('productoxproveedor.precio'); 
+                    
                 }
             ]);
         }
