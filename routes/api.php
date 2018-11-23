@@ -24,6 +24,7 @@ Route::resource('unidades', 'UnidadMedidaController');
 Route::resource('clientesNaturales', 'PersonaNaturalController');
 Route::resource('usuarios', 'UsuarioController');
 Route::resource('movimientos', 'MovimientoController');
+Route::resource('movimientosTipoStock', 'MovimientoTipoStockController');
 Route::resource('proveedores', 'ProveedorController');
 Route::resource('categorias', 'CategoriaController');
 Route::resource('solicitudesCompra', 'SolicitudCompraController');
