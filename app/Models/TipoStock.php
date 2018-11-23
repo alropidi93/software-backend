@@ -16,7 +16,7 @@ class TipoStock extends Model
       'deleted'
     ];
 
-    public function movimientoTipoStock(){
-      return $this->belongsTo('App\Models\MovimientoTipoStock', 'idTipoStock', 'id');
-    }
+    // public function movimientoTipoStock(){
+    //   return $this->belongsTo('App\Models\MovimientoTipoStock', 'idTipoStock', 'id');
+    // }
 }

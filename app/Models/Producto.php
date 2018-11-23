@@ -59,9 +59,9 @@ class Producto extends Model
         return $this->hasMany('App\Models\ProductoXAlmacen', 'idProducto', 'id');
     }
 
-    public function movimientoTipoStock(){
-        return $this->belongsTo('App\Models\MovimientoTipoStock', 'idProducto', 'id');
-    }
+    // public function movimientoTipoStock(){
+    //     return $this->belongsTo('App\Models\MovimientoTipoStock', 'idProducto', 'id');
+    // }
 
 
     

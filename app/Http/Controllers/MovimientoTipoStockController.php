@@ -49,10 +49,11 @@ class MovimientoTipoStockController extends Controller
     public function index(){
         try{
             $movimientos = $this->movimientoTipoStockRepository->obtenerTodos();
+            $usuarioRepository =  new UsuarioRepository(new Usuario);
             foreach ($movimientos as $key => $movimiento) {
                 $this->movimientoTipoStockRepository->loadUsuarioRelationship($movimiento);
                 $usuario = $this->movimientoTipoStockRepository->obtenerUsuarioModel();
-                // $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                $usuarioRepository->loadTipoUsuarioRelationship($usuario);
                 $this->movimientoTipoStockRepository->loadProductoRelationship($movimiento);
                 $this->movimientoTipoStockRepository->loadAlmacenRelationship($movimiento);
                 $this->movimientoTipoStockRepository->loadTipoStockRelationship($movimiento);
@@ -108,11 +109,11 @@ class MovimientoTipoStockController extends Controller
             $movimiento = $this->movimientoTipoStockRepository->guarda($movimientoData->all());
             DB::commit();
 
-            // $this->movimientoTipoStockRepository->setUsuarioModel($usuario);
-            // $this->movimientoTipoStockRepository->loadUsuarioRelationship($movimiento);
-            // $this->movimientoTipoStockRepository->loadProductoRelationship($movimiento);
-            // $this->movimientoTipoStockRepository->loadAlmacenRelationship($movimiento);
-            // $this->movimientoTipoStockRepository->loadTipoStockRelationship($movimiento);
+            $this->movimientoTipoStockRepository->setUsuarioModel($usuario);
+            $this->movimientoTipoStockRepository->loadUsuarioRelationship($movimiento);
+            $this->movimientoTipoStockRepository->loadProductoRelationship($movimiento);
+            $this->movimientoTipoStockRepository->loadAlmacenRelationship($movimiento);
+            $this->movimientoTipoStockRepository->loadTipoStockRelationship($movimiento);
             $movimientoTipoStockResource = new MovimientoTipoStockResource($movimiento);
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Movimiento tipo stock registrado exitosamente');       
@@ -154,3 +155,26 @@ class MovimientoTipoStockController extends Controller
     //     }
     // }
 }
+
+
+/*
+                   ▄              ▄
+                  ▌▒█           ▄▀▒▌
+                  ▌▒▒█        ▄▀▒▒▒▐
+                 ▐▄▀▒▒▀▀▀▀▄▄▄▀▒▒▒▒▒▐
+               ▄▄▀▒░▒▒▒▒▒▒▒▒▒█▒▒▄█▒▐
+             ▄▀▒▒▒░░░▒▒▒░░░▒▒▒▀██▀▒▌
+            ▐▒▒▒▄▄▒▒▒▒░░░▒▒▒▒▒▒▒▀▄▒▒▌
+            ▌░░▌█▀▒▒▒▒▒▄▀█▄▒▒▒▒▒▒▒█▒▐
+           ▐░░░▒▒▒▒▒▒▒▒▌██▀▒▒░░░▒▒▒▀▄▌
+           ▌░▒▄██▄▒▒▒▒▒▒▒▒▒░░░░░░▒▒▒▒▌
+          ▌▒▀▐▄█▄█▌▄░▀▒▒░░░░░░░░░░▒▒▒▐
+          ▐▒▒▐▀▐▀▒░▄▄▒▄▒▒▒▒▒▒░▒░▒░▒▒▒▒▌
+          ▐▒▒▒▀▀▄▄▒▒▒▄▒▒▒▒▒▒▒▒░▒░▒░▒▒▐
+           ▌▒▒▒▒▒▒▀▀▀▒▒▒▒▒▒░▒░▒░▒░▒▒▒▌
+           ▐▒▒▒▒▒▒▒▒▒▒▒▒▒▒░▒░▒░▒▒▄▒▒▐
+            ▀▄▒▒▒▒▒▒▒▒▒▒▒░▒░▒░▒▄▒▒▒▒▌
+              ▀▄▒▒▒▒▒▒▒▒▒▒▄▄▄▀▒▒▒▒▄▀
+                ▀▄▄▄▄▄▄▀▀▀▒▒▒▒▒▄▄▀
+                   ▒▒▒▒▒▒▒▒▒▒▀▀
+ */

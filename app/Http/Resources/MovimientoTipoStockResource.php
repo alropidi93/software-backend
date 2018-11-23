@@ -19,12 +19,12 @@ class MovimientoTipoStockResource extends JsonResource
             'type'          => 'Movimiento Tipo Stock',
             'id'            => $this->id,
             'attributes'    => [
+                'cantidad'=>$this->cantidad,
+                'signo'=>$this->signo,
                 'producto' =>  new ProductoResource($this->whenLoaded('producto')), 
                 'almacen' =>  new AlmacenResource($this->whenLoaded('almacen')),
                 'tipoStock' => new TipoStockResource($this->whenLoaded('tipoStock')),
                 'usuario' => new UsuarioResource($this->whenLoaded('usuario')),
-                'cantidad'=>$this->cantidad,
-                'signo'=>$this->signo,
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at
             ],

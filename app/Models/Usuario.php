@@ -27,9 +27,9 @@ class Usuario extends Model
         return $this->belongsTo('App\Models\TipoUsuario','idTipoUsuario','id');
     }
    
-    public function movimientoTipoStock(){
-        return $this->belongsTo('App\Models\MovimientoTipoStock', 'idUsuario', 'idPersonaNatural');
-    }
+    // public function movimientoTipoStock(){
+    //     return $this->belongsTo('App\Models\MovimientoTipoStock', 'idUsuario', 'idPersonaNatural');
+    // }
     
 
     public function tiendasCargoJefeTienda() {

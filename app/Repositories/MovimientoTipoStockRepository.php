@@ -54,11 +54,11 @@ class MovimientoTipoStockRepository extends BaseRepository {
         }   
     }
 
-    public function loadProductoRelationship($movimiento=null){
-        if (!$movimiento){
+    public function loadProductoRelationship($movimientoTipoStock=null){
+        if (!$movimientoTipoStock){
             $this->model->load('producto');
         }else{
-            $movimiento->load('producto');
+            $movimientoTipoStock->load('producto');
         }
     }
 
