@@ -27,6 +27,7 @@ Route::resource('movimientos', 'MovimientoController');
 Route::resource('movimientosTipoStock', 'MovimientoTipoStockController');
 Route::resource('proveedores', 'ProveedorController');
 Route::resource('categorias', 'CategoriaController');
+Route::resource('descuentos', 'DescuentoController');
 Route::resource('solicitudesCompra', 'SolicitudCompraController');
 Route::resource('lineasSolicitudCompra', 'LineaSolicitudCompraController');
 Route::resource('pedidosTransferencia', 'PedidoTransferenciaController');
