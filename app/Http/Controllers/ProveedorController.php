@@ -37,7 +37,11 @@ class ProveedorController extends Controller
      */
     public function index(){
         try{
-            $proveedorResource =  new ProveedoresResource($this->proveedorRepository->obtenerTodos());  
+            $proveedores = $this->proveedorRepository->obtenerTodos();
+            foreach($proveedores as $key => $proveedor){
+                $this->proveedorRepository->loadProductosRelationship($proveedor);
+            }
+            $proveedorResource =  new ProveedoresResource($proveedores);  
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de proveedores');  
             $responseResourse->body($proveedorResource);
