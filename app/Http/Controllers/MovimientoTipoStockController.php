@@ -68,6 +68,34 @@ class MovimientoTipoStockController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }  
     }
+    public function show($id){
+        try{
+            $movimiento = $this->movimientoTipoStockRepository->obtenerPorId($id);
+
+            if (!$movimiento){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Movimiento no encontrado');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            $usuarioRepository =  new UsuarioRepository(new Usuario);
+            $this->movimientoTipoStockRepository->loadUsuarioRelationship($movimiento);
+                $usuario = $this->movimientoTipoStockRepository->obtenerUsuarioModel();
+                $usuarioRepository->loadTipoUsuarioRelationship($usuario);
+                $this->movimientoTipoStockRepository->loadProductoRelationship($movimiento);
+                $this->movimientoTipoStockRepository->loadAlmacenRelationship($movimiento);
+                $this->movimientoTipoStockRepository->loadTipoStockRelationship($movimiento);
+            
+            
+            $movimientoTipoStockResource =  new MovimientoTipoStockResource($movimiento);  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Mostrar Movimiento Tipo Stock');  
+            $responseResourse->body($movimientoTipoStockResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
+    }
 
     public function store(Request $movimientoData){
         try{
