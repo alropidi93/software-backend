@@ -4,6 +4,7 @@ use App\Models\Descuento;
 use App\Models\Tienda;
 use App\Models\Producto;
 use App\Models\Categoria;
+use Carbon\Carbon;
 
 class DescuentoRepository extends BaseRepository{
     protected $tienda;
@@ -92,5 +93,9 @@ class DescuentoRepository extends BaseRepository{
         if ($this->model->categoria){
             $this->categoria = $this->model->categoria;
         }
+    }
+    public function obtenerDescuentosVigentes(){        
+        $lista = $this->model-> whereDate('fechaIni', '<=', Carbon::now())-> whereDate('fechaFin', '>=', Carbon::now())->where('deleted',false)->get();         
+        return $lista;
     }
 }

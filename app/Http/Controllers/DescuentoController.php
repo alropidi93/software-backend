@@ -412,5 +412,22 @@ class DescuentoController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
     }
+    public function listarDescuentosVigentes(){
+        try{
+            $descuentos = $this->descuentoRepository->obtenerDescuentosVigentes();
+            foreach ($descuentos as $key => $descuento) {
+              $this->descuentoRepository->loadTiendaRelationship($descuento);
+              $this->descuentoRepository->loadProductoRelationship($descuento);
+              $this->descuentoRepository->loadCategoriaRelationship($descuento);
+            }
+            $descuentosResource =  new DescuentosResource($descuentos);  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de descuentos vigentes');  
+            $responseResourse->body($descuentosResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
     
 }

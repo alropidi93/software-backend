@@ -120,3 +120,4 @@ Route::get('proveedor/listarProveedores','ProveedorController@listarProveedores'
 Route::get('almacen/listarStockMinDeAlmacen/{idAlmacen}','AlmacenController@listarConStockMinimoDeAlmacen');
 Route::get('almacen/listarConStockDeAlmacen/{idAlmacen}','AlmacenController@listarConStockDeAlmacen');
 
+Route::get('descuento/ListarDescuentosVigentes', 'DescuentoController@listarDescuentosVigentes');
