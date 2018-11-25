@@ -1,6 +1,6 @@
 <?php
 namespace App\Repositories;
-use App\Models\Categoria;
+use App\Models\SolicitudProducto;
 
 	
 class SolicitudProductoRepository extends BaseRepository{
