@@ -29,6 +29,7 @@ class ProductoResource extends JsonResource
                 'almacenes'=>new AlmacenesResource($this->whenLoaded('almacenes')),
                 'productoxalmacen'=> $this->whenLoaded('pivot'),
                 'precio' => $this->precio,
+                'habilitado' => $this->habilitado,
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,
