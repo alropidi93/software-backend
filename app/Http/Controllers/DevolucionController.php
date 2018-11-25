@@ -44,7 +44,22 @@ class DevolucionController extends Controller
      */
     public function index()
     {
-        //
+        try{
+            $devoluciones = $this->devolucionRepository->obtenerTodos();
+            foreach ($devoluciones as $key => $devolucion) {
+                $this->devolucionRepository->loadUsuarioRelationship($devolucion);
+                $this->devolucionRepository->loadPersonaNaturalRelationship();
+                $this->devolucionRepository->loadPersonaJuridicaRelationship();
+                $this->devolucionRepository->loadLineasDeVentaRelationship($devolucion);
+            }
+            $devolucionesResource = new DevolucionesResource($devoluciones);  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de devoluciones');  
+            $responseResourse->body($devolucionesResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
     }
 
     /**
