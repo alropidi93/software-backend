@@ -11,6 +11,7 @@ class Descuento extends Model
 
     protected $fillable = [
       'id',
+      'idTienda',
       'idProducto',
       'idCategoria',
       'es2x1',
@@ -20,8 +21,12 @@ class Descuento extends Model
       'deleted'
     ];
 
+    public function tienda(){
+      return $this->belongsTo('App\Models\Tienda', 'idTienda', 'id');
+    }
+
     public function producto() {
-      return $this->belongsTo('App\Models\Producto','idComprobantePago','id');
+      return $this->belongsTo('App\Models\Producto','idProducto','id');
     }
 
     public function categoria() {
