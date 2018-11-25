@@ -24,5 +24,9 @@ class ProductoXProveedor extends Pivot
       return $this->belongsTo('App\Models\Proveedor','idProveedor','id');
   }
 
+    public function producto(){
+      return $this->belongsTo('App\Models\Producto','idProducto','id');
+  }
+
    
 }
