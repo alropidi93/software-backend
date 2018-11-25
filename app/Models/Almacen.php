@@ -52,6 +52,9 @@ class Almacen extends Model
         return false;
     }
 
+    // public function movimientoTipoStock(){
+    //     return $this->belongsTo('App\Models\MovimientoTipoStock', 'idAlmacen', 'id');
+    // }
     
 
     // public function newPivot(Model $parent, array $attributes, $table, $exists)
