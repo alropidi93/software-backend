@@ -39,6 +39,9 @@ Route::resource('boleta', 'BoletaController');
 Route::resource('cotizacion', 'CotizacionController');
 Route::resource('devoluciones', 'DevolucionController');
 
+Route::post('descuentos/crearDescuentoPorcentualCategoria', 'DescuentoController@crearDescuentoPorcentualCategoria');
+Route::post('descuentos/crearDescuentoPorcentualProducto', 'DescuentoController@crearDescuentoPorcentualProducto');
+Route::post('descuentos/crearDescuento2x1Producto', 'DescuentoController@crearDescuento2x1Producto');
 
 Route::get('lineaSolicitudCompra/obtenerDisponibles','LineaSolicitudCompraController@obtenerDisponibles');
 

@@ -30,6 +30,6 @@ class Descuento extends Model
     }
 
     public function categoria() {
-      return $this->belongsTo('App\Models\Categoria','idCliente','id');
+      return $this->belongsTo('App\Models\Categoria','idCategoria','id');
     }
 }

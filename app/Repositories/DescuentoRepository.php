@@ -25,10 +25,6 @@ class DescuentoRepository extends BaseRepository{
         return $this->model = $this->model->create($dataArray);    
     }
 
-    public function setDescuentoModel($descuento){
-        $this->model = $descuento;
-    }
-
     public function setTiendaModel($tienda){
         $this->tienda = $tienda;
     }
