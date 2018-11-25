@@ -163,6 +163,28 @@ class DevolucionController extends Controller
      */
     public function show($id)
     {
-        //
+        try{
+            $devolucion = $this->devolucionRepository->obtenerPorId($id);
+            if (!$devolucion){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Devolucion no encontrada');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+
+            $this->devolucionRepository->setModel($devolucion);
+            $this->devolucionRepository->loadUsuarioRelationship();
+            $this->devolucionRepository->loadPersonaNaturalRelationship();
+            $this->devolucionRepository->loadPersonaJuridicaRelationship();
+            $this->devolucionRepository->loadLineasDeVentaRelationship();
+
+            $devolucionResource =  new DevolucionResource($devolucion);  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Devolucion');  
+            $responseResourse->body($devolucionResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
     }
 }
