@@ -282,13 +282,15 @@ class PedidoTransferenciaController extends Controller {
             $list = $data['lineasPedidoTransferencia'];
             $list_collection = new Collection($list);
             
-            
+            /*
             $almacenCercano= $almacenService->obtenerAlmacenCercanoConStockAlt($almacen,1,$data['lineasPedidoTransferencia']);
-            if(!$almacenCercano){
+            
+            if(!$almacenCercano){ //no hay almacen cercano por algoritmo, buscaremos en stock central
                 
                 $almacenCentral = $this->pedidoTransferenciaRepository->getAlmacenCentral();
                 
-                if (!$almacenService->tieneStock($almacenCentral,$list_collection)){
+                if (!$almacenService->tieneStock($almacenCentral,$list_collection)){//no hay stock en almacen central tampoco
+                    $text = 'Pedido de transferencia creado exitosamente, aunque no se encontró ningun almacén destino para él';
                     $dataArray['idAlmacenD']=null;
                     $dataArray['fase']=null;
                     $dataArray['JTO']=$dataArray['JAD']=$dataArray['JTD']=false;
@@ -302,6 +304,22 @@ class PedidoTransferenciaController extends Controller {
                         $this->pedidoTransferenciaRepository->attachLineaPedidoTransferenciaWithOwnModels();
                                     
                     }
+                    DB::commit();
+                            
+                    
+                    $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship();
+                    $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship();
+                    $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
+                    $pedidoTransferenciaCreado = $this->pedidoTransferenciaRepository->obtenerModelo();
+                    $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferenciaCreado);
+                    $responseResource = new ResponseResource(null);
+                    $responseResource->title($text);       
+                    $responseResource->body($pedidoTransferenciaResource);       
+                    return $responseResource;
+
+
+                    
+
                     $this->pedidoTransferenciaRepository->setLineasPedidoTransferenciaByOwnModel();
                     $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
                     $transferenciaData['estado']='Denegado';
@@ -320,6 +338,7 @@ class PedidoTransferenciaController extends Controller {
                     $responseResource->title($text);  
                     $responseResource->body($solicitudCompraResource);
                     return $responseResource; //Esta es una salida de emergencia
+                    
                 }
                 else{
                     $text= "Pedido de transferencia creado directamente en fase 3 para el almacen central, por no haber un almacen cercano";
@@ -335,6 +354,7 @@ class PedidoTransferenciaController extends Controller {
                 $dataArray['fase']=1;
                 $text='Pedido de transferencia creado exitosamente';
             }
+            */
             
             // inicializacion de los flags
             // $dataArray['aceptoJTO'] = false;
@@ -366,7 +386,7 @@ class PedidoTransferenciaController extends Controller {
             $responseResource = new ResponseResource(null);
             
             
-            $responseResource->title($text);       
+            $responseResource->title('Pedido de transferencia creado exitosamente');       
             $responseResource->body($pedidoTransferenciaResource);       
             return $responseResource;
         }
@@ -490,6 +510,7 @@ class PedidoTransferenciaController extends Controller {
     
         }
     }
+
     public function obtenerPedidoTransferenciaPorId($idPedidoTransferencia)
     {
         try{
@@ -1022,7 +1043,8 @@ class PedidoTransferenciaController extends Controller {
     
     }
 
-    protected function enviarSolicitudCompra($dataArray,$text,$lineasPedidoTransferencia){
+    protected function enviarSolicitudCompra($dataArray,$text,$lineasPedidoTransferencia)
+    {
         
             
         $solicitud = $this->solicitudCompraRepository->obtenerSolicitudDisponible();
@@ -1202,30 +1224,171 @@ class PedidoTransferenciaController extends Controller {
 
     public function aceptaPedidoJTO($idPedidoTransferencia, Request $pedidoTransferenciaData)
     {
+        
         try{
+            $dataArray=$pedidoTransferenciaData->all();
+            $validator = \Validator::make($dataArray, 
+                            [ 
+                            'idUsuario' => 'required',
+                            'aceptoJTO' => 'required'
+                            
+                            ]);
+            
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
+            
             DB::beginTransaction();
+            /* Validaciones */
+            
+                       
             $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerPorId($idPedidoTransferencia);
-            $evaluacion = $pedidoTransferenciaData['aceptoJTO'];
+            $this->pedidoTransferenciaRepository->setModel($pedidoTransferencia);
             if (!$pedidoTransferencia){
                 $notFoundResource = new NotFoundResource(null);
                 $notFoundResource->title('Pedido de transferencia no encontrado');
-                $notFoundResource->notFound(['id'=>$id]);
+                $notFoundResource->notFound(['idPedidoTransferencia'=>$id]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
+            else if ($pedidoTransferencia->fueEvaluadoJTO() || $pedidoTransferencia->fueEvaluado()) {
+                
+                if ($pedidoTransferencia->fueEvaluadoJTO()){
+                    
+                    $text = 'El pedido de transferencia ya fue evaluado por el jede de tienda origen';
+                    
+                }
+                else if ($pedidoTransferencia->fueEvaluado()){
+                    
+                    $text = 'El pedido de transferencia ya culminó su ciclo de evaluación';
+                    
+
+                }
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de validación');
+                $errorResource->message($text);
+                return $errorResource->response()->setStatusCode(400);
+            }
+            $usuario = $this->pedidoTransferenciaRepository->getUsuarioById($pedidoTransferenciaData['idUsuario']);
+            
+            if (!$usuario){
+                
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Usuario no encontrado');
+                $notFoundResource->notFound(['idUsuario'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            else{
+                $usuario->tipoUsuario;
+                
+                if ($usuario->esJefeDeTienda()){
+                    
+                    $tienda = $this->pedidoTransferenciaRepository->getTiendaDeAlmacenOrigen();
+                    // Log::info(json_encode($tienda));
+                    // Log::info(json_encode($tienda->jefeDeTienda));
+                    // Log::info(json_encode($usuario));
+                    
+                    if (!($tienda->jefeDeTienda->idPersonaNatural == $usuario->idPersonaNatural)){ //si no es el jefe de tienda de la tienda
+                        $errorResource = new ErrorResource(null);
+                        $errorResource->title('Error de validación');
+                        $errorResource->message('Es jefe de tienda, pero no corresponde al almacén del pedido de transferencia actual');
+                        return $errorResource->response()->setStatusCode(400);
+                    }
+                }
+                else{
+                        $errorResource = new ErrorResource(null);
+                        $errorResource->title('Error de validación');
+                        $errorResource->message('El usuario no es jefe de tienda');
+                        return $errorResource->response()->setStatusCode(400);
+                }
+                unset($dataArray['idUsuario']);
+            }
+            /* Fin de validaciones*/
+                     
+            
+            $evaluacion = $pedidoTransferenciaData['aceptoJTO'];
+                       
+            if(!$evaluacion){ // no acepto
+                
+                $text = 'Pedido de transferencia rechazado por el jefe de tienda origen';
+                
+            }
+            else{//acepto
+                
+                $almacenService = new AlmacenService;
+                $almacenOrigen = $this->pedidoTransferenciaRepository->getAlmacenOrigen();
+                $this->pedidoTransferenciaRepository->setLineasPedidoTransferenciaByOwnModel();
+                $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
+                $almacenCercano= $almacenService->obtenerAlmacenCercanoConStock($almacenOrigen,1,$lineasPedidoTransferencia);
+                
+                if(!$almacenCercano){ //no hay almacen cercano por algoritmo, buscaremos en stock central
+                    
+                    $almacenCentral = $this->pedidoTransferenciaRepository->getAlmacenCentral();
+                    
+                    if (!$almacenService->tieneStock($almacenCentral,$lineasPedidoTransferencia)){//no hay stock en almacen central tampoco
+                        $dataArray['aceptoJTO']=true;
+                        $this->pedidoTransferenciaRepository->actualiza($dataArray);//actualizado el pedido de transferencia
+                        
+                        $transferenciaData['estado'] = 'Denegado';
+                        $transferenciaData['deleted']=false;
+                        $this->pedidoTransferenciaRepository->setTransferenciaData($transferenciaData);
+                        $this->pedidoTransferenciaRepository->attachTransferenciaWithOwnModels();
+                
+                        //si el almacen central no tiene stock se envia de frente la solicitud de compra
+                        $text= "Pedido de transferencia evaluado exitosamente por el jefe de tienda origen, aunque no se encontro almacén para el pedido y se creó una solicitud de compra";
+                        $solicitud = $this->enviarSolicitudCompra(null,$text, $lineasPedidoTransferencia);
+                        $this->solicitudCompraRepository->setModel($solicitud);
+                        $this->solicitudCompraRepository->loadLineasSolicitudCompraRelationship();
+                        DB::commit();
+                        $solicitudCompraResource =  new SolicitudCompraResource($solicitud);
+                        $responseResource = new ResponseResource(null);
+                        $responseResource->title($text);  
+                        $responseResource->body($solicitudCompraResource);
+                        return $responseResource; //Esta es una salida de emergencia
+                        
+                    }
+                    else{//no hay almacen cercano, pero está el almacen central
+                        
+                        $text= "Evaluado exitosamente por el jefe de tienda origen, aunque pasa directo fase 3 para el almacen central, por no haber un almacen cercano";
+                      
+                        $dataArray['idAlmacenD']=$almacenCentral->id;
+                        $dataArray['fase']=3;
+                        $dataArray['aceptoJTO']=true;
+                       
+                    }
+                    
+                }
+                else{
+                    
+                    // el pedido de transferencia es aprobado por el jefe de tieneda y hay almacen cercano
+                    $dataArray['idAlmacenD']=$almacenCercano->id;
+                    $dataArray['fase']=1;
+                    $dataArray['aceptoJTO']=true;
+                    $text='Pedido de transferencia evaluado exitosamente por el jefe de tienda origen y llegó a un almacen cercano';
+                    
+                   
+                    
+                    
+                }
+            }
+            
+            $this->pedidoTransferenciaRepository->actualiza($dataArray);
             $this->pedidoTransferenciaRepository->setModel($pedidoTransferencia);
-            $pedidoTransferenciaDataArray= Algorithm::quitNullValuesFromArray($pedidoTransferenciaData->all());
-            $this->pedidoTransferenciaRepository->actualiza($pedidoTransferenciaDataArray);
-            $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
-            if(!$evaluacion)$this->pedidoTransferenciaRepository->softDelete();
+            
+            
+            $this->pedidoTransferenciaRepository->loadAlmacenOrigenRelationship();
+            $this->pedidoTransferenciaRepository->loadAlmacenDestinoRelationship();
+            $this->pedidoTransferenciaRepository->loadLineasPedidoTransferenciaRelationship();
+            
+            // $pedidoTransferencia->transferencia;
+            // $pedidoTransferencia->almacenDestino;
             
             DB::commit();
             $pedidoTransferenciaResource =  new PedidoTransferenciaResource($pedidoTransferencia);
             $responseResource = new ResponseResource(null);
-            
-            $responseResource->title('Pedido de transferencia evaluado por el jefe de tienda origen exitosamente.');       
+            $responseResource->title($text);       
             $responseResource->body($pedidoTransferenciaResource);     
-            
             return $responseResource;
+            
         }catch(\Exception $e){
             DB::rollback();
             return (new ExceptionResource($e))->response()->setStatusCode(500);
