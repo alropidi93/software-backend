@@ -18,6 +18,7 @@ use App\Repositories\ProductoRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Helpers\Algorithm;
+use App\Http\Helpers\ArrayHelper;
 use Illuminate\Support\Facades\Input;
 
 class ProveedorController extends Controller
@@ -194,5 +195,37 @@ class ProveedorController extends Controller
         }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
+    }
+
+    public function listarPorProductos(){
+        
+
+        try{
+            $product_id_array = json_decode(Input::get('productos_lista'));
+      
+
+            if(!(ArrayHelper::isArray($product_id_array) && ArrayHelper::isIntNumericalArray($product_id_array)&& !ArrayHelper::checkIfArrayIsEmpty($product_id_array))){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de parámetro');
+                $errorResource->message('Parámetro inválido para la consulta');
+                return $errorResource->response()->setStatusCode(400);
+            }
+            $proveedores = $this->proveedorRepository->obtenerProveedoresPorIdProductoArray($product_id_array);
+            
+            $proveedorResource =  new ProveedoresResource($proveedores);  
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de proveedores con los productos consultados');  
+            $responseResourse->body($proveedorResource);
+            return $responseResourse;
+            
+
+
+     
+            
+            
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+        
     }
 }

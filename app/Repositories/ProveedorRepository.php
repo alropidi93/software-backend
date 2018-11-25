@@ -53,4 +53,47 @@ class ProveedorRepository extends BaseRepository{
             $this->productos = $this->model->productos;
         }
     }
+
+    public function obtenerProveedoresPorIdProductoArray($product_id_array){
+
+        // return $queryBase = $this->model->where('deleted',false)->with(['productos' => function ($query){
+        //     $query->where('producto.id',4);
+        //     }])
+        //     ->with(['productos' => function ($query){
+        //         $query->where('producto.id',5);
+        //         }])
+        //     ->get();
+        
+
+        // $proveedores = $this->model->where('deleted',false)->get();    
+        // $proveedores->load([
+        //     'productos'=>function($query)use($product_id_array){
+        //         foreach ($product_id_array as $key => $product_id) {
+        //             $query->where('producto.deleted', false)
+        //             ->where('producto.id',$product_id);
+        //         }
+                 
+        //     },
+        // ]);  
+
+        return $this->model->where('deleted',false)->whereHas('productos', $filter = function ($query) use ($product_id_array) {
+                    $query->whereIn('producto.id', $product_id_array);
+                }, '=', count($product_id_array) )
+                ->with(['productos'=> $filter])
+                ->get();
+
+        
+    
+
+        //   $queryBase = $this->model->where('deleted',false);
+
+        // foreach ($product_id_array as $key => $product_id) {
+        //     $queryBase =  $queryBase->whereHas('productos',function ($query) use ($product_id){
+        //         $query->where('producto.deleted',false)->where('productoxproveedor.deleted',false)
+        //         ->where('producto.id',$product_id);
+        //     });
+        // }
+        // return $queryBase->get();
+       
+    }
 }

@@ -112,7 +112,10 @@ Route::get('pedidoTransferencia/obtenerHistorialPedidosTransferencia/{idPedidoTr
 
 Route::put('producto/actualizarStock/{idProducto}' , 'ProductoController@modificarStock');
 Route::get('producto/consultarStock/{idProducto}','ProductoController@consultarStock');
+
 Route::get('proveedor/listarProveedores','ProveedorController@listarProveedores');
+Route::get('proveedor/listarPorProductos','ProveedorController@listarPorProductos');
+
 
 Route::get('almacen/listarStockMinDeAlmacen/{idAlmacen}','AlmacenController@listarConStockMinimoDeAlmacen');
 Route::get('almacen/listarConStockDeAlmacen/{idAlmacen}','AlmacenController@listarConStockDeAlmacen');
