@@ -133,4 +133,20 @@ class ComprobantePagoRepository extends BaseRepository {
         order by "totalVendido" DESC'));
         return $lista;
     }
+
+    public function reporteTotalesClientesPorBoletas(){
+        $lista = DB::select(DB::raw('select b."idCliente", cP."subtotal" "Subtotal", b."igv" "IGV" , b."igv" + cP.subtotal "Total"
+        from "boleta" b, "comprobantePago" cP
+        where "idCliente" is not null and b."idComprobantePago" = cP."id"
+        order by b."idCliente"'));
+        return $lista;
+    }
+
+    public function reporteTotalesClientesPorFacturas(){
+        $lista = DB::select(DB::raw('select f."idCliente", cP."subtotal" "Subtotal", f."igv" "IGV" , f."igv" + cP.subtotal "Total"
+        from "factura" f, "comprobantePago" cP
+        where "idCliente" is not null and f."idComprobantePago" = cP."id"
+        order by f."idCliente"'));
+        return $lista;
+    }
 }
