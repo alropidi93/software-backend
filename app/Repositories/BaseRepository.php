@@ -137,6 +137,10 @@ abstract class BaseRepository {
         return $this->model->where($key,$value)->where('deleted',false)->get();
     }
 
+    public function crear($data){
+        return $this->model->create($data);
+    }
+
     
 
     

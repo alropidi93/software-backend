@@ -21,6 +21,7 @@ class CreateMovimientoTipoStockTable extends Migration
             $table->integer('idUsuario');
             $table->integer('cantidad');
             $table->char('signo');
+            $table->string('tipo',100);
             $table->boolean('deleted');
             $table->timestamps();
 

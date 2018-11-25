@@ -446,6 +446,9 @@ class PedidoTransferenciaRepository extends BaseRepository {
         $almacenDelQueEsJefe = $usuario->almacenCentral()->where('deleted',false)->first();;
         return $almacenDelQueEsJefe->id == $almacen->id;
     }
+    public function obtenerStockPrincipal(){
+        return $this->tipoStock->where('key',1)->where('deleted',false)->first();
+    }
 
     public function actualizaSumaRestaStocks($almacenOrigen, $almacenDestino, $lineasPedidoTransferencia){
         $tipoStock = $this->tipoStock->where('key',1)->where('deleted',false)->first();//obtenemos el tipo principal de stock

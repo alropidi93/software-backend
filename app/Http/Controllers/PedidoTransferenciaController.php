@@ -11,6 +11,7 @@ use App\Repositories\PedidoTransferenciaRepository;
 use App\Repositories\LineaPedidoTransferenciaRepository;
 use App\Repositories\SolicitudCompraRepository;
 use App\Repositories\LineaSolicitudCompraRepository;
+use App\Repositories\MovimientoTipoStockRepository;
 use App\Http\Resources\LineaSolicitudCompraResource;
 use App\Http\Resources\LineasSolicitudCompraResource;
 use Illuminate\Support\Facades\Log;
@@ -38,8 +39,9 @@ class PedidoTransferenciaController extends Controller {
     protected $solicitudCompraRepository;
     protected $lineaSolicitudCompraRepository;
     protected $lineasPedidoTransferencia;
+    protected $movimientoTipoStockRepository;
 
-    public function __construct(PedidoTransferenciaRepository $pedidoTransferenciaRepository, SolicitudCompraRepository $solicitudCompraRepository,LineaSolicitudCompraRepository $lineaSolicitudCompraRepository, LineaPedidoTransferenciaRepository $lineaPedidoTransferenciaRepository)
+    public function __construct(PedidoTransferenciaRepository $pedidoTransferenciaRepository, SolicitudCompraRepository $solicitudCompraRepository,LineaSolicitudCompraRepository $lineaSolicitudCompraRepository, LineaPedidoTransferenciaRepository $lineaPedidoTransferenciaRepository, MovimientoTipoStockRepository $movimientoTipoStockRepository)
     {
         PedidoTransferenciaResource::withoutWrapping();
         
@@ -50,6 +52,7 @@ class PedidoTransferenciaController extends Controller {
         $this->solicitudCompraRepository = $solicitudCompraRepository;
         $this->lineaSolicitudCompraRepository = $lineaSolicitudCompraRepository;
         $this->lineaPedidoTransferenciaRepository = $lineaPedidoTransferenciaRepository;
+        $this->movimientoTipoStockRepository = $movimientoTipoStockRepository;
     }
 
     public function index() 
@@ -667,6 +670,7 @@ class PedidoTransferenciaController extends Controller {
 
                     }
                     else{
+                        
                         Log::info("Test1");
                         $this->pedidoTransferenciaRepository->actualiza(['aceptoJTD'=>true]);
 
@@ -677,9 +681,31 @@ class PedidoTransferenciaController extends Controller {
                         Log::info("Test2");
                         $this->pedidoTransferenciaRepository->loadTransferenciaRelationShip();
                         $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();
-                        Log::info("Test3");
-                        $this->pedidoTransferenciaRepository->actualizaSumaRestaStocks($pedidoTransferencia->almacenOrigen,$pedidoTransferencia->almacenDestino,$lineasPedidoTransferencia);
-                        Log::info("Test4");
+                        // Log::info("Test3");
+                        // $this->pedidoTransferenciaRepository->actualizaSumaRestaStocks($pedidoTransferencia->almacenOrigen,$pedidoTransferencia->almacenDestino,$lineasPedidoTransferencia);
+                        // Log::info("Test4");
+
+                        /**/
+                        $tipoStockPrincipal = $this->pedidoTransferenciaRepository->obtenerStockPrincipal();
+                        foreach ($lineasPedidoTransferencia as $key => $lt) {
+                            $this->movimientoTipoStockRepository->crear(['idAlmacen' => $pedidoTransferencia->almacenOrigen->id,
+                                                                         'idProducto'=>$lt->idProducto,
+                                                                         'idTipoStock'=> $tipoStockPrincipal->id,
+                                                                         'idUsuario'=>$usuario->idPersonaNatural,
+                                                                         'cantidad'=>$lt->cantidad,
+                                                                         'signo'=> '+',
+                                                                         'tipo'=> 'transferencia',
+                                                                         'deleted'=>false]);
+                            $this->movimientoTipoStockRepository->crear(['idAlmacen' => $pedidoTransferencia->almacenDestino->id,
+                                                                         'idProducto'=>$lt->idProducto,
+                                                                         'idTipoStock'=> $tipoStockPrincipal->id,
+                                                                         'idUsuario'=>$usuario->idPersonaNatural,
+                                                                         'cantidad'=>$lt->cantidad,
+                                                                         'signo'=> '-',
+                                                                         'tipo'=> 'transferencia',
+                                                                         'deleted'=>false]);
+                        }
+                        /**/
                         $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
                         Log::info("Test5");
                         DB::commit();
