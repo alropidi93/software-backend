@@ -237,4 +237,30 @@ class ComprobantePagoController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
     }
+
+    public function reporteTotalesClientesPorBoletas(){
+        try{
+            $ventas = $this->comprobantePagoRepository->reporteTotalesClientesPorBoletas();
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de totales de los clientes por boletas');  
+            $responseResourse->body($ventas);
+            return $responseResourse;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+
+    public function reporteTotalesClientesPorFacturas(){
+        try{
+            $ventas = $this->comprobantePagoRepository->reporteTotalesClientesPorFacturas();
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de totales de los clientes por facturas');  
+            $responseResourse->body($ventas);
+            return $responseResourse;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
 }
