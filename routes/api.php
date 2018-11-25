@@ -37,6 +37,7 @@ Route::resource('comprobanteDePago', 'ComprobantePagoController');
 Route::resource('factura', 'FacturaController');
 Route::resource('boleta', 'BoletaController');
 Route::resource('cotizacion', 'CotizacionController');
+Route::resource('devoluciones', 'DevolucionController');
 
 
 Route::get('lineaSolicitudCompra/obtenerDisponibles','LineaSolicitudCompraController@obtenerDisponibles');

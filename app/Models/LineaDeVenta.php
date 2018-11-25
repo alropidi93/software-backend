@@ -13,12 +13,18 @@ class LineaDeVenta extends Model
       'id',
       'idProducto',
       'cantidad',
+      'subtotalLinea',
       'idComprobantePago',
       'idCotizacion',
+      'idDevolucion',
       'deleted'
     ];
     public function comprobantePago() {
         return $this->belongsTo('App\Models\ComprobantePago','idComprobantePago','id');
+    }
+
+    public function devolucion() {
+        return $this->belongsTo('App\Models\Devolucion','idDevolucion','id');
     }
 
     public function cotizacion(){

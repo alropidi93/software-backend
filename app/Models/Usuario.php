@@ -56,6 +56,10 @@ class Usuario extends Model
     public function comprobantesPago(){
         return $this->hasMany('App\Models\ComprobantePago', 'idCajero', 'idPersonaNatural');
     }
+
+    public function devoluciones(){
+        return $this->hasMany('App\Models\Devolucion', 'idUsuario', 'idPersonaNatural');
+    }
     
 
     // public function tienda() {
