@@ -17,7 +17,8 @@ class MovimientoTipoStock extends Model
       'idUsuario',
       'cantidad',
       'signo',
-      'deleted'
+      'deleted',
+      'tipo'
     ];
 
     public function producto(){
