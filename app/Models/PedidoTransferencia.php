@@ -68,6 +68,10 @@ class PedidoTransferencia extends Model
     public function fueAceptadoJTO(){
         return $this->aceptoJTO;
     }
+
+    public function fueEvaluadoJTO(){
+        return $this->aceptoJTO!=null;
+    }
     
     public function fueAceptadoJAD(){
         return $this->aceptoJAD;
