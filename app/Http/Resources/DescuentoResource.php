@@ -18,6 +18,7 @@ class DescuentoResource extends JsonResource
             'type'          => 'Descuento',
             'id'            => $this->id,
             'attributes'    => [
+                'tienda' => new TiendaResource($this->whenLoaded('tienda')), //THIS FUCKING LINE
                 'producto' => new ProductoResource($this->whenLoaded('producto')),
                 'categoria' => new CategoriaResource($this->whenLoaded('categoria')),           
                 'es2x1' => $this->es2x1,

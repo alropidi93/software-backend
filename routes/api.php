@@ -39,6 +39,9 @@ Route::resource('boleta', 'BoletaController');
 Route::resource('cotizacion', 'CotizacionController');
 Route::resource('devoluciones', 'DevolucionController');
 
+Route::post('descuentos/crearDescuentoPorcentualCategoria', 'DescuentoController@crearDescuentoPorcentualCategoria');
+Route::post('descuentos/crearDescuentoPorcentualProducto', 'DescuentoController@crearDescuentoPorcentualProducto');
+Route::post('descuentos/crearDescuento2x1Producto', 'DescuentoController@crearDescuento2x1Producto');
 
 Route::get('lineaSolicitudCompra/obtenerDisponibles','LineaSolicitudCompraController@obtenerDisponibles');
 
@@ -58,6 +61,8 @@ Route::post('factura/asignarCliente/{idComprobantePago}', 'FacturaController@asi
 
 Route::get('comprobantePago/reporteVentasCajeros', 'ComprobantePagoController@reporteVentasCajeros');
 Route::get('comprobantePago/reporteVentasProductos', 'ComprobantePagoController@reporteVentasProductos');
+Route::get('comprobantePago/reporteTotalesClientesPorBoletas', 'ComprobantePagoController@reporteTotalesClientesPorBoletas');
+Route::get('comprobantePago/reporteTotalesClientesPorFacturas', 'ComprobantePagoController@reporteTotalesClientesPorFacturas');
 
 Route::post('tienda/asignarJefeAlmacen/{idTienda}', 'TiendaController@asignarJefeDeAlmacen');
 Route::post('tienda/desasignarJefeAlmacen/{idTienda}' , 'TiendaController@desasignarJefeDeAlmacen');
@@ -120,3 +125,4 @@ Route::get('proveedor/listarPorProductos','ProveedorController@listarPorProducto
 Route::get('almacen/listarStockMinDeAlmacen/{idAlmacen}','AlmacenController@listarConStockMinimoDeAlmacen');
 Route::get('almacen/listarConStockDeAlmacen/{idAlmacen}','AlmacenController@listarConStockDeAlmacen');
 
+Route::get('descuento/ListarDescuentosVigentes', 'DescuentoController@listarDescuentosVigentes');
