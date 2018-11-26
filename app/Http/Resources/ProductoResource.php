@@ -27,7 +27,8 @@ class ProductoResource extends JsonResource
                 'proveedores' => new ProveedoresResource($this->whenLoaded('proveedores')),
                 'categoria' => new CategoriaResource($this->whenLoaded('categoria')),
                 'almacenes'=>new AlmacenesResource($this->whenLoaded('almacenes')),
-                'productoxalmacen'=> $this->whenLoaded('almacen.pivot'),
+                'productoxalmacen'=> $this->whenLoaded('pivot'),
+                'productoxproveedor'=> $this->whenLoaded('pivot'),
                 
                 'precio' => $this->precio,
                 'habilitado' => $this->habilitado,
