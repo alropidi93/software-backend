@@ -1,10 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Models\SolicitudCompra;
 use App\Repositories\SolicitudCompraRepository;
+use App\Repositories\MovimientoTipoStockRepository;
+use App\Repositories\LineaSolicitudCompraRepository;
+use App\Repositories\LineaPedidoTransferenciaRepository;
+use App\Repositories\UsuarioRepository;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SolicitudCompraResource;
 use App\Http\Resources\SolicitudesCompraResource;
@@ -13,16 +17,32 @@ use App\Http\Resources\ErrorResource;
 use App\Http\Resources\ValidationResource;
 use App\Http\Resources\ResponseResource;
 use App\Http\Resources\NotFoundResource;
+
+use App\Services\ProductoService;
+
 use Illuminate\Support\Facades\DB;
 use App\Http\Helpers\Algorithm;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Collection;
 
 class SolicitudCompraController extends Controller
 {
     protected $solicitudCompraRepository;
-    public function __construct(SolicitudCompraRepository $solicitudCompraRepository){
+    protected $movimientoTipoStockRepository;
+    protected $lineaSolicitudCompraRepository;
+    protected $lineaPedidoTransferenciRepository;
+    protected $usuarioRepository;
+    public function __construct(SolicitudCompraRepository $solicitudCompraRepository,
+                                MovimientoTipoStockRepository $movimientoTipoStockRepository,
+                                LineaSolicitudCompraRepository $lineaSolicitudCompraRepository,
+                                LineaPedidoTransferenciaRepository $lineaPedidoTransferenciRepository,
+                                UsuarioRepository $usuarioRepository){
         SolicitudCompraResource::withoutWrapping();
         $this->solicitudCompraRepository = $solicitudCompraRepository;
+        $this->movimientoTipoStockRepository = $movimientoTipoStockRepository;
+        $this->lineaSolicitudCompraRepository = $lineaSolicitudCompraRepository;
+        $this->lineaPedidoTransferenciaRepository = $lineaPedidoTransferenciRepository;
+        $this->usuarioRepository = $usuarioRepository;
     }
 
     /**
@@ -174,5 +194,118 @@ class SolicitudCompraController extends Controller
             DB::rollback();
             return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
+    }
+
+    public function efectuarCompra(Request $data){
+        
+        try{
+            $validator = \Validator::make($data->all(), 
+                            [
+                                'idUsuario'=>'required',
+                                'idProveedor' => 'required',
+                                'producto_id_cantidad_list' => 'required'
+                            ]
+                        );
+            
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
+
+            $usuario = $this->usuarioRepository->obtenerUsuarioPorId($data['idUsuario']);
+            if (!$usuario){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Usuario no encontrado');
+                $notFoundResource->notFound(['idUsuario'=>$data['idUsuario']]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            
+            $proveedor = $this->solicitudCompraRepository->obtenerProveedorPorId($data['idProveedor']);
+            if (!$proveedor){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Proveedor no encontrado');
+                $notFoundResource->notFound(['idProveedor'=>$data['idProveedor']]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            $prod_id_cantidad_collection =  new Collection($data['producto_id_cantidad_list']);
+            $productoService =  new ProductoService();
+            $product_id_array = $productoService->obtenerIdArray($prod_id_cantidad_collection);
+            
+            if(!($proveedor->tieneExactamenteProductos($product_id_array))){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de petición');
+                $errorResource->message('El proveedor no vende exactamente los productos solicitados');
+                return $errorResource->response()->setStatusCode(400);
+
+            }
+            /* Datos de prueba
+            $product_id_array=[1,5];
+            $prod_id_cantidad_collection = array(array('id'=>1,'cantidad'=>20),array('id'=>5,'cantidad'=>29));
+            */
+            DB::beginTransaction();
+            $solicitudCompra = $this->solicitudCompraRepository->obtenerSolicitudDisponible();
+            
+            $this->solicitudCompraRepository->setModel($solicitudCompra);
+            Log::info(count($prod_id_cantidad_collection));
+            $array_id_success =[];
+            foreach ($prod_id_cantidad_collection as $key => $productoObj) {
+                Log::info("key: ".$key);
+                Log::info("id Producto: ".$productoObj['id']);
+                
+                $lineaSC = $this->solicitudCompraRepository->obtenerLineaPorProductoIdDisponible($productoObj['id']);
+                
+                Log::info(json_encode($lineaSC));
+                
+                if(!$lineaSC) continue; //verificamos que la linea de solicitud de compra del producto este presente
+                
+                Log::info(json_encode($lineaSC->cantidad));
+                Log::info(json_encode($productoObj['cantidad']));
+                
+                
+                if (!$lineaSC->cantidad == $productoObj['cantidad']) continue; // verificamos que las cantidades enviadas en el post sean las mismas de la linea de solicitud de compra
+                //return json_encode($this->lineaSolicitudCompraRepository);
+                $this->lineaSolicitudCompraRepository->setModel($lineaSC);
+                $this->lineaSolicitudCompraRepository->actualiza(['idProveedor'=>$proveedor->id]);
+                Log::info("sacaremos lineas de pedido de transeferencia asociada a la linea de solicitud de compra");
+                $lineasPT = $this->lineaSolicitudCompraRepository->obtenerLineasPedidoTransferencia();
+                Log::info(json_encode($lineasPT));
+
+                $tipoStockPrincipal = $this->solicitudCompraRepository->obtenerStockPrincipal();
+                Log::info(json_encode($tipoStockPrincipal));
+                foreach ($lineasPT as $lineaPT ){
+                    
+                    Log::info(json_encode($lineaPT));
+                    $almacenOrigen = $this->lineaPedidoTransferenciaRepository->obtenerAlmacenOrigen($lineaPT);
+                    if(!$almacenOrigen) continue;// si no encuentra almacen de origen no actualiza
+                    Log::info("Va a guardar el movimiento");
+                    $this->movimientoTipoStockRepository->crear(['idAlmacen' => $almacenOrigen->id,
+                                                                         'idProducto'=>$productoObj['id'],
+                                                                         'idTipoStock'=> $tipoStockPrincipal->id,
+                                                                         'idUsuario'=>$usuario->idPersonaNatural,
+                                                                         'cantidad'=>$lineaPT->cantidad,
+                                                                         'signo'=> '+',
+                                                                         'tipo'=> 'compra',
+                                                                         'deleted'=>false]);
+                    
+                }
+                array_push($array_id_success,$productoObj['id']);
+                
+            }
+            
+           
+           
+            $this->solicitudCompraRepository->loadSpecifLineasRelationship($array_id_success);
+            
+            DB::commit();
+            $solicitudCompraResource =  new SolicitudCompraResource($solicitudCompra);  
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Solicitud de compra con lineas con compras efectuadas');  
+            $responseResource->body($solicitudCompraResource);
+            return $responseResource;
+        }
+        catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
+
     }
 }

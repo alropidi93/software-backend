@@ -41,7 +41,11 @@ class PedidoTransferenciaController extends Controller {
     protected $lineasPedidoTransferencia;
     protected $movimientoTipoStockRepository;
 
-    public function __construct(PedidoTransferenciaRepository $pedidoTransferenciaRepository, SolicitudCompraRepository $solicitudCompraRepository,LineaSolicitudCompraRepository $lineaSolicitudCompraRepository, LineaPedidoTransferenciaRepository $lineaPedidoTransferenciaRepository, MovimientoTipoStockRepository $movimientoTipoStockRepository)
+    public function __construct(PedidoTransferenciaRepository $pedidoTransferenciaRepository,
+                                SolicitudCompraRepository $solicitudCompraRepository,
+                                LineaSolicitudCompraRepository $lineaSolicitudCompraRepository,
+                                LineaPedidoTransferenciaRepository $lineaPedidoTransferenciaRepository,
+                                MovimientoTipoStockRepository $movimientoTipoStockRepository)
     {
         PedidoTransferenciaResource::withoutWrapping();
         
@@ -544,6 +548,7 @@ class PedidoTransferenciaController extends Controller {
 
     public function evaluarPedidoTransferencia($idPedidoTransferencia,Request $data)
     {
+       
         try{
             ini_set("max_execution_time", 1000 );
             
@@ -603,6 +608,7 @@ class PedidoTransferenciaController extends Controller {
             
             //Para los de fase 1
             if ($pedidoTransferencia->estaEnPrimerIntento()){
+               
                 
                 $tienda = $this->pedidoTransferenciaRepository->getTiendaDeAlmacenDestino();
                 /* Validaciones de fase 1(es igual que para fase 2)*/
@@ -661,7 +667,7 @@ class PedidoTransferenciaController extends Controller {
                 }
                 /* Fin de validaciones de fase 1*/  
                 if ($evaluacion){
-                    
+                     
                     if ($usuario->esJefeDeAlmacenAsignado()){
                         
                         $this->pedidoTransferenciaRepository->actualiza(['aceptoJAD'=>true]);
@@ -687,7 +693,9 @@ class PedidoTransferenciaController extends Controller {
 
                         /**/
                         $tipoStockPrincipal = $this->pedidoTransferenciaRepository->obtenerStockPrincipal();
+                        Log::info("entrando");
                         foreach ($lineasPedidoTransferencia as $key => $lt) {
+                            Log::info($key);
                             $this->movimientoTipoStockRepository->crear(['idAlmacen' => $pedidoTransferencia->almacenOrigen->id,
                                                                          'idProducto'=>$lt->idProducto,
                                                                          'idTipoStock'=> $tipoStockPrincipal->id,
@@ -706,6 +714,7 @@ class PedidoTransferenciaController extends Controller {
                                                                          'deleted'=>false]);
                         }
                         /**/
+                        
                         $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerModelo();
                         Log::info("Test5");
                         DB::commit();
@@ -979,7 +988,7 @@ class PedidoTransferenciaController extends Controller {
             }
             //Para los de fase 3
             else if ($pedidoTransferencia->estaEnTercerIntento()){
-                
+              
                 $almacenCentral = $this->pedidoTransferenciaRepository->getAlmacenDestino();
                 $almacenService  = new AlmacenService;
                 $lineasPedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerLineasPedidoTransferenciaFromOwnModel();

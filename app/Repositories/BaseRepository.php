@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use Illuminate\Support\Facades\Log;
 abstract class BaseRepository {
     /**
      * The Model instance.
@@ -111,10 +112,15 @@ abstract class BaseRepository {
      */
     public function actualiza($data)
     {
-       
+        
+        Log::info("step 0");
+        
         $this->model->update($data);
+        Log::info("step 1");
         $newModel = $this->obtenerPorId($this->model->id);
+        Log::info("step 2");
         $this->setModel($newModel);
+        Log::info("step 3");
         
     }
 

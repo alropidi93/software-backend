@@ -21,6 +21,7 @@ use App\Http\Helpers\Algorithm;
 use App\Http\Helpers\ArrayHelper;
 use Illuminate\Support\Facades\Input;
 
+
 class ProveedorController extends Controller
 {
     protected $proveedorRepository;

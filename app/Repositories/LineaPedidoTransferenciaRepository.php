@@ -31,6 +31,16 @@ class LineaPedidoTransferenciaRepository extends BaseRepository{
         
     }
 
+    public function obtenerAlmacenOrigen($lineaPT){
+        $pt = $lineaPT->pedidoTransferencia()->where('pedidoDeTransferencia.deleted',false)->first();
+        if($pt){
+            return  $pt->almacenOrigen()->where('almacen.deleted', false)->first();
+        }
+        return null;
+        
+
+    }
+
     
   
 }

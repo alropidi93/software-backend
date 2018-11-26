@@ -20,6 +20,10 @@ class Proveedor extends Model
       'deleted'
     ];
 
+    public function tieneExactamenteProductos($id_array){
+      return $this->productos()->where('producto.deleted',false)->whereIn('id',$id_array)->count()==count($id_array);
+    }
+
     public function productos(){
         return $this->belongsToMany('App\Models\Producto','productoxproveedor',
           'idProveedor','idProducto')->withPivot('deleted','precio','created_at','updated_at');

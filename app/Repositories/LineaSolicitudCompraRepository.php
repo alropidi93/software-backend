@@ -5,16 +5,25 @@ use App\Models\LineaSolicitudCompra;
 use App\Models\Proveedor;
 use App\Models\Producto;
 use App\Models\SolicitudCompra;
+use App\Models\LineaPedidoTransferencia;
 	
 class LineaSolicitudCompraRepository extends BaseRepository{
     protected $proveedor;
     protected $producto;
+    protected $solicitudCompra;
+    protected $lineaPedidoTransferencia;
 
-    public function __construct(LineaSolicitudCompra $lineaSolicitudCompra, Proveedor $proveedor, Producto $producto,SolicitudCompra $solicitudCompra){
+    public function __construct(LineaSolicitudCompra $lineaSolicitudCompra,
+                                Proveedor $proveedor,
+                                Producto $producto,
+                                SolicitudCompra $solicitudCompra,
+                                LineaPedidoTransferencia $lineaPedidoTransferencia){
+
         $this->model = $lineaSolicitudCompra;
         $this->proveedor = $proveedor;
         $this->producto = $producto;
         $this->solicitudCompra = $solicitudCompra;
+        $this->lineaPedidoTransferencia = $lineaPedidoTransferencia;
     }
     public function getProductoById($idProducto){
         
@@ -27,7 +36,10 @@ class LineaSolicitudCompraRepository extends BaseRepository{
     public function setSolicitudCompraModel($solicitudCompra){
         $this->solicitudCompra = $solicitudCompra;
     }
-
+    public function obtenerLineasPedidoTransferencia(){
+        
+        return $this->model->lineasPedidoTransferencia()->where('deleted',false)->get();
+    }
 
     public function setProductoModel($producto){
         $this->producto = $producto;
@@ -88,7 +100,7 @@ class LineaSolicitudCompraRepository extends BaseRepository{
     
     public function attachOrAccumulateLineaSolicitudCompra($producto,$cantidad){
         
-        $lineaSolicitudCompra = $this->model->where('idProducto',$producto->id)->where('deleted',false)
+        $lineaSolicitudCompra = $this->model->where('idProducto',$producto->id)->whereNull('idProveedor')->where('deleted',false)
             ->whereHas('solicitudCompra',function($q){
                 $q->where('solicitudDeCompra.enviado',false)->where('solicitudDeCompra.deleted',false);
             })->first(); 

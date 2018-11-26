@@ -2,20 +2,26 @@
 namespace App\Repositories;
 use App\Models\Tienda;
 use App\Models\SolicitudCompra;
+use App\Models\Proveedor;
+use App\Models\TipoStock;
 use App\Models\LineaSolicitudCompra; ///no poner esta linea de mierda me hizo perder 2 horas :')
 	
 class SolicitudCompraRepository extends BaseRepository {
     protected $lineaSolicitudCompra;
     protected $lineasSolicitudCompra;
     protected $tienda;
+    protected $proveedor;
+    protected $tipoStock;
     /**
      * Create a new ProductoRepository instance.
      * @return void
      */
-    public function __construct(SolicitudCompra $solicitudCompra, LineaSolicitudCompra $lineaSolicitudCompra, Tienda $tienda=null){
+    public function __construct(SolicitudCompra $solicitudCompra, LineaSolicitudCompra $lineaSolicitudCompra, Tienda $tienda=null, Proveedor $proveedor,TipoStock $tipoStock){
         $this->model = $solicitudCompra;
         $this->tienda = $tienda;
         $this->lineaSolicitudCompra = $lineaSolicitudCompra;
+        $this->proveedor = $proveedor;
+        $this->tipoStock = $tipoStock;
     }
 
     /**
@@ -104,6 +110,8 @@ class SolicitudCompraRepository extends BaseRepository {
         $this->lineaSolicitudCompra = $lineaSolicitudCompra;
     }
 
+    
+
     public function setTiendaModel($tienda){
         $this->tienda = $tienda;
     }
@@ -150,6 +158,37 @@ class SolicitudCompraRepository extends BaseRepository {
 
     public function crearNueva(){
         return $this->model->create(['deleted'=>false,'enviado'=>false]);
+    }
+
+    public function obtenerProveedorPorId($idProveedor){
+        return $this->proveedor->where('id', $idProveedor)->first();
+    }
+
+    public function obtenerStockPrincipal(){
+        return $this->tipoStock->where('key',1)->where('deleted',false)->first();
+    }
+
+    public function obtenerLineaPorProductoIdDisponible($idProducto){
+        return $this->model->lineasSolicitudCompra()->where('idProducto',$idProducto)->whereNull('idProveedor')->where('deleted',false)->first();
+    }
+
+ 
+
+    public function loadSpecifLineasRelationship($id_array){
+        $this->model = $this->model->load([
+            'lineasSolicitudCompra'=>function($query) use ($id_array){
+                // $query->where('lineaSolicitudDeCompra.deleted', false)->wherePivot('deleted',false);
+                $query->where('lineaSolicitudDeCompra.deleted', false)->whereIn('idProducto',$id_array); 
+            },
+            'lineasSolicitudCompra.producto'=>function($query){
+                
+                $query->where('producto.deleted', false); 
+            },
+            'lineasSolicitudCompra.proveedor'=>function($query){
+                
+                $query->where('proveedor.deleted', false); 
+            }
+        ]);
     }
 
     
