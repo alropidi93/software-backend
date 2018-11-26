@@ -38,6 +38,7 @@ Route::resource('factura', 'FacturaController');
 Route::resource('boleta', 'BoletaController');
 Route::resource('cotizacion', 'CotizacionController');
 Route::resource('devoluciones', 'DevolucionController');
+Route::resource('solicitudesProducto', 'SolicitudProductoController');
 
 Route::post('descuentos/crearDescuentoPorcentualCategoria', 'DescuentoController@crearDescuentoPorcentualCategoria');
 Route::post('descuentos/crearDescuentoPorcentualProducto', 'DescuentoController@crearDescuentoPorcentualProducto');

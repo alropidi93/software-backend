@@ -18,7 +18,9 @@ class Producto extends Model
         'idTipoProducto',
         'idUnidadMedida',
         'idCategoria',
+        'idDescuento',
         'precio',
+        'habilitado',
         'deleted'
     ];
 
@@ -63,8 +65,10 @@ class Producto extends Model
     // public function movimientoTipoStock(){
     //     return $this->belongsTo('App\Models\MovimientoTipoStock', 'idProducto', 'id');
     // }
-
-
+    public function descuento(){
+        return $this->hasOne('App\Models\Descuento', 'idDescuento', 'id');
+    }
+   
     
  
 
