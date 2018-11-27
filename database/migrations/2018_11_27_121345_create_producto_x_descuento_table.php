@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCategoriaXDescuentoTable extends Migration
+class CreateProductoXDescuentoTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,15 @@ class CreateCategoriaXDescuentoTable extends Migration
      */
     public function up()
     {
-        Schema::create('categoriaxdescuento', function (Blueprint $table) {
-            $table->integer('idCategoria');
+        Schema::create('productoxdescuento', function (Blueprint $table) {
+            $table->integer('idTienda');
+            $table->integer('idProducto');
             $table->integer('idDescuento');
             $table->boolean('deleted');
             $table->timestamps();
-            $table->primary(['idCategoria','idDescuento']);
-            $table->foreign('idCategoria')->references('id')->on('categoria')->onUpdate('cascade')->onDelete('cascade');
+            $table->primary(['idTienda','idProducto','idDescuento']);
+            $table->foreign('idTienda')->references('id')->on('tienda')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('idProducto')->references('id')->on('producto')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('idDescuento')->references('id')->on('descuento')->onUpdate('cascade')->onDelete('cascade');
         });
     }
@@ -31,6 +33,6 @@ class CreateCategoriaXDescuentoTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('categoriaxdescuento');
+        Schema::dropIfExists('productoxdescuento');
     }
 }

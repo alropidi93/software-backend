@@ -444,4 +444,23 @@ class DescuentoController extends Controller
         }
     }
     
+    public function obtenerProductosSinDescuentoDeTienda($idTienda){
+        try{
+            $tienda = $this->tiendaRepository->obtenerPorId($idTienda);
+            if (!$tienda){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Tienda no encontrada');
+                $notFoundResource->notFound(['id'=>$idTienda]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            $lista = $this->descuentoRepository->obtenerProductosSinDescuentoDeTienda($idTienda);
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de productos sin descuento en esta tienda');  
+            $responseResourse->body($lista);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+    
 }

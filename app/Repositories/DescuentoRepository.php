@@ -1,5 +1,6 @@
 <?php
 namespace App\Repositories;
+use Illuminate\Support\Facades\DB;
 use App\Models\Descuento;
 use App\Models\Tienda;
 use App\Models\Producto;
@@ -99,8 +100,32 @@ class DescuentoRepository extends BaseRepository{
         return $lista;
     }
 
-    public function obtenerProductosSinDescuento(){
-        $list = $this->producto->where('deleted',false)->whereDoesntHave('descuento')->where('deleted',false)->get();
-        return $list;
+    public function obtenerProductosSinDescuentoDeTienda($id){
+        //obtener descuentos
+        $descuentos = DB::table('descuento')->get();
+
+        //obtener descuentos de la tienda indicada
+        $descuentosTienda = array();
+        foreach($descuentos as $key => $descuento){
+            if($descuento->idTienda==$id){
+                $descuentosTienda[]=$descuento;
+            }
+        }
+        
+        //ver que productos no estan en la lista de descuentos y agregarlos
+        $productos = DB::table('producto')->get();
+        $listaProductos = array();
+        foreach($productos as $key => $producto){
+            $estaProducto = false;
+            foreach($descuentosTienda as $key => $descuentoTienda){
+                if($producto->id == $descuentoTienda->idProducto){
+                    $estaProducto = true;
+                }
+            }
+            if(!$estaProducto){
+                $listaProductos[] = $producto;
+            }
+        }
+        return $listaProductos;
     }
 }
