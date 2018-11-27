@@ -131,3 +131,4 @@ Route::get('descuento/obtenerProductosSinDescuentoDeTienda/{idTienda}', 'Descuen
 
 
 Route::post('solicitudCompra/efectuarCompra','SolicitudCompraController@efectuarCompra');
+Route::get('solicitudCompra/lineasCompraHistorial','SolicitudCompraController@listarLineasComprasEfectuadas');

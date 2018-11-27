@@ -12,6 +12,7 @@ use App\Repositories\UsuarioRepository;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SolicitudCompraResource;
 use App\Http\Resources\SolicitudesCompraResource;
+use App\Http\Resources\LineasSolicitudCompraResource;
 use App\Http\Resources\ExceptionResource;
 use App\Http\Resources\ErrorResource;
 use App\Http\Resources\ValidationResource;
@@ -307,5 +308,99 @@ class SolicitudCompraController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
 
+    }
+
+    public function listarLineasComprasEfectuadas(){
+        try{
+            
+            $filter = Input::get('filterBy');
+            $value = strtolower(Input::get('value'));
+            if (count(Input::get())>0){
+                if (!$filter || !$value){
+                    $errorResource = new ErrorResource(null);
+                    $errorResource->title('Error de búsqueda');
+                    $errorResource->message('Parámetros inválidos para la búsqueda');
+                    return $errorResource->response()->setStatusCode(400);
+                }
+            }
+            
+            
+            $responseResource = new ResponseResource(null);
+            
+            
+            if ($filter && $value){
+                
+                switch ($filter) {
+                    case 'idProducto':
+                                     
+                        $lineasSolicitudCompra = $this->solicitudCompraRepository->obtenerLineasConProveedorConFiltro($filter, $value);
+                        foreach ($lineasSolicitudCompra as $key => $pt) {
+                            $this->lineaSolicitudCompraRepository->loadProveedorRelationship($pt);
+                            $this->lineaSolicitudCompraRepository->loadProductoRelationship($pt);
+                            
+                        }
+                        $lineasSolicitudCompraResource =  new LineasSolicitudCompraResource($lineasSolicitudCompra);
+                        $responseResource->title('Lista de lineas de solicitud de compras efectuadas historicas filtradas por id de producto');       
+                        $responseResource->body($lineasSolicitudCompraResource);
+                        break;
+    
+                    case 'nombreProducto':
+                      
+                        $lineasSolicitudCompra = $this->solicitudCompraRepository->obtenerLineasConProveedorConFiltro($filter, $value);
+                        foreach ($lineasSolicitudCompra as $key => $pt) {
+                            $this->lineaSolicitudCompraRepository->loadProveedorRelationship($pt);
+                            $this->lineaSolicitudCompraRepository->loadProductoRelationship($pt);
+                            
+                        }
+                        $lineasSolicitudCompraResource =  new LineasSolicitudCompraResource($lineasSolicitudCompra);
+                        $responseResource->title('Lista de lineas de solicitud de compras efectuadas filtrados por nombre de producto');       
+                        $responseResource->body($lineasSolicitudCompraResource);
+                        break;
+                    
+    
+                    case 'nombreProveedor':
+                        $lineasSolicitudCompra = $this->solicitudCompraRepository->obtenerLineasConProveedorConFiltro($filter, $value);
+                        foreach ($lineasSolicitudCompra as $key => $pt) {
+                            $this->lineaSolicitudCompraRepository->loadProveedorRelationship($pt);
+                            $this->lineaSolicitudCompraRepository->loadProductoRelationship($pt);
+                            
+                        }
+                        $lineasSolicitudCompraResource =  new LineasSolicitudCompraResource($lineasSolicitudCompra);
+                        $responseResource->title('Lista de lineas de solicitud de compras efectuadas filtrados por nombre de proveedor');       
+                        $responseResource->body($lineasSolicitudCompraResource);
+                        break;
+                   
+                    
+    
+                    default:
+                        $errorResource = new ErrorResource(null);
+                        $errorResource->title('Error de búsqueda');
+                        $errorResource->message('Valor de filtro inválido');
+                        return $errorResource->response()->setStatusCode(400);
+                }
+                return $responseResource;
+            
+            }
+
+            
+            $lineasSolicitudCompra = $this->solicitudCompraRepository->obtenerLineasConProveedor();
+            foreach ($lineasSolicitudCompra as $key => $pt) {
+                $this->lineaSolicitudCompraRepository->loadProveedorRelationship($pt);
+                $this->lineaSolicitudCompraRepository->loadProductoRelationship($pt);
+             
+                
+            }
+            $lineasSolicitudCompraResource =  new LineasSolicitudCompraResource($lineasSolicitudCompra);  
+            
+            
+            $responseResource->title('Lista de lineas de solicitudes de compras efectuadas historicas');  
+            $responseResource->body($lineasSolicitudCompraResource);
+            return $responseResource;
+        }
+        catch(\Exception $e){
+                   
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
     }
 }
