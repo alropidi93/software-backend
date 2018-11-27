@@ -98,4 +98,9 @@ class DescuentoRepository extends BaseRepository{
         $lista = $this->model-> whereDate('fechaIni', '<=', Carbon::now())-> whereDate('fechaFin', '>=', Carbon::now())->where('deleted',false)->get();         
         return $lista;
     }
+
+    public function obtenerProductosSinDescuento(){
+        $list = $this->producto->where('deleted',false)->whereDoesntHave('descuento')->where('deleted',false)->get();
+        return $list;
+    }
 }
