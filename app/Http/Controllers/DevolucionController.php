@@ -9,6 +9,8 @@ use App\Repositories\DevolucionRepository;
 use App\Repositories\LineaDeVentaRepository;
 use App\Repositories\UsuarioRepository;
 use App\Repositories\ComprobantePagoRepository;
+use App\Repositories\BoletaRepository;
+use App\Repositories\FacturaRepository;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\DevolucionResource;
 use App\Http\Resources\DevolucionesResource;
@@ -26,13 +28,16 @@ class DevolucionController extends Controller
 {
     protected $devolucionRepository;
     protected $comprobantePagoRepository;
+    protected $boletaRepository;
     protected $lineasDeVenta;
     protected $usuarioRepository;
     
-    public function __construct(DevolucionRepository $devolucionRepository=null, ComprobantePagoRepository $comprobantePagoRepository=null, LineaDeVentaRepository $lineaDeVentaRepository=null, UsuarioRepository $usuarioRepository=null){
+    public function __construct(DevolucionRepository $devolucionRepository=null, ComprobantePagoRepository $comprobantePagoRepository=null, LineaDeVentaRepository $lineaDeVentaRepository=null, UsuarioRepository $usuarioRepository=null, BoletaRepository $boletaRepository=null, FacturaRepository $facturaRepository=null){
         DevolucionResource::withoutWrapping();
         $this->devolucionRepository = $devolucionRepository;
         $this->comprobantePagoRepository = $comprobantePagoRepository;
+        $this->boletaRepository = $boletaRepository;
+        $this->facturaRepository = $facturaRepository;
         $this->lineaDeVentaRepository = $lineaDeVentaRepository;
         $this->usuarioRepository = $usuarioRepository;
     }
@@ -104,21 +109,51 @@ class DevolucionController extends Controller
             }
 
             $idCliente = $request['idCliente'];
-            //buscar al cliente natural o juridico
-            $clienteNatural = $this->devolucionRepository->getClienteNaturalById($idCliente);
-            if(!$clienteNatural){
-                $clienteJuridico = $this->devolucionRepository->getClienteJuridicoById($idCliente);
-                if(!$clienteJuridico){
-                    $notFoundResource = new NotFoundResource(null);
-                    $notFoundResource->title('No existe este cliente');
-                    $notFoundResource->notFound(['id' => $idCliente]);
-                    return $notFoundResource->response()->setStatusCode(404);
+            //find out whether it's boleta or factura and assign its cliente
+            if(true){
+                $esClienteNatural = false;
+                $boleta = $this->boletaRepository->obtenerBoletaId($idComprobantePago);
+                if($boleta){
+                    $clienteNatural = $this->devolucionRepository->getClienteNaturalById($idCliente);
+                    if(!$clienteNatural){
+                        $notFoundResource = new NotFoundResource(null);
+                        $notFoundResource->title('No existe este cliente natural');
+                        $notFoundResource->notFound(['id' => $idCliente]);
+                        return $notFoundResource->response()->setStatusCode(404);
+                    }
+                    $this->devolucionRepository->setPersonaNaturalModel($clienteNatural);
+                    $esClienteNatural = true;
                 }else{
+                    //era factura
+                    $factura = $this->facturaRepository->obtenerFacturaPorId($idComprobantePago);
+                    $clienteJuridico = $this->devolucionRepository->getClienteJuridicoById($idCliente);
+                    if(!$clienteJuridico){
+                        $notFoundResource = new NotFoundResource(null);
+                        $notFoundResource->title('No existe este juridico');
+                        $notFoundResource->notFound(['id' => $idCliente]);
+                        return $notFoundResource->response()->setStatusCode(404);
+                    }
                     $this->devolucionRepository->setPersonaJuridicaModel($clienteJuridico);
+                    $esClienteNatural = false;
                 }
-            }else{
-                $this->devolucionRepository->setPersonaNaturalModel($clienteNatural);
             }
+
+            // $idCliente = $request['idCliente'];
+            // //buscar al cliente natural o juridico
+            // $clienteNatural = $this->devolucionRepository->getClienteNaturalById($idCliente);
+            // if(!$clienteNatural){
+            //     $clienteJuridico = $this->devolucionRepository->getClienteJuridicoById($idCliente);
+            //     if(!$clienteJuridico){
+            //         $notFoundResource = new NotFoundResource(null);
+            //         $notFoundResource->title('No existe este cliente');
+            //         $notFoundResource->notFound(['id' => $idCliente]);
+            //         return $notFoundResource->response()->setStatusCode(404);
+            //     }else{
+            //         $this->devolucionRepository->setPersonaJuridicaModel($clienteJuridico);
+            //     }
+            // }else{
+            //     $this->devolucionRepository->setPersonaNaturalModel($clienteNatural);
+            // }
             
             DB::beginTransaction();
             $this->devolucionRepository->guarda($request->all());
@@ -133,12 +168,11 @@ class DevolucionController extends Controller
             $devolucionCreada = $this->devolucionRepository->obtenerModelo();
             $this->devolucionRepository->setModel($devolucionCreada);
             $this->devolucionRepository->loadUsuarioRelationship();
-            if($clienteNatural){
-                $this->devolucionRepository->setPersonaNaturalModel($clienteNatural);
+
+            if($esClienteNatural){
                 $this->devolucionRepository->loadPersonaNaturalRelationship();
                 $this->devolucionRepository->attachPersonaNatural();
-            }else if($clienteJuridico){
-                $this->devolucionRepository->setPersonaJuridicaModel($clienteJuridico);
+            }else{
                 $this->devolucionRepository->loadPersonaJuridicaRelationship();
                 $this->devolucionRepository->attachPersonaJuridica();
             }

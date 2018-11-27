@@ -252,6 +252,7 @@ class DescuentoController extends Controller
             DB::commit();
 
             $this->descuentoRepository->setModel($descuento);
+            // $this->descuentoRepository->setProductoModel($producto);
             $this->descuentoRepository->loadTiendaRelationship();
             $this->descuentoRepository->loadProductoRelationship();
                                  
@@ -424,6 +425,19 @@ class DescuentoController extends Controller
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de descuentos vigentes');  
             $responseResourse->body($descuentosResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+
+    public function obtenerProductosSinDescuento(){
+        try{
+            $productos = $this->descuentoRepository->obtenerProductosSinDescuento();
+            $productosResource = new ProductosResource($productos);
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de productos sin descuento');  
+            $responseResourse->body($productosResource);
             return $responseResourse;
         }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);

@@ -46,6 +46,13 @@ class ProductoRepository extends BaseRepository {
         return $this->model = $this->model->create($dataArray);
         
     }
+    public function guardaPrecioPorAlmacen($productoData)
+    {
+        $productoData['deleted'] =false;
+
+        return $this->model = $this->model->create($productoData);
+        
+    }
 
     public function loadUnidadMedidaRelationship($producto=null){
     
@@ -208,6 +215,23 @@ class ProductoRepository extends BaseRepository {
                             ->where('idTipoStock',$idTipoStock)
                             ->where('deleted',false)
                             ->update(['cantidad'=>$cantidad]);
+    }
+
+    public function actualizarPrecio($idTipoStock, $idAlmacen, $precio){
+        $productoxalmacen =  ProductoXAlmacen::where('idAlmacen',$idAlmacen)
+                            ->where('idProducto',$this->model->id)
+                            ->where('idTipoStock',$idTipoStock)
+                            ->where('deleted',false)
+                            ->update(['precio'=>$precio]);
+    }
+
+    public function setPrecioxAlmacen($idProducto){
+        $producto = $this->productoRepository->obtenerPorId($idProducto);
+        $precio = $producto['precio'];
+        DB::table('productoxalmacen')
+            ->where('idProducto', $idProducto)
+            ->where('idTipoStock', 1)
+            ->update(['precio' => $precio]);
     }
 
     public function checkProductoProveedorOwnModelsRelationship(){

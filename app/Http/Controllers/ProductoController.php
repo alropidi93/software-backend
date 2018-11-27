@@ -91,6 +91,7 @@ class ProductoController extends Controller
             DB::beginTransaction();
             
             $producto = $this->productoRepository->guarda($productoData->all());
+            $this->productoRepository->guardaPrecioPorAlmacen($productoData);
             // $producto->unidadMedida;
             // $producto->categoria;
             // $producto->tipoProducto;
@@ -479,8 +480,53 @@ class ProductoController extends Controller
         }
     }
 
+    public function actualizarPrecio($idProducto, Request $data){
+        // $data con tiene: idTipoStock, idAlmacen y precio
+        try{
+            $productoDataArray= Algorithm::quitNullValuesFromArray($data->all());
+            $validator = \Validator::make($productoDataArray, 
+                            ['idTipoStock' => 'required',
+                            'idAlmacen' => 'required',
+                            'precio'=>'required']);
 
-    public function test(){
-        
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
+            DB::beginTransaction();
+            $idTipoStock = $data['idTipoStock'];
+            $idAlmacen = $data['idAlmacen'];
+            $precio = $data['precio'];
+
+            $producto = $this->productoRepository->obtenerPorId($idProducto);
+            $this->productoRepository->setModel($producto);
+            $this->productoRepository->actualizarPrecio( $idTipoStock, $idAlmacen, $precio);
+
+            $producto = $this->productoRepository->obtenerModelo();
+            DB::commit();
+            $productoResource =  new ProductoResource($producto);  
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Precio del producto modificado correctamente');  
+            $responseResource->body($productoResource);
+            return $responseResource;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+
+    public function setPrecioxAlmacen($idProducto){
+        try{
+            $producto = $this->productoRepository->obtenerPorId($idProducto);
+            if (!$producto){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Producto no encontrado');
+                $notFoundResource->notFound(['id' => $idProducto]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            $this->productorepository->setPrecioxAlmacen($idProducto);
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
     }
 }
