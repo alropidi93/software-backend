@@ -130,3 +130,4 @@ Route::get('descuento/ListarDescuentosVigentes', 'DescuentoController@listarDesc
 
 
 Route::post('solicitudCompra/efectuarCompra','SolicitudCompraController@efectuarCompra');
+Route::get('solicitudCompra/lineasCompraHistorial','SolicitudCompraController@listarLineasComprasEfectuadas');

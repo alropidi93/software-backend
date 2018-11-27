@@ -191,5 +191,36 @@ class SolicitudCompraRepository extends BaseRepository {
         ]);
     }
 
+    protected function obtenerLineasConProveedorQuery(){
+        $solicitudCompraDisponible = $this->obtenerSolicitudDisponible();
+        return $solicitudCompraDisponible->lineasSolicitudCompra()->where('deleted',false)->whereNotNull('idProveedor');
+    }
+    public function obtenerLineasConProveedor(){
+        return $this->obtenerLineasConProveedorQuery()->get();
+    }
+
+
+    public function obtenerLineasConProveedorConFiltro($filter, $value){
+        if($filter=='idProducto'){
+            return $this->obtenerLineasConProveedorQuery()->where($filter,$value)->get();
+        }
+        else if ($filter=='nombreProducto'){
+            
+            return $this->obtenerLineasConProveedorQuery()->whereHas('producto',function($query) use ($value){
+                $query->whereRaw("lower(nombre) like ? ",'%'.$value.'%')->where('deleted',false);
+            })->get();
+
+        }
+            
+        else if ($filter=='nombreProveedor'){
+            return $this->obtenerLineasConProveedorQuery()->whereHas('proveedor',function($query) use ($value){
+                $query->whereRaw("lower(contacto) like ? ",'%'.$value.'%')->where('deleted',false);
+            })->get();
+        }
+     
+        return null;
+
+    }
+
     
 }
