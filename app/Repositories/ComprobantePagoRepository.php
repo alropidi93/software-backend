@@ -148,7 +148,7 @@ class ComprobantePagoRepository extends BaseRepository {
     }
 
     public function reporteMovimientos(){
-        $lista = DB::select(DB::raw('select mts.id "Id Movimiento", p."nombre" "Producto", ts."tipo" "Tipo", mts."cantidad" "Cantidad", mts."signo" "Signo"
+        $lista = DB::select(DB::raw('select mts.id "Id Movimiento", p."nombre" "Producto", ts."tipo" "Tipo", mts."cantidad" "Cantidad", mts."signo" "Signo", mts."created_at" "Fecha Movimiento"
         from "movimientoTipoStock" mts, "tipoStock" ts, "producto" p
         where mts."idTipoStock" = ts."id" and mts."idProducto" = p."id"'));
         return $lista;
