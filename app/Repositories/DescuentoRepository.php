@@ -1,5 +1,6 @@
 <?php
 namespace App\Repositories;
+use Illuminate\Support\Facades\DB;
 use App\Models\Descuento;
 use App\Models\Tienda;
 use App\Models\Producto;
@@ -99,8 +100,106 @@ class DescuentoRepository extends BaseRepository{
         return $lista;
     }
 
-    public function obtenerProductosSinDescuento(){
-        $list = $this->producto->where('deleted',false)->whereDoesntHave('descuento')->where('deleted',false)->get();
-        return $list;
+    public function obtenerProductosSinDescuentoDeTienda($id){
+        //obtener descuentos
+        $descuentos = DB::table('descuento')->where('deleted', false)->get();
+
+        //obtener descuentos de la tienda indicada
+        $descuentosTienda = array();
+        foreach($descuentos as $key => $descuento){
+            if($descuento->idTienda==$id){
+                $descuentosTienda[]=$descuento;
+            }
+        }
+        
+        //ver que productos no estan en la lista de descuentos y agregarlos
+        $productos = DB::table('producto')->where('deleted', false)->get();
+        $listaProductos = array();
+        foreach($productos as $key => $producto){
+            $estaProducto = false;
+            foreach($descuentosTienda as $key => $descuentoTienda){
+                if($producto->id == $descuentoTienda->idProducto){
+                    $estaProducto = true;
+                }
+            }
+            if(!$estaProducto){
+                $listaProductos[] = $producto;
+            }
+        }
+        return $listaProductos;
+    }
+
+    public function obtenerProductosConDescuentoDeTienda($id){
+        //obtener descuentos
+        $descuentos = DB::table('descuento')->where('deleted', false)->get();
+
+        //obtener descuentos de la tienda indicada
+        $descuentosTienda = array();
+        foreach($descuentos as $key => $descuento){
+            if($descuento->idTienda==$id){
+                $descuentosTienda[]=$descuento;
+            }
+        }
+        
+        //ver que productos estan en la lista de descuentos y agregarlos
+        $productos = DB::table('producto')->where('deleted', false)->get();
+        $listaProductos = array();
+        foreach($productos as $key => $producto){
+            // $estaProducto = false;
+            foreach($descuentosTienda as $key => $descuentoTienda){
+                if($producto->id == $descuentoTienda->idProducto){
+                    $listaProductos[] = $producto;
+                    break;
+                }
+            }
+        }
+        return $listaProductos;
+    }
+    public function obtenerCategoriasSinDescuentoDeTienda($id){
+        //obtener descuentos
+        $descuentos = DB::table('descuento')->where('deleted', false)->get();
+
+        //obtener descuentos de la tienda indicada
+        $descuentosTienda = array();
+        foreach($descuentos as $key => $descuento){
+            if($descuento->idTienda==$id){
+                $descuentosTienda[]=$descuento;
+            }
+        }
+        
+        //encontrar productos con descuentos para luego retirar sus categorias de la lista 
+        $productos = DB::table('producto')->where('deleted', false)->get();
+        $listaProductosConDescuento = array();
+        foreach($productos as $key => $producto){
+            $estaProducto = false;
+            foreach($descuentosTienda as $key => $descuentoTienda){
+                if($producto->id == $descuentoTienda->idProducto){
+                    $estaProducto = true;
+                }
+            }
+            if($estaProducto){
+                $listaProductosConDescuento[] = $producto;
+            }
+        }
+        $categorias= DB::table('categoria')->where('deleted', false)->get();
+        $listaCategorias=array();
+        foreach($categorias as $key => $categoria){
+            $estaCategoria = false;
+            $estaProductoDeEstaCategoria= false;
+            foreach($listaProductosConDescuento as $key => $producto){
+                if($categoria->id == $producto->idCategoria){
+                    $estaProductoDeEstaCategoria = true;
+                }
+            }
+            foreach($descuentosTienda as $key => $descuentoTienda){
+                if($categoria->id == $descuentoTienda->idCategoria){
+                    $estaCategoria = true;
+                }
+            }
+            if(!$estaCategoria and !$estaProductoDeEstaCategoria ){
+                $listaCategorias[] = $categoria;
+            }
+        }
+        return $listaCategorias;
     }
 }

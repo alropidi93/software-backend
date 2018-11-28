@@ -14,6 +14,7 @@ use App\Repositories\CategoriaRepository;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\DescuentoResource;
 use App\Http\Resources\DescuentosResource;
+use App\Http\Resources\ProductoResource;
 use App\Http\Resources\ExceptionResource;
 use App\Http\Resources\ValidationResource;
 use App\Http\Resources\ResponseResource;
@@ -302,7 +303,7 @@ class DescuentoController extends Controller
             $descuentoData['es2x1'] = true;
             DB::beginTransaction();
             $descuento = $this->descuentoRepository->guarda($descuentoData->all());
-            // DB::commit();
+            DB::commit();
 
             $this->descuentoRepository->setModel($descuento);
             $this->descuentoRepository->loadTiendaRelationship();
@@ -438,6 +439,92 @@ class DescuentoController extends Controller
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de productos sin descuento');  
             $responseResourse->body($productosResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+    
+    public function obtenerProductosSinDescuentoDeTienda($idTienda){
+        try{
+            $tienda = $this->tiendaRepository->obtenerPorId($idTienda);
+            if (!$tienda){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Tienda no encontrada');
+                $notFoundResource->notFound(['id'=>$idTienda]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            $lista = $this->descuentoRepository->obtenerProductosSinDescuentoDeTienda($idTienda);
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de productos sin descuento en esta tienda');  
+            $responseResourse->body($lista);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+
+    public function obtenerProductosSinDescuentoDeTiendaConRelaciones($idTienda){
+        try{
+            $tienda = $this->tiendaRepository->obtenerPorId($idTienda);
+            if (!$tienda){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Tienda no encontrada');
+                $notFoundResource->notFound(['id'=>$idTienda]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            $lista = $this->descuentoRepository->obtenerProductosSinDescuentoDeTienda($idTienda);
+            $lstProductos= array();
+            foreach($lista as $key => $item){
+                $producto = $this->productoRepository->obtenerPorId($item->id);
+                $productoResource =  new ProductoResource($producto);
+                $lstProductos[] = $productoResource;
+            }
+            foreach ($lstProductos as $key => $prod) {
+                $this->productoRepository->loadTipoProductoRelationship($prod);
+                $this->productoRepository->loadCategoriaRelationship($prod);       
+            }
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de productos sin descuento en esta tienda');  
+            $responseResourse->body($lstProductos);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+
+    public function obtenerProductosConDescuentoDeTienda($idTienda){
+        try{
+            $tienda = $this->tiendaRepository->obtenerPorId($idTienda);
+            if (!$tienda){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Tienda no encontrada');
+                $notFoundResource->notFound(['id'=>$idTienda]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            $lista = $this->descuentoRepository->obtenerProductosConDescuentoDeTienda($idTienda);
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de productos con descuento en esta tienda');  
+            $responseResourse->body($lista);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+    
+    public function obtenerCategoriasSinDescuentoDeTienda($idTienda){
+        try{
+            $tienda = $this->tiendaRepository->obtenerPorId($idTienda);
+            if (!$tienda){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Tienda no encontrada');
+                $notFoundResource->notFound(['id'=>$idTienda]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            $lista = $this->descuentoRepository->obtenerCategoriasSinDescuentoDeTienda($idTienda);
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de categorias sin descuento en esta tienda');  
+            $responseResourse->body($lista);
             return $responseResourse;
         }catch(\Exception $e){
             return (new ExceptionResource($e))->response()->setStatusCode(500);
