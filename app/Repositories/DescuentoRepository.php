@@ -113,7 +113,7 @@ class DescuentoRepository extends BaseRepository{
         }
         
         //ver que productos no estan en la lista de descuentos y agregarlos
-        $productos = DB::table('producto')->get();
+        $productos = DB::table('producto')->where('deleted', false)->get();
         $listaProductos = array();
         foreach($productos as $key => $producto){
             $estaProducto = false;
@@ -124,6 +124,33 @@ class DescuentoRepository extends BaseRepository{
             }
             if(!$estaProducto){
                 $listaProductos[] = $producto;
+            }
+        }
+        return $listaProductos;
+    }
+
+    public function obtenerProductosConDescuentoDeTienda($id){
+        //obtener descuentos
+        $descuentos = DB::table('descuento')->where('deleted', false)->get();
+
+        //obtener descuentos de la tienda indicada
+        $descuentosTienda = array();
+        foreach($descuentos as $key => $descuento){
+            if($descuento->idTienda==$id){
+                $descuentosTienda[]=$descuento;
+            }
+        }
+        
+        //ver que productos estan en la lista de descuentos y agregarlos
+        $productos = DB::table('producto')->where('deleted', false)->get();
+        $listaProductos = array();
+        foreach($productos as $key => $producto){
+            // $estaProducto = false;
+            foreach($descuentosTienda as $key => $descuentoTienda){
+                if($producto->id == $descuentoTienda->idProducto){
+                    $listaProductos[] = $producto;
+                    break;
+                }
             }
         }
         return $listaProductos;
