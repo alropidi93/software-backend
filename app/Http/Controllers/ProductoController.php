@@ -551,7 +551,7 @@ class ProductoController extends Controller
                 $notFoundResource->notFound(['idProducto'=>$idProducto]);
                 return $notFoundResource->response()->setStatusCode(404);
             }
-            $tienda = $this->productoRepository->obtenerTiendaPorId($idProducto);
+            $tienda = $this->productoRepository->obtenerTiendaPorId($idTienda);
             if (!$tienda){
                 $notFoundResource = new NotFoundResource(null);
                 $notFoundResource->title('Tienda no encontrada');
