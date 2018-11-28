@@ -102,7 +102,7 @@ class DescuentoRepository extends BaseRepository{
 
     public function obtenerProductosSinDescuentoDeTienda($id){
         //obtener descuentos
-        $descuentos = DB::table('descuento')->get();
+        $descuentos = DB::table('descuento')->where('deleted', false)->get();
 
         //obtener descuentos de la tienda indicada
         $descuentosTienda = array();
