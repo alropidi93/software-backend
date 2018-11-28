@@ -302,7 +302,7 @@ class DescuentoController extends Controller
             $descuentoData['es2x1'] = true;
             DB::beginTransaction();
             $descuento = $this->descuentoRepository->guarda($descuentoData->all());
-            // DB::commit();
+            DB::commit();
 
             $this->descuentoRepository->setModel($descuento);
             $this->descuentoRepository->loadTiendaRelationship();
