@@ -116,12 +116,10 @@ class ComprobantePagoRepository extends BaseRepository {
     }
 
     public function reporteVentasCajeros(){
-        $lista = DB::select(DB::raw('select pN.id AS "idCajero",  pN.nombre || \' \' || pN.apellidos AS "nombre", SUM(cP.subtotal) AS "totalVendido"
+        $lista = DB::select(DB::raw('select pN.id "ID Cajero",  pN.nombre || \' \' || pN.apellidos "Nombre", cP."created_at" "Fecha de emision", cP.subtotal AS "Subtotal"
         from "comprobantePago" cP, "personaNatural" pN
         where cp."idCajero" = pn."id"
-        group by pN.id, pN.nombre
-        order by pN."id" DESC'));
-        
+        order by pN."id"'));
         return $lista;
     }
 
@@ -146,6 +144,13 @@ class ComprobantePagoRepository extends BaseRepository {
         from "factura" f, "comprobantePago" cP
         where "idCliente" is not null and f."idComprobantePago" = cP."id"
         order by f."idCliente"'));
+        return $lista;
+    }
+
+    public function reporteMovimientos(){
+        $lista = DB::select(DB::raw('select mts.id "Id Movimiento", p."nombre" "Producto", ts."tipo" "Tipo", mts."cantidad" "Cantidad", mts."signo" "Signo"
+        from "movimientoTipoStock" mts, "tipoStock" ts, "producto" p
+        where mts."idTipoStock" = ts."id" and mts."idProducto" = p."id"'));
         return $lista;
     }
 }

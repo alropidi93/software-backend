@@ -64,6 +64,7 @@ Route::get('comprobantePago/reporteVentasCajeros', 'ComprobantePagoController@re
 Route::get('comprobantePago/reporteVentasProductos', 'ComprobantePagoController@reporteVentasProductos');
 Route::get('comprobantePago/reporteTotalesClientesPorBoletas', 'ComprobantePagoController@reporteTotalesClientesPorBoletas');
 Route::get('comprobantePago/reporteTotalesClientesPorFacturas', 'ComprobantePagoController@reporteTotalesClientesPorFacturas');
+Route::get('comprobantePago/reporteMovimientos', 'ComprobantePagoController@reporteMovimientos');
 
 Route::post('tienda/asignarJefeAlmacen/{idTienda}', 'TiendaController@asignarJefeDeAlmacen');
 Route::post('tienda/desasignarJefeAlmacen/{idTienda}' , 'TiendaController@desasignarJefeDeAlmacen');
