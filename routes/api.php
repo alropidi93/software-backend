@@ -128,6 +128,7 @@ Route::get('almacen/listarConStockDeAlmacen/{idAlmacen}','AlmacenController@list
 
 Route::get('descuento/ListarDescuentosVigentes', 'DescuentoController@listarDescuentosVigentes');
 Route::get('descuento/obtenerProductosSinDescuentoDeTienda/{idTienda}', 'DescuentoController@obtenerProductosSinDescuentoDeTienda');
+Route::get('descuento/obtenerCategoriasSinDescuentoDeTienda/{idTienda}', 'DescuentoController@obtenerCategoriasSinDescuentoDeTienda');
 
 
 Route::post('solicitudCompra/efectuarCompra','SolicitudCompraController@efectuarCompra');
