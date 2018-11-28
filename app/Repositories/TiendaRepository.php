@@ -178,4 +178,6 @@ class TiendaRepository extends BaseRepository {
         $almacenTienda= $this->almacen->where('idTienda',$idTienda)->first();
         return $almacenTienda['id'];
     }
+
+    
 }

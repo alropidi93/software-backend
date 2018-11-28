@@ -18,9 +18,7 @@ use App\Http\Resources\ErrorResource;
 use App\Http\Resources\ValidationResource;
 use App\Http\Resources\ResponseResource;
 use App\Http\Resources\NotFoundResource;
-
 use App\Services\ProductoService;
-
 use Illuminate\Support\Facades\DB;
 use App\Http\Helpers\Algorithm;
 use Illuminate\Support\Facades\Input;

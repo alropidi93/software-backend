@@ -7,6 +7,8 @@ use App\Models\TipoProducto;
 use App\Models\UnidadMedida;
 use App\Models\Categoria;
 use App\Models\Almacen;
+use App\Models\Tienda;
+use App\Models\TipoStock;
 	
 class ProductoRepository extends BaseRepository {
     protected $tipoProducto;
@@ -16,6 +18,8 @@ class ProductoRepository extends BaseRepository {
     protected $proveedores;
     protected $almacenes;
     protected $almacen;
+    protected $tienda;
+    protected $tipoStock;
     /** 
      * Create a new ProductoRepository instance.
      * @param  App\Models\Producto $producto
@@ -23,7 +27,7 @@ class ProductoRepository extends BaseRepository {
      * @param  App\Models\Proveedor $proveedor
      * @return void
      */
-    public function __construct(Producto $producto, TipoProducto $tipoProducto,UnidadMedida $unidadMedida ,Proveedor $proveedor, Categoria $categoria, Almacen $almacen) 
+    public function __construct(Producto $producto, TipoProducto $tipoProducto,UnidadMedida $unidadMedida ,Proveedor $proveedor, Categoria $categoria, Almacen $almacen, Tienda $tienda,TipoStock $tipoStock) 
     {
         $this->model = $producto;
         $this->tipoProducto = $tipoProducto;
@@ -31,6 +35,8 @@ class ProductoRepository extends BaseRepository {
         $this->proveedor = $proveedor;
         $this->categoria = $categoria;
         $this->almacen = $almacen;
+        $this->tienda = $tienda;
+        $this->tipoStock = $tipoStock;
         
     }
 
@@ -74,6 +80,9 @@ class ProductoRepository extends BaseRepository {
         if ($this->model->unidadMedida){
             $this->unidadMedida = $this->model->unidadMedida;
         }
+    }
+    public function obtenerStockPrincipal(){
+        return $this->tipoStock->where('key',1)->where('deleted',false)->first();
     }
 
     public function loadCategoriaRelationship($producto=null){
@@ -130,7 +139,11 @@ class ProductoRepository extends BaseRepository {
             $this->model = $this->model->load([
                 'almacenes'=>function($query){
                     $query->where('almacen.deleted', false); 
-                }
+                },
+                'almacenes.tienda'=>function($query){
+                    $query->where('tienda.deleted', false); 
+                },
+
             ]);
             foreach ($this->model->almacenes as $key => $almacen) {
                 $almacen->pivot->load([
@@ -143,7 +156,10 @@ class ProductoRepository extends BaseRepository {
             $this->model =$producto->load([
                 'almacenes'=>function($query){
                     $query->where('almacen.deleted', false); 
-                }
+                },
+                'almacenes.tienda'=>function($query){
+                    $query->where('tienda.deleted', false); 
+                },
             ]);
             foreach ($this->model->almacenes as $key => $almacen) {
                 $almacen->pivot->load([
@@ -387,5 +403,26 @@ class ProductoRepository extends BaseRepository {
                 }
             }
         }
+    }
+
+    public function obtenerTiendaPorId($id){
+        return $this->tienda->where('id',$id)->where('deleted',false)->first();
+    }
+
+    public function actualizarDataPorTienda( $tienda,$data){
+        
+        $idProducto = $this->model->id;
+        
+        $idAlmacen = $tienda->almacen->id;
+        $idTipoStock = $this->obtenerStockPrincipal()->id;
+        
+
+        
+        $productoxalmacen =  ProductoXAlmacen::where('idAlmacen',$idAlmacen)
+                            ->where('idProducto',$idProducto)
+                            ->where('idTipoStock',$idTipoStock)
+                            ->where('deleted',false)
+                            ->update($data);
+        
     }
 }

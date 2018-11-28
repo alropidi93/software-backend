@@ -529,4 +529,52 @@ class ProductoController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
     }
+
+    public function actualizarPorTienda($idProducto,$idTienda, Request $data){
+        try{
+           
+            $dataArray= Algorithm::quitNullValuesFromArray($data->all());
+            
+            if (count($dataArray)==0){
+                $errorResource = new ErrorResource(null);
+                $errorResource->title('Error de actualización');
+                $errorResource->message('No se han enviado datos para actualizar');
+                return $errorResource->response()->setStatusCode(400);
+            }
+
+          
+            DB::beginTransaction();
+            $producto = $this->productoRepository->obtenerPorId($idProducto);
+            if (!$producto){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Producto no encontrada');
+                $notFoundResource->notFound(['idProducto'=>$idProducto]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            $tienda = $this->productoRepository->obtenerTiendaPorId($idProducto);
+            if (!$tienda){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Tienda no encontrada');
+                $notFoundResource->notFound(['idTienda'=>$idTienda]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            
+
+            $this->productoRepository->setModel($producto);
+            $this->productoRepository->actualizarDataPorTienda($tienda,$dataArray);
+            // $producto->almacenes;
+            // $producto;
+            $producto = $this->productoRepository->obtenerModelo();
+            DB::commit();
+            $this->productoRepository->loadAlmacenesRelationship($producto);
+            $productoResource =  new ProductoResource($producto);  
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Datos del producto en una tienda actualizados correctamente');  
+            $responseResource->body($productoResource);
+            return $responseResource;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
 }

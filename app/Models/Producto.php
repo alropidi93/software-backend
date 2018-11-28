@@ -48,7 +48,7 @@ class Producto extends Model
     public function almacenes(){
         return $this->belongsToMany('App\Models\Almacen','productoxalmacen',
         'idProducto','idAlmacen')->using('App\Models\ProductoXAlmacen')
-        ->withPivot('idTipoStock','cantidad','deleted','created_at','updated_at');
+        ->withPivot('idTipoStock','cantidad','precio','deleted','created_at','updated_at');
     }
     
 
