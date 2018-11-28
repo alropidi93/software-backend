@@ -141,7 +141,7 @@ class DescuentoRepository extends BaseRepository{
         }
         
         //encontrar productos con descuentos para luego retirar sus categorias de la lista 
-        $productos = DB::table('producto')->where('deleted', false)->get();
+        $productos = DB::table('producto')->where('habilitado', true)->where('deleted', false)->get();
         $listaProductosConDescuento = array();
         foreach($productos as $key => $producto){
             $estaProducto = false;
