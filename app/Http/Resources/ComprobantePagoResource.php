@@ -24,6 +24,7 @@ class ComprobantePagoResource extends JsonResource
                 'fechaEnt' => $this->fechaEnt,
                 'lineasDeVenta' => new LineasDeVentaResource($this->whenLoaded('lineasDeVenta')),
                 'cajero' => new UsuarioResource($this->whenLoaded('usuario')),
+                'tienda' => new TiendaResource($this->whenLoaded('tienda')),
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,

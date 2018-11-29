@@ -11,12 +11,17 @@ class ComprobantePago extends Model
   
     protected $fillable = [
       'id',
+      'idTienda',
       'idCajero',
       'subtotal',
       'entrega',
       'fechaEnt',
       'deleted'     
     ];
+
+    public function tienda(){
+      return $this->belongsTo('App\Models\Tienda', 'idTienda', 'id');
+    }
 
     public function usuario() {
       return $this->belongsTo('App\Models\Usuario','idCajero','idPersonaNatural');
