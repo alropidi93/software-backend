@@ -551,7 +551,7 @@ class DescuentoController extends Controller
                 $this->productoRepository->loadCategoriaRelationship($prod);       
             }
             $responseResourse = new ResponseResource(null);
-            $responseResourse->title('Lista de productos sin descuento en esta tienda');  
+            $responseResourse->title('Lista de productos con descuento en esta tienda');  
             $responseResourse->body($lstProductos);
             return $responseResourse;
         }catch(\Exception $e){
