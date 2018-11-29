@@ -67,7 +67,8 @@ class ProductoController extends Controller
                             'stockMin' => 'required',
                             'descripcion'=>'required',
                             'idCategoria' => 'required',
-                            'precio' => 'required']);
+                            'idTipoProducto' => 'required',
+                            'idUnidadMedida' => 'required']);
 
             if ($validator->fails()) {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
