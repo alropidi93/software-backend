@@ -102,7 +102,7 @@ class DescuentoRepository extends BaseRepository{
 
     public function obtenerProductosSinDescuentoDeTienda($id){
         //obtener descuentos
-        $descuentos = DB::table('descuento')->where('deleted', false)->get();
+        $descuentos = $this->model->whereDate('fechaIni', '<=', Carbon::now())-> whereDate('fechaFin', '>=', Carbon::now())->where('deleted',false)->get();
 
         //obtener descuentos de la tienda indicada
         $descuentosTienda = array();
@@ -131,7 +131,7 @@ class DescuentoRepository extends BaseRepository{
 
     public function obtenerProductosConDescuentoDeTienda($id){
         //obtener descuentos
-        $descuentos = DB::table('descuento')->where('deleted', false)->get();
+        $descuentos = $this->model->whereDate('fechaIni', '<=', Carbon::now())-> whereDate('fechaFin', '>=', Carbon::now())->where('deleted',false)->get();
 
         //obtener descuentos de la tienda indicada
         $descuentosTienda = array();
@@ -157,7 +157,7 @@ class DescuentoRepository extends BaseRepository{
     }
     public function obtenerCategoriasSinDescuentoDeTienda($id){
         //obtener descuentos
-        $descuentos = DB::table('descuento')->where('deleted', false)->get();
+        $descuentos = $this->model->whereDate('fechaIni', '<=', Carbon::now())-> whereDate('fechaFin', '>=', Carbon::now())->where('deleted',false)->get();
 
         //obtener descuentos de la tienda indicada
         $descuentosTienda = array();
@@ -204,7 +204,7 @@ class DescuentoRepository extends BaseRepository{
     }
     public function obtenerProductosConAlgunDescuento($idTienda){
         //obtener descuentos
-        $descuentos = DB::table('descuento')->where('deleted', false)->get();
+        $descuentos = $this->model->whereDate('fechaIni', '<=', Carbon::now())-> whereDate('fechaFin', '>=', Carbon::now())->where('deleted',false)->get();
 
         //obtener descuentos de la tienda indicada
         $descuentosTienda = array();
