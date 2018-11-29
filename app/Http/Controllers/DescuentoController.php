@@ -530,5 +530,32 @@ class DescuentoController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
     }
-    
+     public function obtenerProductosConDescuentoDeTiendaConRelaciones($idTienda){
+        try{
+            $tienda = $this->tiendaRepository->obtenerPorId($idTienda);
+            if (!$tienda){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Tienda no encontrada');
+                $notFoundResource->notFound(['id'=>$idTienda]);
+                return $notFoundResource->response()->setStatusCode(404);;
+            }
+            $lista = $this->descuentoRepository->obtenerProductosConAlgunDescuento($idTienda);
+            $lstProductos= array();
+            foreach($lista as $key => $item){
+                $producto = $this->productoRepository->obtenerPorId($item->id);
+                $productoResource =  new ProductoResource($producto);
+                $lstProductos[] = $productoResource;
+            }
+            foreach ($lstProductos as $key => $prod) {
+                $this->productoRepository->loadTipoProductoRelationship($prod);
+                $this->productoRepository->loadCategoriaRelationship($prod);       
+            }
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de productos sin descuento en esta tienda');  
+            $responseResourse->body($lstProductos);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
 }

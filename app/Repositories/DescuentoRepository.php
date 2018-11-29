@@ -202,4 +202,54 @@ class DescuentoRepository extends BaseRepository{
         }
         return $listaCategorias;
     }
+    public function obtenerProductosConAlgunDescuento($idTienda){
+        //obtener descuentos
+        $descuentos = DB::table('descuento')->where('deleted', false)->get();
+
+        //obtener descuentos de la tienda indicada
+        $descuentosTienda = array();
+        foreach($descuentos as $key => $descuento){
+            if($descuento->idTienda==$idTienda){
+                $descuentosTienda[]=$descuento;
+            }
+        }
+        
+        //encontrar productos con descuentos para luego retirar sus categorias de la lista 
+        $productos = DB::table('producto')->where('deleted', false)->get();
+        $listaProductosConDescuento = array();
+        foreach($productos as $key => $producto){
+            $estaProducto = false;
+            foreach($descuentosTienda as $key => $descuentoTienda){
+                if($producto->id == $descuentoTienda->idProducto){
+                    $estaProducto = true;
+                }
+            }
+            if($estaProducto){
+                $listaProductosConDescuento[] = $producto;
+            }
+        }
+        $categorias= DB::table('categoria')->where('deleted', false)->get();   
+        foreach($categorias as $key => $categoria){
+            $estaCategoria = false;
+           //  $estaProductoDeEstaCategoria= false;
+           //  foreach($listaProductosConDescuento as $key => $producto){
+           //      if($categoria->id == $producto->idCategoria){
+           //          $estaProductoDeEstaCategoria = true;
+           //      }
+           //  }
+            foreach($descuentosTienda as $key => $descuentoTienda){
+                if($categoria->id == $descuentoTienda->idCategoria){
+                    $estaCategoria = true;
+                }
+            }
+            if($estaCategoria){
+               foreach($productos as $key => $producto){
+                   if($categoria->id == $producto->idCategoria){
+                       $listaProductosConDescuento[] = $producto;
+                   }
+               }
+            }
+        }
+        return $listaProductosConDescuento;
+   }
 }

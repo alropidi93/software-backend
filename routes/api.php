@@ -130,6 +130,7 @@ Route::get('descuento/ListarDescuentosVigentes', 'DescuentoController@listarDesc
 Route::get('descuento/obtenerProductosConDescuentoDeTienda/{idTienda}', 'DescuentoController@obtenerProductosConDescuentoDeTienda');
 Route::get('descuento/obtenerProductosSinDescuentoDeTienda/{idTienda}', 'DescuentoController@obtenerProductosSinDescuentoDeTienda');
 Route::get('descuento/obtenerProductosSinDescuentoDeTiendaConRelaciones/{idTienda}', 'DescuentoController@obtenerProductosSinDescuentoDeTiendaConRelaciones');
+Route::get('descuento/obtenerProductosConDescuentoDeTiendaConRelaciones/{idTienda}', 'DescuentoController@obtenerProductosConDescuentoDeTiendaConRelaciones');
 Route::get('descuento/obtenerCategoriasSinDescuentoDeTienda/{idTienda}', 'DescuentoController@obtenerCategoriasSinDescuentoDeTienda');
 
 
