@@ -9,6 +9,7 @@ use App\Models\Categoria;
 use App\Models\Almacen;
 use App\Models\Tienda;
 use App\Models\TipoStock;
+use App\Models\Descuento;
 	
 class ProductoRepository extends BaseRepository {
     protected $tipoProducto;
@@ -20,6 +21,7 @@ class ProductoRepository extends BaseRepository {
     protected $almacen;
     protected $tienda;
     protected $tipoStock;
+    protected $descuento;
     /** 
      * Create a new ProductoRepository instance.
      * @param  App\Models\Producto $producto
@@ -27,7 +29,7 @@ class ProductoRepository extends BaseRepository {
      * @param  App\Models\Proveedor $proveedor
      * @return void
      */
-    public function __construct(Producto $producto, TipoProducto $tipoProducto,UnidadMedida $unidadMedida ,Proveedor $proveedor, Categoria $categoria, Almacen $almacen, Tienda $tienda,TipoStock $tipoStock) 
+    public function __construct(Producto $producto, TipoProducto $tipoProducto,UnidadMedida $unidadMedida ,Proveedor $proveedor, Categoria $categoria, Almacen $almacen, Tienda $tienda,TipoStock $tipoStock, Descuento $descuento) 
     {
         $this->model = $producto;
         $this->tipoProducto = $tipoProducto;
@@ -37,6 +39,7 @@ class ProductoRepository extends BaseRepository {
         $this->almacen = $almacen;
         $this->tienda = $tienda;
         $this->tipoStock = $tipoStock;
+        $this->descuento = $descuento;
         
     }
 
@@ -106,14 +109,32 @@ class ProductoRepository extends BaseRepository {
             $this->categoria = $this->model->categoria;
         }
     }
+    public function loadDescuentoRelationship($producto=null){
+    
+        if (!$producto){
+            $this->model = $this->model->load([
+                'descuento'=>function($query){
+                    $query->where('deleted', false); 
+                }
+            ]);
+        }
+        else{
+            
+            $this->model =$producto->load([
+                'descuento'=>function($query){
+                    $query->where('deleted', false); 
+                }
+            ]);
+        }
+        if ($this->model->descuento){
+            $this->descuento = $this->model->descuento;
+        }
+    }
 
     public function loadTipoProductoRelationship($producto=null){
       
-
-
         if (!$producto){
-        
-            
+               
 
             $this->model = $this->model->load([
                 'tipoProducto'=>function($query){

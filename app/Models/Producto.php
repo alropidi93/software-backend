@@ -66,7 +66,7 @@ class Producto extends Model
     //     return $this->belongsTo('App\Models\MovimientoTipoStock', 'idProducto', 'id');
     // }
     public function descuento(){
-        return $this->hasOne('App\Models\Descuento', 'idDescuento', 'id');
+        return $this->hasOne('App\Models\Descuento', 'id', 'idDescuento');
     }
    
     
