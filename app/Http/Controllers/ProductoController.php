@@ -91,8 +91,8 @@ class ProductoController extends Controller
             }
             DB::beginTransaction();
             
-            $producto = $this->productoRepository->guarda($productoData->all());
-            $this->productoRepository->guardaPrecioPorAlmacen($productoData);
+            // $producto = $this->productoRepository->guarda($productoData->all());
+            $producto = $this->productoRepository->guardaPrecioPorAlmacen($productoData->all());
             // $producto->unidadMedida;
             // $producto->categoria;
             // $producto->tipoProducto;
