@@ -547,7 +547,6 @@ class DescuentoController extends Controller
                 $lstProductos[] = $productoResource;
             }
             foreach ($lstProductos as $key => $prod) {
-                return $prod->idTipoProducto;
                 $this->productoRepository->loadTipoProductoRelationship($prod);
                 $this->productoRepository->loadDescuentoRelationship($prod);       
             }
