@@ -132,17 +132,19 @@ class ComprobantePagoRepository extends BaseRepository {
     }
 
     public function reporteTotalesClientesPorBoletas(){
-        $lista = DB::select(DB::raw('select b."idCliente", cP."subtotal" "Subtotal", b."igv" "IGV" , b."igv" + cP.subtotal "Total"
-        from "boleta" b, "comprobantePago" cP
-        where "idCliente" is not null and b."idComprobantePago" = cP."id"
+        $lista = DB::select(DB::raw('select b."idCliente" "ID Cliente", pN.nombre|| \' \' ||pN.apellidos "Nombre", cP."subtotal" "Subtotal", b."igv" "IGV" , b."igv" + cP.subtotal "Total", cP."created_at" "Fecha de Emision"
+        from "boleta" b, "comprobantePago" cP, "personaNatural" pN
+        where "idCliente" is not null and b."idComprobantePago" = cP."id" and 
+        b."idCliente" = pN."id" and pN.id not in (select "idPersonaNatural" from usuario)
         order by b."idCliente"'));
         return $lista;
     }
 
     public function reporteTotalesClientesPorFacturas(){
-        $lista = DB::select(DB::raw('select f."idCliente", cP."subtotal" "Subtotal", f."igv" "IGV" , f."igv" + cP.subtotal "Total"
-        from "factura" f, "comprobantePago" cP
-        where "idCliente" is not null and f."idComprobantePago" = cP."id"
+        $lista = DB::select(DB::raw('select f."idCliente" "ID Cliente", pN.nombre|| \' \' ||pN.apellidos "Nombre", cP."subtotal" "Subtotal", f."igv" "IGV" , f."igv" + cP.subtotal "Total", cP."created_at" "Fecha de Emision"
+        from "factura" f, "comprobantePago" cP, "personaNatural" pN
+        where "idCliente" is not null and f."idComprobantePago" = cP."id" and 
+        f."idCliente" = pN."id" and pN.id not in (select "idPersonaNatural" from usuario)
         order by f."idCliente"'));
         return $lista;
     }
