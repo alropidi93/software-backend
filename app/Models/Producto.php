@@ -73,8 +73,12 @@ class Producto extends Model
     {
         return $this->hasMany('App\Models\Descuento', 'idProducto', 'id');
     }
-   
-    
+
+    public function descuentosTc(){
+        return $this->belongsToMany('App\Models\Descuento','productoxdescuento',
+          'idProducto','idDescuento')->using('App\Models\ProductoXDescuento')
+          ->withPivot('idTienda', 'deleted','created_at','updated_at');
+    }
  
 
     

@@ -27,6 +27,11 @@ class DescuentoRepository extends BaseRepository{
         return $this->model = $this->model->create($dataArray);    
     }
 
+    public function attachProductoXDescuento($descuento, $idTienda){
+        $this->model->productoxdescuentos()->save($descuento, ['idTienda'=>$idTienda, 'deleted'=>false] );
+        $this->model->save();
+    }
+
     public function setTiendaModel($tienda){
         $this->tienda = $tienda;
     }

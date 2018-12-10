@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Producto;
 use App\Repositories\ProductoRepository;
+use App\Repositories\DescuentoRepository;
+use App\Repositories\TiendaRepository;
 use App\Repositories\CategoriaRepository;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\DescuentoResource;
+use App\Http\Resources\DescuentosResource;
 use App\Http\Resources\ProductoResource;
 use App\Http\Resources\ProductosResource;
 use App\Http\Resources\ExceptionResource;
@@ -22,11 +26,15 @@ class ProductoController extends Controller
 {
     protected $productoRepository;
     protected $categoriaRepository;
+    protected $descuentoRepository;
+    protected $tiendaRepository;
 
-    public function __construct(ProductoRepository $productoRepository, CategoriaRepository $categoriaRepository){
+    public function __construct(ProductoRepository $productoRepository, CategoriaRepository $categoriaRepository, DescuentoRepository $descuentoRepository=null, TiendaRepository $tiendaRepository=null){
         ProductoResource::withoutWrapping();
         $this->productoRepository = $productoRepository;
         $this->categoriaRepository = $categoriaRepository;
+        $this->descuentoRepository = $descuentoRepository;
+        $this->tiendaRepository = $tiendaRepository;
     }
     /**
      * Display a listing of the resource.
@@ -106,6 +114,62 @@ class ProductoController extends Controller
             $responseResource->title('Producto creada exitosamente');       
             $responseResource->body($productoResource);       
             return $responseResource;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+
+    public function crearDescuentoPorcentualProductoTc(Request $descuentoData){
+        try{
+            $validator = \Validator::make($descuentoData->all(), 
+                            ['idProducto' => 'required',
+                            'idTienda'=>  'required',
+                            'fechaIni'=>  'required',
+                            'fechaFin'=>  'required',
+                            'porcentaje'=>  'required',
+                            ]);
+
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
+
+            //validaciones
+            if(true){
+                //verificar que la tienda existe
+                $tienda = $this->tiendaRepository->obtenerPorId($descuentoData['idTienda']);
+                if(!$tienda){
+                    $notFoundResource = new NotFoundResource(null);
+                    $notFoundResource->title('No existe esta tienda');
+                    $notFoundResource->notFound(['id' => $descuentoData['idTienda']]);
+                    return $notFoundResource->response()->setStatusCode(404);
+                }
+                //verificar que el producto existe
+                $producto = $this->productoRepository->obtenerPorId($descuentoData['idProducto']);
+                if (!$producto){
+                    $notFoundResource = new NotFoundResource(null);
+                    $notFoundResource->title('No existe este producto');
+                    $notFoundResource->notFound(['id' => $descuentoData['idProducto']]);
+                    return $notFoundResource->response()->setStatusCode(404);
+                }
+            }
+
+            DB::beginTransaction();
+            $descuento = $this->descuentoRepository->guarda($descuentoData->all());
+            DB::commit();
+
+            $this->descuentoRepository->setModel($descuento);
+            $this->descuentoRepository->loadTiendaRelationship();
+            $this->descuentoRepository->loadProductoRelationship();
+
+            //HERE WE ATTEMPT TO STORE INTO PRODUCTOXDESCUENTO
+            $this->productoRepository->attachProductoXDescuento($descuento, $descuentoData['idProducto'], $descuentoData['idTienda']);
+                                 
+            $descuentoResource =  new DescuentoResource($descuento);
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Descuento porcentual por producto creado exitosamente');       
+            $responseResourse->body($descuentoResource);       
+            return $responseResourse;
         }catch(\Exception $e){
             DB::rollback();
             return (new ExceptionResource($e))->response()->setStatusCode(500);
