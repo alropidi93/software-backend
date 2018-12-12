@@ -448,6 +448,7 @@ class ProductoRepository extends BaseRepository {
     }
 
     public function attachProductoXDescuento($descuento, $idProducto, $idTienda){
+        
         $this->model->descuentosTc()->save($descuento , ['idTienda'=>$idTienda, 'idProducto'=> $idProducto, 'deleted'=>false] );
         $this->model->save();
     }

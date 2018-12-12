@@ -163,6 +163,7 @@ class ProductoController extends Controller
             $this->descuentoRepository->loadProductoRelationship();
 
             //HERE WE ATTEMPT TO STORE INTO PRODUCTOXDESCUENTO
+            $this->productoRepository->setModel($producto);
             $this->productoRepository->attachProductoXDescuento($descuento, $descuentoData['idProducto'], $descuentoData['idTienda']);
                                  
             $descuentoResource =  new DescuentoResource($descuento);
