@@ -170,6 +170,7 @@ class AlmacenRepository extends BaseRepository{
         ->join('tipoStock', 'tipoStock.id', '=', 'productoxalmacen.idTipoStock')
         ->where('tipoStock.key',1)
         ->where('tipoStock.deleted',false)
+        ->where('producto.habilitado',true)
         ->where('producto.deleted',false)
         ->wherePivot('deleted',false)
         ->whereRaw('producto."stockMin" >= productoxalmacen.cantidad')
@@ -190,6 +191,7 @@ class AlmacenRepository extends BaseRepository{
         ->where('tipoStock.key',1)
         ->where('tipoStock.deleted',false)
         ->where('producto.deleted',false)
+        ->where('producto.habilitado',true)
         ->wherePivot('deleted',false)
         ->get();
 

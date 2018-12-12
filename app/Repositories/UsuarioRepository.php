@@ -84,6 +84,18 @@ class UsuarioRepository extends BaseRepository {
         $this->model->update($dataArray); //set data only in its PersonaNatural model
     }
 
+    public function actualizarPrincipalOApoyo($dataArray){
+        ///////////////////////////
+        //CREAR EL MODELO Y RESOURCE PARA QUE SEA MAS RAPIDO///////////////////////////
+        ///////////////////////////
+        $idTienda = $dataArray['idTienda'];
+        $miembroPrincipal = $dataArray['miembroPrincipal'];
+        $usuarioxtienda =  UsuarioXTienda::where('idUsuario',$idUsuario)
+                            ->where('idTienda',$idTienda)
+                            ->where('deleted',false)
+                            ->update(['miembroPrincipal'=>$miembroPrincipal]);
+    }
+
     public function actualizaSoloUsuario($dataArray){
         //persona natural no tiene atributos con el mismo nombre de atributos del usuario que se vayan a actualizar
         //deleted, created_at y updated_at son comunes, pero estos jamas se actualizaran por acá
