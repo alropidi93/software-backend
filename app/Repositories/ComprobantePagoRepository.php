@@ -155,4 +155,12 @@ class ComprobantePagoRepository extends BaseRepository {
         where mts."idTipoStock" = ts."id" and mts."idProducto" = p."id"'));
         return $lista;
     }
+
+    public function reporteCompras(){
+        $lista = DB::select(DB::raw('select sc.id "N° solicitud", t."nombre", p."nombre", lsc."cantidad", prov."razonSocial", sc."created_at" "Fecha Solicitud"
+        from "lineaSolicitudDeCompra" lsc, "solicitudDeCompra" sc, "producto" p, "proveedor" prov, "tienda" t
+        where lsc."idSolicitudDeCompra" = sc."id" and lsc."idProducto" = p."id" and lsc."idProveedor" = prov."id" and sc."idTienda" = t."id"
+        order by "N° solicitud"'));
+        return $lista;
+    }
 }

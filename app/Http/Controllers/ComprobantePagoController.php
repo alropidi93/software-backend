@@ -276,4 +276,17 @@ class ComprobantePagoController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);
         }
     }
+
+    public function reporteCompras(){
+        try{
+            $ventas = $this->comprobantePagoRepository->reporteCompras();
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de totales de compras');  
+            $responseResourse->body($ventas);
+            return $responseResourse;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
 }
