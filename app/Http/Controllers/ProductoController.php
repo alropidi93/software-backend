@@ -107,6 +107,11 @@ class ProductoController extends Controller
             // return $producto;
 
             DB::commit();
+
+            //Agregar el nuevo producto en TODOS los almacenes con stock 0
+            app('App\Http\Controllers\AlmacenController')->cargarProductoNuevoEnTodosLosAlmacenes($producto);
+            
+
             $this->productoRepository->setModel($producto);
             $this->productoRepository->loadCategoriaRelationship();
             $productoResource =  new ProductoResource($producto);
