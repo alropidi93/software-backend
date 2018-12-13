@@ -126,6 +126,7 @@ class DevolucionRepository extends BaseRepository {
         $this->lineaDeVenta =  new LineaDeVenta;
         $this->lineaDeVenta['idProducto'] =  $dataLineaDeVenta['idProducto'];
         $this->lineaDeVenta['cantidad'] = $dataLineaDeVenta['cantidad'];
+        $this->lineaDeVenta['subtotalLinea'] = array_key_exists('subtotalLinea',$dataLineaDeVenta)? $dataLineaDeVenta['subtotalLinea']:0;
         $this->lineaDeVenta['deleted'] =  false; //default value
     }
 
