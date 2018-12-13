@@ -303,6 +303,24 @@ class BoletaController extends Controller
             return (new ExceptionResource($e))->response()->setStatusCode(500);   
         }
     }
+
+    public function ListarBoletasNoRecogidas(){
+        try{
+            $boletas = $this->boletaRepository->ListarBoletasNoRecogidas();
+            foreach($boletas as $key => $boleta){
+                $this->boletaRepository->loadPersonaNaturalRelationship($boleta);
+                $this->comprobantePagoRepository->loadCajeroRelationship($boleta->comprobantePago);
+                $this->comprobantePagoRepository->loadLineasDeVentaRelationship($boleta->comprobantePago);
+            }
+            $boletasResource =  new BoletasResource($boletas); 
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Lista de boletas con fecha de recojo vencida');  
+            $responseResourse->body($boletasResource);
+            return $responseResourse;
+        }catch(\Exception $e){
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
+    }
 }
 
 

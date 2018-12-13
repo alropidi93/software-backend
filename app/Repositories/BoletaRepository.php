@@ -122,6 +122,18 @@ class BoletaRepository extends BaseRepository {
         return $lista;
     }
 
+    public function ListarBoletasNoRecogidas(){
+       
+        $lista =  $this->model->whereHas('comprobantePago', function ($query) {
+            $query->where('entrega', false)->where('deleted',false);
+        })->where('deleted',false)->get();
+        
+        foreach ($lista as $key => $boleta) {
+            $boleta->comprobantePago;
+        }
+        return $lista;
+    }
+
     public function obtenerBoletaPorId($id){
         $boleta = $this->model->where('idComprobantePago',$id)->where('deleted',false)->first();
         if($boleta) $boleta->comprobantePago;
