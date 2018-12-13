@@ -16,6 +16,7 @@ class ComprobantePago extends Model
       'subtotal',
       'entrega',
       'fechaEnt',
+      'entregado',
       'deleted'     
     ];
 
