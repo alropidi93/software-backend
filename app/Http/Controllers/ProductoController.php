@@ -43,7 +43,7 @@ class ProductoController extends Controller
      */
     public function index(){
         try{
-            $productos = $this->productoRepository->obtenerProductosHabilitados();
+            $productos = $this->productoRepository->obtenerTodos();
             
             foreach ($productos as $key => $producto) {
                 $this->productoRepository->loadTipoProductoRelationship($producto);
