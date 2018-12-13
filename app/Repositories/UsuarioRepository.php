@@ -1,6 +1,7 @@
 <?php
 namespace App\Repositories;
 use App\Models\Usuario;
+use App\Models\UsuarioXTienda;
 use App\Models\TipoUsuario;
 use App\Models\PersonaNatural;
 use App\Models\Tienda;
@@ -84,10 +85,7 @@ class UsuarioRepository extends BaseRepository {
         $this->model->update($dataArray); //set data only in its PersonaNatural model
     }
 
-    public function actualizarPrincipalOApoyo($dataArray){
-        ///////////////////////////
-        //CREAR EL MODELO Y RESOURCE PARA QUE SEA MAS RAPIDO///////////////////////////
-        ///////////////////////////
+    public function actualizarPrincipalOApoyo($idUsuario, $dataArray){
         $idTienda = $dataArray['idTienda'];
         $miembroPrincipal = $dataArray['miembroPrincipal'];
         $usuarioxtienda =  UsuarioXTienda::where('idUsuario',$idUsuario)
