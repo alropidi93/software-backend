@@ -799,7 +799,7 @@ class UsuarioController extends Controller
             
             foreach ($usuarios as $key => $usuario) {
                 $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
-                //$usuario->tiendas;
+               
                 $this->usuarioRepository->loadTiendasCargoTrabajadorRelationship($usuario);
                 
             }
