@@ -6,7 +6,8 @@ use App\Models\Proveedor;
 use App\Models\Producto;
 use App\Models\SolicitudCompra;
 use App\Models\LineaPedidoTransferencia;
-	
+use Illuminate\Support\Facades\Log;	
+
 class LineaSolicitudCompraRepository extends BaseRepository{
     protected $proveedor;
     protected $producto;
@@ -99,17 +100,23 @@ class LineaSolicitudCompraRepository extends BaseRepository{
     }
     
     public function attachOrAccumulateLineaSolicitudCompra($producto,$cantidad){
-        
+        Log::info("estamos en attachOrAccumulate");
         $lineaSolicitudCompra = $this->model->where('idProducto',$producto->id)->whereNull('idProveedor')->where('deleted',false)
             ->whereHas('solicitudCompra',function($q){
                 $q->where('solicitudDeCompra.enviado',false)->where('solicitudDeCompra.deleted',false);
             })->first(); 
-        
+        Log::info(json_encode($lineaSolicitudCompra));
         if ($lineaSolicitudCompra){
             //actualizamos
-            
+            Log::info("*************");
+            Log::info($lineaSolicitudCompra->cantidad);
+            Log::info($cantidad);
+            Log::info($lineaSolicitudCompra->cantidad + $cantidad);
+            Log::info("*************");
             $this->model = $lineaSolicitudCompra;
+            Log::info(json_encode($this->model));
             $this->actualiza(['cantidad'=>$lineaSolicitudCompra->cantidad + $cantidad]);
+            Log::info(json_encode($this->model));
         }
         else{
             

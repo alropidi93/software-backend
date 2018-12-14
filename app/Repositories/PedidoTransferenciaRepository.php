@@ -352,22 +352,7 @@ class PedidoTransferenciaRepository extends BaseRepository {
             $q->where('transferencia.deleted',false);
         })->where('deleted',false)->get();
         $lista = $listaRecibidos->merge($listaEmitidos);
-        // $lista=array();
-        // foreach ($lista2 as $key => $pedidoTransferencia){
-        //     if(!$pedidoTransferencia->fueEvaluado()) {
-        //         array_push($lista, $pedidoTransferencia);
-        //     }
-        // }
-        
-        // foreach ($lista as $key => $pedidoTransferencia){
-        //     //$pedidoTransferencia->load('transferencia');
-        //     if($pedidoTransferencia->transferencia){
-        //         Log::info("Esta descartando");
-        //         unset($lista[$key]);
-        //         Log::info(json_encode("lista"));
-        //     }
-        
-        // }
+ 
         
         return $lista;
     }
@@ -382,7 +367,7 @@ class PedidoTransferenciaRepository extends BaseRepository {
     }
 
     public function obtenerLineasPedidoTransferenciaFromOwnModel(){
-        return $this->lineasPedidoTransferencia;
+        return $this->model->lineasPedidoTransferencia;
     }
 
     public function obtenerTiendaDeAlmacenOrigenFromOwnModel(){
