@@ -482,9 +482,16 @@ class PedidoTransferenciaController extends Controller {
 
     public function evaluarPedidoTransferencia($idPedidoTransferencia,Request $data)
     {
-       
+        // $almacenOrigen = $this->pedidoTransferenciaRepository->getAlmacenById(2);
+        // $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia);
+        // $lineasPedidoTransferencia = $pedidoTransferencia->lineasPedidoTransferencia;
+        // $almacenService = new AlmacenService;
+        // return $almacenCercano = $almacenService->obtenerAlmacenCercanoConStock($almacenOrigen,2,$lineasPedidoTransferencia);
+        
+        
         try{
             ini_set("max_execution_time", 1000 );
+            
             $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia);
             $dataArray=$data->all();
             $dataArray= Algorithm::quitNullValuesFromArray($dataArray);
@@ -498,7 +505,7 @@ class PedidoTransferenciaController extends Controller {
                 return (new ValidationResource($validator))->response()->setStatusCode(422);
             }
             $idUsuario =  $data['idUsuario'];
-            $pedidoTransferencia = $this->pedidoTransferenciaRepository->obtenerPedidoTransferenciaConTransferenciaPorId($idPedidoTransferencia);
+            
             /* Validaciones generales */
             if (!$pedidoTransferencia){
                 $notFoundResource = new NotFoundResource(null);
