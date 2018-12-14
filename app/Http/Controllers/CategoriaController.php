@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Categoria;
 use App\Models\Producto;
+use App\Models\Tienda;
 use App\Repositories\CategoriaRepository;
+use App\Repositories\TiendaRepository;
+use App\Repositories\DescuentoRepository;
 use App\Repositories\ProductoRepository;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoriaResource;
+use App\Http\Resources\DescuentoResource;
 use App\Http\Resources\CategoriasResource;
 use App\Http\Resources\ExceptionResource;
 use App\Http\Resources\ErrorResource;
@@ -28,11 +32,73 @@ class CategoriaController extends Controller
      */
 
     protected $categoriaRepository;
+    protected $tiendaRepository;
+    protected $descuentoRepository;
 
-    public function __construct(CategoriaRepository $categoriaRepository){
+    public function __construct(CategoriaRepository $categoriaRepository=null, TiendaRepository $tiendaRepository=null, DescuentoRepository $descuentoRepository=null){
         CategoriaResource::withoutWrapping();
         $this->categoriaRepository = $categoriaRepository;
+        $this->tiendaRepository = $tiendaRepository;
+        $this->descuentoRepository = $descuentoRepository;
     }
+
+    public function crearDescuentoPorcentualCategoriaTc(Request $descuentoData){
+        try{
+            $validator = \Validator::make($descuentoData->all(), 
+                            ['idCategoria' => 'required',
+                            'idTienda'=>  'required',
+                            'fechaIni'=>  'required',
+                            'fechaFin'=>  'required',
+                            'porcentaje'=>  'required',
+                            ]);
+
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
+
+            //validaciones
+            if(true){
+                //verificar que la tienda existe
+                $tienda = $this->tiendaRepository->obtenerPorId($descuentoData['idTienda']);
+                if(!$tienda){
+                    $notFoundResource = new NotFoundResource(null);
+                    $notFoundResource->title('No existe esta tienda');
+                    $notFoundResource->notFound(['id' => $descuentoData['idTienda']]);
+                    return $notFoundResource->response()->setStatusCode(404);
+                }
+                //verificar que la categoria existe
+                $categoria = $this->categoriaRepository->obtenerPorId($descuentoData['idCategoria']);
+                if (!$categoria){
+                    $notFoundResource = new NotFoundResource(null);
+                    $notFoundResource->title('No existe esta categoria');
+                    $notFoundResource->notFound(['id' => $descuentoData['idCategoria']]);
+                    return $notFoundResource->response()->setStatusCode(404);
+                }
+            }
+
+            DB::beginTransaction();
+            $descuento = $this->descuentoRepository->guarda($descuentoData->all());
+            DB::commit();
+
+            $this->descuentoRepository->setModel($descuento);
+            $this->descuentoRepository->loadTiendaRelationship();
+            $this->descuentoRepository->loadCategoriaRelationship();
+
+            $this->categoriaRepository->setModel($categoria);
+            $this->categoriaRepository->setProductosDeCategoriaEnProductoXDescuento($descuentoData['idCategoria'], $descuento, $descuentoData);
+            $this->categoriaRepository->attachCategoriaXDescuento($descuento, $descuentoData['idCategoria'], $descuentoData['idTienda']);
+                                 
+            $descuentoResource =  new DescuentoResource($descuento);
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Descuento porcentual por categoria creado exitosamente');       
+            $responseResourse->body($descuentoResource);       
+            return $responseResourse;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+
     public function index()
     {
         try{

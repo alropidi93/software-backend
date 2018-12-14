@@ -85,7 +85,8 @@ class ComprobantePagoRepository extends BaseRepository {
         $this->lineaDeVenta =  new LineaDeVenta;
         $this->lineaDeVenta['idProducto'] =  $dataLineaDeVenta['idProducto'];
         $this->lineaDeVenta['cantidad'] = $dataLineaDeVenta['cantidad'];
-        $this->lineaDeVenta['subtotalLinea'] = array_key_exists('subtotalLinea',$dataLineaDeVenta)? $dataLineaDeVenta['subtotalLinea']:0;
+        $this->lineaDeVenta['subtotalConIgv'] = array_key_exists('subtotalConIgv',$dataLineaDeVenta)? $dataLineaDeVenta['subtotalConIgv']:0;
+        $this->lineaDeVenta['precioUnitarioConIgv'] = array_key_exists('precioUnitarioConIgv',$dataLineaDeVenta)? $dataLineaDeVenta['precioUnitarioConIgv']:0;
         $this->lineaDeVenta['deleted'] =  false; //default value
     }
 
