@@ -182,6 +182,62 @@ class ProductoController extends Controller
         }
     }
 
+    public function crearDescuento2x1ProductoTc(Request $descuentoData){
+        try{
+            $validator = \Validator::make($descuentoData->all(), 
+                            ['idProducto' => 'required',
+                            'idTienda'=>  'required',
+                            'fechaIni'=>  'required',
+                            'fechaFin'=>  'required'
+                            ]);
+
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
+
+            //validaciones
+            if(true){
+                //verificar que la tienda existe
+                $tienda = $this->tiendaRepository->obtenerPorId($descuentoData['idTienda']);
+                if(!$tienda){
+                    $notFoundResource = new NotFoundResource(null);
+                    $notFoundResource->title('No existe esta tienda');
+                    $notFoundResource->notFound(['id' => $descuentoData['idTienda']]);
+                    return $notFoundResource->response()->setStatusCode(404);
+                }
+                //verificar que la categoria existe
+                $producto = $this->productoRepository->obtenerPorId($descuentoData['idProducto']);
+                if (!$producto){
+                    $notFoundResource = new NotFoundResource(null);
+                    $notFoundResource->title('No existe este producto');
+                    $notFoundResource->notFound(['id' => $descuentoData['idProducto']]);
+                    return $notFoundResource->response()->setStatusCode(404);
+                }
+            }
+            $descuentoData['es2x1'] = true;
+            DB::beginTransaction();
+            $descuento = $this->descuentoRepository->guarda($descuentoData->all());
+            DB::commit();
+
+            $this->descuentoRepository->setModel($descuento);
+            $this->descuentoRepository->loadTiendaRelationship();
+            $this->descuentoRepository->loadProductoRelationship();
+
+            //HERE WE ATTEMPT TO STORE INTO PRODUCTOXDESCUENTO
+            $this->productoRepository->setModel($producto);
+            $this->productoRepository->attachProductoXDescuento($descuento, $descuentoData['idProducto'], $descuentoData['idTienda']);
+                                 
+            $descuentoResource =  new DescuentoResource($descuento);
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Descuento 2x1 para el producto creado exitosamente');       
+            $responseResourse->body($descuentoResource);       
+            return $responseResourse;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+
     /**
      * Display the specified resource.
      *
