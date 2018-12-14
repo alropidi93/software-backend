@@ -2,22 +2,26 @@
 namespace App\Repositories;
 use App\Models\Producto;
 use App\Models\Almacen;
+use App\Models\Tienda;
 use App\Models\Usuario;
 use App\Models\TipoStock;
 use App\Models\MovimientoTipoStock;
+use Illuminate\Support\Facades\Log;
 	
 class MovimientoTipoStockRepository extends BaseRepository {
     protected $usuario;
     protected $producto;
     protected $almacen;
     protected $tipoStock;
+    protected $tienda;
 
-    public function __construct(MovimientoTipoStock $movimientoTipoStock, Usuario $usuario=null, Producto $producto=null, Almacen $almacen=null, TipoStock $tipoStock=null){
+    public function __construct(MovimientoTipoStock $movimientoTipoStock, Usuario $usuario=null, Producto $producto=null, Almacen $almacen=null, TipoStock $tipoStock=null,$tienda=null){
         $this->model = $movimientoTipoStock;
         $this->usuario = $usuario;
         $this->producto = $producto;
         $this->almacen = $almacen;
         $this->tipoStock = $tipoStock;
+        $this->tienda = $tienda;
     }
 
     public function guarda($dataArray){
@@ -40,12 +44,19 @@ class MovimientoTipoStockRepository extends BaseRepository {
                 }
             ]);
         }else{   
+            Log::info("Estamos en el else");
+            Log::info(json_encode($movimiento));
+            
             $this->model =$movimiento->load([
                 'usuario'=>function($query){
+                    Log::info("****1");
                     $query->where('usuario.deleted', false);
+                    
                 },
                 'usuario.personaNatural' => function ($query) {
+                    Log::info("****2");
                     $query->where('personaNatural.deleted', false);
+                    
                 }
             ]);
         }
@@ -96,5 +107,18 @@ class MovimientoTipoStockRepository extends BaseRepository {
 
     public function obtenerUsuarioModel(){
         return $this->usuario;
+    }
+
+
+    public function listarPorTienda($idTienda){
+        return $this->model->where('movimientoTipoStock.deleted',false)->whereHas('almacen',function($query)use ($idTienda){
+            $query->where('almacen.deleted',false)->whereHas('tienda',function($query2)use ($idTienda){
+                $query2->where('id',$idTienda)->where('tienda.deleted',false);
+            });
+        })->get();
+    }
+
+    public function obtenerTiendaPorId($idTienda){
+        return $this->tienda->where('id',$idTienda)->where('deleted',false)->first();
     }
 }
