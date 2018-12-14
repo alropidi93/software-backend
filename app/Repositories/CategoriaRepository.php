@@ -1,6 +1,7 @@
 <?php
 namespace App\Repositories;
 use App\Models\Categoria;
+use Illuminate\Support\Facades\DB;
 
 	
 class CategoriaRepository extends BaseRepository{
@@ -8,7 +9,7 @@ class CategoriaRepository extends BaseRepository{
     protected $productoRepository;
 
    
-    public function __construct(Categoria $categoria,ProductoRepository $productoRepository)
+    public function __construct(Categoria $categoria=null,ProductoRepository $productoRepository=null)
     {
         $this->model = $categoria;
         $this->productoRepository=$productoRepository;
@@ -31,17 +32,14 @@ class CategoriaRepository extends BaseRepository{
             }
         }
         foreach($listaProductosCategoria as $key => $producto){
-            $this->productoRepository->setModel($producto);
+            $prod = $this->productoRepository->obtenerPorId($producto->id);
+            $this->productoRepository->setModel($prod);
             $this->productoRepository->attachProductoXDescuento($descuento, $producto->id, $descuentoData['idTienda']);
         }
-
-
-
-       
     }
     
     public function attachCategoriaXDescuento($descuento, $idCategoria, $idTienda){
-        $this->model->descuentosTc()->save($descuento , ['idTienda'=>$idTienda, 'idCategoria'=> $idCategoria, 'deleted'=>false] );
+        $this->model->descuentosCategoriaTc()->save($descuento , ['idTienda'=>$idTienda, 'idCategoria'=> $idCategoria, 'deleted'=>false] );
         $this->model->save();
     }
     

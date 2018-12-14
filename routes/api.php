@@ -47,6 +47,8 @@ Route::post('descuentos/crearDescuento2x1Producto', 'DescuentoController@crearDe
 Route::post('producto/crearDescuentoPorcentualProductoTc', 'ProductoController@crearDescuentoPorcentualProductoTc');
 Route::post('producto/crearDescuento2x1ProductoTc', 'ProductoController@crearDescuento2x1ProductoTc');
 
+Route::post('categoria/crearDescuentoPorcentualCategoriaTc', 'CategoriaController@crearDescuentoPorcentualCategoriaTc');
+
 Route::get('lineaSolicitudCompra/obtenerDisponibles','LineaSolicitudCompraController@obtenerDisponibles');
 
 Route::get('busqueda/clienteNaturalPorDni','PersonaNaturalController@busquedaPorDni');

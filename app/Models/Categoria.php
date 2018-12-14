@@ -17,5 +17,11 @@ class Categoria extends Model
       'deleted',
       
     ];
+
+    public function descuentosCategoriaTc(){
+      return $this->belongsToMany('App\Models\Descuento','categoriaxtiendaxdescuento',
+        'idCategoria','idDescuento')->using('App\Models\CategoriaXTiendaXDescuento')
+        ->withPivot('idTienda', 'deleted','created_at','updated_at');
+  }
     
 }
