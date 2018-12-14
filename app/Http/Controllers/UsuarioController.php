@@ -207,6 +207,42 @@ class UsuarioController extends Controller
         }
         
     }
+    
+    public function actualizarPrincipalOApoyo($id,Request $usuarioData)
+    {
+        //usuarioData debe contener idTienda y el flag de si es principal o no
+        try{
+            $usuarioDataArray= Algorithm::quitNullValuesFromArray($usuarioData->all());
+         
+            DB::beginTransaction();
+            $usuario= $this->usuarioRepository->obtenerUsuarioPorId($id);
+            if (!$usuario){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Usuario no encontrado');
+                $notFoundResource->notFound(['id'=>$id]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+            
+            $this->usuarioRepository->setModelUsuario($usuario);
+            $this->usuarioRepository->actualizarPrincipalOApoyo($id, $usuarioDataArray);
+            $usuario = $this->usuarioRepository->obtenerModelo();
+            DB::commit();
+            $this->usuarioRepository->loadTipoUsuarioRelationship();
+
+            $usuarioResource =  new UsuarioResource($usuario);
+            $responseResourse = new ResponseResource(null);
+            
+            $responseResourse->title('Usuario actualizado exitosamente');       
+            $responseResourse->body($usuarioResource);
+            return $responseResourse;
+        }
+        catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+            
+        }
+        
+    }
 
     /**
      * Remove the specified resource from storage.

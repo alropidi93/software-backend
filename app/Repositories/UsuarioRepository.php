@@ -1,6 +1,7 @@
 <?php
 namespace App\Repositories;
 use App\Models\Usuario;
+use App\Models\UsuarioXTienda;
 use App\Models\TipoUsuario;
 use App\Models\PersonaNatural;
 use App\Models\Tienda;
@@ -82,6 +83,15 @@ class UsuarioRepository extends BaseRepository {
             $dataArray['password'] = bcrypt($dataArray['password']);
         $this->personaNatural->update($dataArray);
         $this->model->update($dataArray); //set data only in its PersonaNatural model
+    }
+
+    public function actualizarPrincipalOApoyo($idUsuario, $dataArray){
+        $idTienda = $dataArray['idTienda'];
+        $miembroPrincipal = $dataArray['miembroPrincipal'];
+        $usuarioxtienda =  UsuarioXTienda::where('idUsuario',$idUsuario)
+                            ->where('idTienda',$idTienda)
+                            ->where('deleted',false)
+                            ->update(['miembroPrincipal'=>$miembroPrincipal]);
     }
 
     public function actualizaSoloUsuario($dataArray){

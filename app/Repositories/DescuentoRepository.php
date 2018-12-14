@@ -257,4 +257,8 @@ class DescuentoRepository extends BaseRepository{
         }
         return $listaProductosConDescuento;
    }
+   public function obtenerIdDescuentoConIdProductoYIdTienda ($idTienda, $idProducto){
+       $idDescuento=  DB::table('productoxdescuento')->where('idTienda', $idTienda)->where('idProducto', $idProducto)->where('deleted', false)->first();
+       return $idDescuento->idDescuento;
+   }
 }

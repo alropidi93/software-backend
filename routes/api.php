@@ -59,7 +59,9 @@ Route::get('busqueda/cotizacionesPorDocumento','CotizacionController@busquedaPor
 Route::post('asignarTipoUsuario/{idUsuario}', 'UsuarioController@asignarRol');
 
 Route::get('boletas/ListarBoletasParaRecoger', 'BoletaController@listarBoletasParaRecoger');
+Route::get('boletas/ListarBoletasNoRecogidas', 'BoletaController@ListarBoletasNoRecogidas');
 Route::get('facturas/ListarFacturasParaRecoger', 'FacturaController@listarFacturasParaRecoger');
+Route::get('facturas/listarFacturasNoRecogidas', 'FacturaController@listarFacturasNoRecogidas');
 Route::post('boleta/asignarCliente/{idComprobantePago}', 'BoletaController@asignarCliente');
 Route::post('factura/asignarCliente/{idComprobantePago}', 'FacturaController@asignarCliente');
 
@@ -68,6 +70,7 @@ Route::get('comprobantePago/reporteVentasProductos', 'ComprobantePagoController@
 Route::get('comprobantePago/reporteTotalesClientesPorBoletas', 'ComprobantePagoController@reporteTotalesClientesPorBoletas');
 Route::get('comprobantePago/reporteTotalesClientesPorFacturas', 'ComprobantePagoController@reporteTotalesClientesPorFacturas');
 Route::get('comprobantePago/reporteMovimientos', 'ComprobantePagoController@reporteMovimientos');
+Route::get('comprobantePago/reporteCompras', 'ComprobantePagoController@reporteCompras');
 
 Route::post('tienda/asignarJefeAlmacen/{idTienda}', 'TiendaController@asignarJefeDeAlmacen');
 Route::post('tienda/desasignarJefeAlmacen/{idTienda}' , 'TiendaController@desasignarJefeDeAlmacen');
@@ -94,6 +97,7 @@ Route::get('usuario/listarPorRol', 'UsuarioController@listarPorRol');
 Route::get('usuario/listarPorRolSinTienda', 'UsuarioController@listarPorRolSinTiendaAsignada');
 Route::get('usuario/obtenerPorRolPorTienda/{idTienda}','UsuarioController@obtenerPorRolPorTienda');
 Route::get('usuario/cajerosPorTienda/{idTienda}','UsuarioController@obtenerCajerosPorTienda');
+Route::post('usuario/actualizarPrincipalOApoyo/{idUsuario}','UsuarioController@actualizarPrincipalOApoyo');
 
 Route::post('almacen/cargarProductosStock','AlmacenController@cargarProductosStock');
 Route::post('almacen/asignarJefeDeAlmacenCentral','AlmacenController@asignarJefeAlmacenCentral');

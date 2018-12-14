@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Almacen;
 use App\Models\Usuario;
+use App\Models\Producto;
 use App\Repositories\AlmacenRepository;
 
 use App\Repositories\UsuarioRepository;
@@ -25,7 +26,7 @@ class AlmacenController extends Controller {
 
     protected $almacenRepository;
 
-    public function __construct(AlmacenRepository $almacenRepository){
+    public function __construct(AlmacenRepository $almacenRepository=null){
         AlmacenResource::withoutWrapping();
         $this->almacenRepository = $almacenRepository;
     }
@@ -116,6 +117,41 @@ class AlmacenController extends Controller {
         }
 
        
+    }
+
+    public function cargarProductoNuevoEnTodosLosAlmacenes(Producto $producto){
+        set_time_limit ( 1000 );
+        try{
+     
+            $num_almacenes =  $this->almacenRepository->cantidadElementos();
+      
+            if ($num_almacenes==0){
+                $notFoundResource = new NotFoundResource(null);
+                $notFoundResource->title('Almacenes no encontrados');
+                $notFoundResource->notFound(['num_almacenes'=>$num_almacenes]);
+                return $notFoundResource->response()->setStatusCode(404);
+            }
+
+            DB::beginTransaction();
+            $almacenes = $this->almacenRepository->obtenerTodos();
+            foreach ($almacenes as $key => $almacen) {
+                $this->almacenRepository->setModel($almacen);
+                $this->almacenRepository->attachProductoStockNuevoByTipoStock($producto,1);
+                $this->almacenRepository->attachProductoStockNuevoByTipoStock($producto,2);
+                $this->almacenRepository->attachProductoStockNuevoByTipoStock($producto,3);
+                $this->almacenRepository->loadProductosRelationship();  
+            }
+            DB::commit();
+            
+            $almacenesResource =  new AlmacenesResource($almacenes);
+            $responseResource = new ResponseResource(null);
+            $responseResource->title('Producto agregado a los almacenes');  
+            $responseResource->body($almacenesResource);   
+            return $responseResource;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);   
+        }
     }
 
     public function cargarProductosStock(Request $data)

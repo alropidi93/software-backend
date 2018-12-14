@@ -130,6 +130,18 @@ class AlmacenRepository extends BaseRepository{
         $this->model->productos()->save($producto , ['idTipoStock'=>$tipoStock->id,'cantidad'=>$cantidadRnd,'deleted'=>false] );
         $this->model->save();
     }
+
+    public function attachProductoStockNuevoByTipoStock($producto,$keyTipoStock){
+        $tipoStock = $this->tipoStock->where('key',$keyTipoStock)->where('deleted',false)->first();
+        if (!$tipoStock){
+            throw new \Exception('No se encontro Tipo Stock');
+        }
+        
+        $cantidad = 0;
+
+        $this->model->productos()->save($producto , ['idTipoStock'=>$tipoStock->id,'cantidad'=>$cantidad,'deleted'=>false] );
+        $this->model->save();
+    }
     
     public function loadJefeDeAlmacenCentralRelationship($tienda=null){
         if (!$tienda){
@@ -158,6 +170,7 @@ class AlmacenRepository extends BaseRepository{
         ->join('tipoStock', 'tipoStock.id', '=', 'productoxalmacen.idTipoStock')
         ->where('tipoStock.key',1)
         ->where('tipoStock.deleted',false)
+        ->where('producto.habilitado',true)
         ->where('producto.deleted',false)
         ->wherePivot('deleted',false)
         ->whereRaw('producto."stockMin" >= productoxalmacen.cantidad')
@@ -178,6 +191,7 @@ class AlmacenRepository extends BaseRepository{
         ->where('tipoStock.key',1)
         ->where('tipoStock.deleted',false)
         ->where('producto.deleted',false)
+        ->where('producto.habilitado',true)
         ->wherePivot('deleted',false)
         ->get();
 

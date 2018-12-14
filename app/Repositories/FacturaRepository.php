@@ -38,6 +38,7 @@ class FacturaRepository extends BaseRepository {
     protected function setComprobantePagoData($dataComprobantePago){
         $dataComprobantePago= Algorithm::quitNullValuesFromArray($dataComprobantePago);
         $this->comprobantePago['idCajero'] = array_key_exists('idCajero',$dataComprobantePago)? $dataComprobantePago['idCajero']:null;
+        $this->comprobantePago['idTienda'] = array_key_exists('idTienda',$dataComprobantePago)? $dataComprobantePago['idTienda']:null;
         $this->comprobantePago['entrega'] = array_key_exists('entrega',$dataComprobantePago)? $dataComprobantePago['entrega']:true;
         $this->comprobantePago['fechaEnt'] = array_key_exists('fechaEnt',$dataComprobantePago)? $dataComprobantePago['fechaEnt']:null;
         $this->comprobantePago['subtotal'] =  $dataComprobantePago['subtotal'];
@@ -108,6 +109,17 @@ class FacturaRepository extends BaseRepository {
     public function listarFacturasParaRecoger(){
         $lista =  $this->model->whereHas('comprobantePago', function ($query) {
             $query->where('entrega', false)->where('deleted',false);
+        })->where('deleted',false)->get();
+        
+        foreach ($lista as $key => $factura) {
+            $factura->comprobantePago;
+        }
+        return $lista;
+    }
+
+    public function listarFacturasNoRecogidas(){
+        $lista =  $this->model->whereHas('comprobantePago', function ($query) {
+            $query->where('entrega', false)->whereRaw('(current_date::date - "fechaEnt"::date)  > 15')->where('deleted',false);
         })->where('deleted',false)->get();
         
         foreach ($lista as $key => $factura) {

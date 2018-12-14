@@ -63,6 +63,11 @@ class ProductoRepository extends BaseRepository {
         
     }
 
+    public function obtenerProductosHabilitados(){
+        $list = $this->model->where('deleted',false)->where('habilitado', true)->get();
+        return $list;
+    }
+
     public function loadUnidadMedidaRelationship($producto=null){
     
         if (!$producto){
@@ -276,7 +281,7 @@ class ProductoRepository extends BaseRepository {
     }
 
     public function listarConStock(){
-        $productos = $this->model->where('deleted',false)->get();
+        $productos = $this->model->where('habilitado',true)->where('deleted',false)->get();
         foreach ($productos as $key => $producto) {
             $this->loadAlmacenesRelationship($producto);
         }
@@ -333,7 +338,7 @@ class ProductoRepository extends BaseRepository {
         $productos=null;
         switch($idAlmacen){
             case 2:
-                $productos =$this->model->where('deleted',false)->with(['almacenes' => function ($query) {
+                $productos =$this->model->where('habilitado', true)->where('deleted',false)->with(['almacenes' => function ($query) {
                     $query->where('almacen.deleted',false)->where('almacen.id',2)->where('productoxalmacen.deleted',false)
                     ->join('tipoStock', 'tipoStock.id', '=', 'productoxalmacen.idTipoStock')
                     ->join('producto','producto.id', '=', 'productoxalmacen.idProducto')

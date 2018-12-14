@@ -85,6 +85,7 @@ class ComprobantePagoRepository extends BaseRepository {
         $this->lineaDeVenta =  new LineaDeVenta;
         $this->lineaDeVenta['idProducto'] =  $dataLineaDeVenta['idProducto'];
         $this->lineaDeVenta['cantidad'] = $dataLineaDeVenta['cantidad'];
+        $this->lineaDeVenta['subtotalLinea'] = array_key_exists('subtotalLinea',$dataLineaDeVenta)? $dataLineaDeVenta['subtotalLinea']:0;
         $this->lineaDeVenta['deleted'] =  false; //default value
     }
 
@@ -153,6 +154,14 @@ class ComprobantePagoRepository extends BaseRepository {
         $lista = DB::select(DB::raw('select mts.id "Id Movimiento", p."nombre" "Producto", ts."tipo" "Tipo", mts."cantidad" "Cantidad", mts."signo" "Signo", mts."created_at" "Fecha Movimiento"
         from "movimientoTipoStock" mts, "tipoStock" ts, "producto" p
         where mts."idTipoStock" = ts."id" and mts."idProducto" = p."id"'));
+        return $lista;
+    }
+
+    public function reporteCompras(){
+        $lista = DB::select(DB::raw('select sc.id "N° solicitud", t."nombre", p."nombre", lsc."cantidad", prov."razonSocial", sc."created_at" "Fecha Solicitud"
+        from "lineaSolicitudDeCompra" lsc, "solicitudDeCompra" sc, "producto" p, "proveedor" prov, "tienda" t
+        where lsc."idSolicitudDeCompra" = sc."id" and lsc."idProducto" = p."id" and lsc."idProveedor" = prov."id" and sc."idTienda" = t."id"
+        order by "N° solicitud"'));
         return $lista;
     }
 }

@@ -541,15 +541,23 @@ class DescuentoController extends Controller
             }
             $lista = $this->descuentoRepository->obtenerProductosConAlgunDescuento($idTienda);
             $lstProductos= array();
+            
             foreach($lista as $key => $item){
+                $tupla=array();
                 $producto = $this->productoRepository->obtenerPorId($item->id);
                 $productoResource =  new ProductoResource($producto);
-                $lstProductos[] = $productoResource;
+                $idDescuento= $this->descuentoRepository->obtenerIdDescuentoConIdProductoYIdTienda($idTienda,$producto->id); 
+                $descuento=$this->descuentoRepository->obtenerPorId($idDescuento);   
+                $descuentoResource =  new DescuentoResource($descuento);           
+                $tupla['producto'] = $productoResource;
+                $tupla['descuento'] = $descuentoResource;
+                $lstProductos[] = $tupla;
             }
-            foreach ($lstProductos as $key => $prod) {
-                $this->productoRepository->loadTipoProductoRelationship($prod);
-                $this->productoRepository->loadDescuentoRelationship($prod);       
-            }
+            // foreach ($lstProductos as $key => $prod) {
+            //     $this->productoRepository->loadTipoProductoRelationship($prod);
+               
+
+            // }
             $responseResourse = new ResponseResource(null);
             $responseResourse->title('Lista de productos con descuento en esta tienda');  
             $responseResourse->body($lstProductos);
