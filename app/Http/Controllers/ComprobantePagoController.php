@@ -8,6 +8,7 @@ use App\Models\Usuario;
 use App\Repositories\ComprobantePagoRepository;
 use App\Repositories\LineaDeVentaRepository;
 use App\Repositories\UsuarioRepository;
+use App\Repositories\MovimientoTipoStockRepository;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ComprobantePagoResource;
 use App\Http\Resources\ComprobantesPagoResource;
@@ -25,12 +26,14 @@ class ComprobantePagoController extends Controller
 {
     protected $comprobantePagoRepository;
     protected $lineasDeVenta;
+    protected $movimientoTipoStockRepository;
     
-    public function __construct(ComprobantePagoRepository $comprobantePagoRepository, LineaDeVentaRepository $lineaDeVentaRepository){
+    public function __construct(ComprobantePagoRepository $comprobantePagoRepository=null, LineaDeVentaRepository $lineaDeVentaRepository=null, MovimientoTipoStockRepository $movimientoTipoStockRepository=null){
         ComprobantePagoResource::withoutWrapping();
         // LineaDeVentaResource::withoutWrapping(); // no tiene similar en pedido trans contro
         $this->comprobantePagoRepository = $comprobantePagoRepository;
         $this->lineaDeVentaRepository = $lineaDeVentaRepository;
+        $this->movimientoTipoStockRepository = $movimientoTipoStockRepository;
     }
 
     /**
@@ -205,6 +208,85 @@ class ComprobantePagoController extends Controller
             $responseResourse->body(['id' => $id]);
             DB::commit();
 
+            return $responseResourse;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+
+    public function actualizarStockRecojoPorRecojo(Request $request){
+        //request contiene idVenta (idComprobantePago de boleta o factura) y lineasDeVenta
+        try{
+            $validator = \Validator::make($request->all(), 
+                            ['idAlmacen' => 'required',
+                            'lineasDeVenta'=>  'required',
+                            'idUsuario'=>  'required'
+                            ]);
+
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
+
+            $lineas = $request['lineasDeVenta'];
+            foreach($lineas as $key => $linea){
+                $movimiento = $this->movimientoTipoStockRepository->crear(['idAlmacen' => $request['idAlmacen'],
+                                                        'idProducto'=>$linea['idProducto'],
+                                                        'idTipoStock'=> 3,
+                                                        'idUsuario'=>$request['idUsuario'],
+                                                        'cantidad'=>$linea['cantidad'],
+                                                        'signo'=> '-',
+                                                        'tipo'=> 'recojo',
+                                                        'deleted'=>false]);
+            }
+
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Movimiento por recojo creado');  
+            $responseResourse->body([$movimiento]);
+            return $responseResourse;
+        }catch(\Exception $e){
+            DB::rollback();
+            return (new ExceptionResource($e))->response()->setStatusCode(500);
+        }
+    }
+
+    public function actualizarStockRecojoPorVencimiento(){
+        //request contiene idVenta (idComprobantePago de boleta o factura) y lineasDeVenta
+        try{
+            $validator = \Validator::make($comprobantePagoData->all(), 
+                            ['idAlmacen' => 'required',
+                            'lineasDeVenta'=>  'required',
+                            'idUsuario'=>  'required'
+                            ]);
+
+            if ($validator->fails()) {
+                return (new ValidationResource($validator))->response()->setStatusCode(422);
+            }
+
+            $lineas = $request['lineasDeVenta'];
+            foreach($lineas as $key => $linea){
+                $movimientoSalida = $this->movimientoTipoStockRepository->crear(['idAlmacen' => $request['idAlmacen'],
+                                                        'idProducto'=>$linea->idProducto,
+                                                        'idTipoStock'=> 3,
+                                                        'idUsuario'=>$request['idUsuario'],
+                                                        'cantidad'=>$linea->cantidad,
+                                                        'signo'=> '-',
+                                                        'tipo'=> 'vencimiento',
+                                                        'deleted'=>false]);
+
+                $movimientoEntrada = $this->movimientoTipoStockRepository->crear(['idAlmacen' => $request['idAlmacen'],
+                                                        'idProducto'=>$linea->idProducto,
+                                                        'idTipoStock'=> 2,
+                                                        'idUsuario'=>$request['idUsuario'],
+                                                        'cantidad'=>$linea->cantidad,
+                                                        'signo'=> '+',
+                                                        'tipo'=> 'vencimiento',
+                                                        'deleted'=>false]);
+            }
+
+            $responseResourse = new ResponseResource(null);
+            $responseResourse->title('Movimiento por vencimiento creado');  
+            $responseResourse->body([$movimientoSalida]);
             return $responseResourse;
         }catch(\Exception $e){
             DB::rollback();

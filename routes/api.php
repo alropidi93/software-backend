@@ -67,6 +67,9 @@ Route::get('facturas/listarFacturasNoRecogidas', 'FacturaController@listarFactur
 Route::post('boleta/asignarCliente/{idComprobantePago}', 'BoletaController@asignarCliente');
 Route::post('factura/asignarCliente/{idComprobantePago}', 'FacturaController@asignarCliente');
 
+Route::post('comprobantePago/actualizarStockRecojoPorRecojo', 'ComprobantePagoController@actualizarStockRecojoPorRecojo');
+Route::post('comprobantePago/actualizarStockRecojoPorVencimiento', 'ComprobantePagoController@actualizarStockRecojoPorVencimiento');
+
 Route::get('comprobantePago/reporteVentasCajeros', 'ComprobantePagoController@reporteVentasCajeros');
 Route::get('comprobantePago/reporteVentasProductos', 'ComprobantePagoController@reporteVentasProductos');
 Route::get('comprobantePago/reporteTotalesClientesPorBoletas', 'ComprobantePagoController@reporteTotalesClientesPorBoletas');
