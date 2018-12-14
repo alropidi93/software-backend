@@ -18,7 +18,8 @@ class LineaDeVentaResource extends JsonResource
             'id'            => $this->id,
             'attributes'    => [
                 'cantidad' => $this->cantidad,
-                'subtotalLinea' => $this->subtotalLinea,
+                'subtotalConIgv' => $this->subtotalConIgv,
+                'precioUnitarioConIgv' => $this->precioUnitarioConIgv,
                 'producto' => new ProductoResource($this->whenLoaded('producto')),
                 'deleted' => $this->deleted,
                 'created_at' => $this->created_at,
