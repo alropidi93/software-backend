@@ -359,7 +359,7 @@ class UsuarioRepository extends BaseRepository {
                 return $q2->where('key',4)->orWhere('key',5);
             })->where('deleted',false);
         })->whereDoesntHave('tiendas', function ($query2) {
-            $query2->where('tienda.deleted', false);
+            $query2->where('usuarioxtienda.miembroPrincipal',true)->where('tienda.deleted', false);
         })->where('usuario.deleted',false)->get();
         
         foreach ($cajeros as $key => $usuario) {
@@ -477,12 +477,14 @@ class UsuarioRepository extends BaseRepository {
         $almaceneros = $this->model->whereHas('tipoUsuario', function ($query) {
             $query->where('key', 6)->where('deleted',false);
         })->whereDoesntHave('tiendas', function ($query2) {
-            $query2->where('tienda.deleted', false);
+            $query2->where('usuarioxtienda.miembroPrincipal',true)->where('tienda.deleted', false);
         })->where('usuario.deleted',false)->get();
         foreach ($almaceneros as $key => $usuario) {
             $usuario->personaNatural;       
         } 
         return $almaceneros;
+
+        
     }
 
     public function listarJefesAlmacen(){
