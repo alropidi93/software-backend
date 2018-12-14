@@ -117,6 +117,17 @@ class FacturaRepository extends BaseRepository {
         return $lista;
     }
 
+    public function listarFacturasNoRecogidas(){
+        $lista =  $this->model->whereHas('comprobantePago', function ($query) {
+            $query->where('entrega', false)->whereRaw('(current_date::date - "fechaEnt"::date)  > 15')->where('deleted',false);
+        })->where('deleted',false)->get();
+        
+        foreach ($lista as $key => $factura) {
+            $factura->comprobantePago;
+        }
+        return $lista;
+    }
+
     public function obtenerFacturaPorId($id){
         $factura = $this->model->where('idComprobantePago',$id)->where('deleted',false)->first();
         if($factura) $factura->comprobantePago;

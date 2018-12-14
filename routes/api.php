@@ -61,6 +61,7 @@ Route::post('asignarTipoUsuario/{idUsuario}', 'UsuarioController@asignarRol');
 Route::get('boletas/ListarBoletasParaRecoger', 'BoletaController@listarBoletasParaRecoger');
 Route::get('boletas/ListarBoletasNoRecogidas', 'BoletaController@ListarBoletasNoRecogidas');
 Route::get('facturas/ListarFacturasParaRecoger', 'FacturaController@listarFacturasParaRecoger');
+Route::get('facturas/listarFacturasNoRecogidas', 'FacturaController@listarFacturasNoRecogidas');
 Route::post('boleta/asignarCliente/{idComprobantePago}', 'BoletaController@asignarCliente');
 Route::post('factura/asignarCliente/{idComprobantePago}', 'FacturaController@asignarCliente');
 
