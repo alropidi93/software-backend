@@ -251,15 +251,10 @@ class SolicitudCompraController extends Controller
                 Log::info("id Producto: ".$productoObj['id']);
                 
                 $lineaSC = $this->solicitudCompraRepository->obtenerLineaPorProductoIdDisponible($productoObj['id']);
-                
                 Log::info(json_encode($lineaSC));
-                
                 if(!$lineaSC) continue; //verificamos que la linea de solicitud de compra del producto este presente
-                
                 Log::info(json_encode($lineaSC->cantidad));
                 Log::info(json_encode($productoObj['cantidad']));
-                
-                
                 if (!$lineaSC->cantidad == $productoObj['cantidad']) continue; // verificamos que las cantidades enviadas en el post sean las mismas de la linea de solicitud de compra
                 //return json_encode($this->lineaSolicitudCompraRepository);
                 $this->lineaSolicitudCompraRepository->setModel($lineaSC);

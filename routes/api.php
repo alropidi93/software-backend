@@ -92,8 +92,6 @@ Route::post('login', 'UsuarioController@login');
 Route::resource('tipoUsuarios', 'TipoUsuarioController');
 Route::resource('tipoProductos', 'TipoProductoController');
 
-
-
 Route::get('usuario/jefesTiendaNoAsignados', 'UsuarioController@listarJefesDeTiendaSinTienda');
 Route::get('usuario/jefesAlmacenNoAsignados', 'UsuarioController@listarJefesDeAlmacenSinTienda');
 Route::get('usuario/cajeros', 'UsuarioController@listarCajeros');
@@ -112,10 +110,7 @@ Route::get('producto/listarStockMin','ProductoController@listarConStockMinimo');
 Route::get('producto/listarProductosDeAlmacen/{idAlmacen}','ProductoController@listarProductosDeAlmacen');
 Route::get('producto/listarProductosDeAlmacenTest/{idAlmacen}','ProductoController@listarProductosDeAlmacenTest');
 Route::post('producto/{idProducto}/actualizarPorTienda/{idTienda}','ProductoController@actualizarPorTienda');
-
-
 Route::get('transferencia/listarEstados','TransferenciaController@listarEstados');
-
 Route::get('pedidoTransferencia/verPedidosTransferenciaRecibidos/{idAlmacenD}','PedidoTransferenciaController@verPedidosTransferenciaRecibidos');
 Route::get('pedidoTransferencia/obtenerPedidoTransferenciaPorId/{idPedidoTransferencia}','PedidoTransferenciaController@obtenerPedidoTransferenciaPorId');
 Route::get('pedidoTransferencia/verPedidosTransferenciaJTO/{idAlmacenO}','PedidoTransferenciaController@verPedidosTransferenciaJTO');// no esta en uso
@@ -128,17 +123,14 @@ Route::post('pedidoTransferencia/aceptaPedidoJAD/{idPedidoTransferencia}','Pedid
 Route::post('pedidoTransferencia/evaluar/{idPedidoTransferencia}','PedidoTransferenciaController@evaluarPedidoTransferencia');
 Route::get('pedidoTransferencia/obtenerHistorialPedidosTransferencia/{idPedidoTransferencia}','PedidoTransferenciaController@obtenerHistorialPedidosTransferencia');
 
-
 Route::put('producto/actualizarStock/{idProducto}' , 'ProductoController@modificarStock');
 Route::get('producto/consultarStock/{idProducto}','ProductoController@consultarStock');
 
 Route::get('proveedor/listarProveedores','ProveedorController@listarProveedores');
 Route::get('proveedor/listarPorProductos','ProveedorController@listarPorProductos');
 
-
 Route::get('almacen/listarStockMinDeAlmacen/{idAlmacen}','AlmacenController@listarConStockMinimoDeAlmacen');
 Route::get('almacen/listarConStockDeAlmacen/{idAlmacen}','AlmacenController@listarConStockDeAlmacen');
-
 Route::get('descuento/ListarDescuentosVigentes', 'DescuentoController@listarDescuentosVigentes');
 Route::get('descuento/obtenerProductosConDescuentoDeTienda/{idTienda}', 'DescuentoController@obtenerProductosConDescuentoDeTienda');
 Route::get('descuento/obtenerProductosSinDescuentoDeTienda/{idTienda}', 'DescuentoController@obtenerProductosSinDescuentoDeTienda');
@@ -146,6 +138,8 @@ Route::get('descuento/obtenerProductosSinDescuentoDeTiendaConRelaciones/{idTiend
 Route::get('descuento/obtenerProductosConDescuentoDeTiendaConRelaciones/{idTienda}', 'DescuentoController@obtenerProductosConDescuentoDeTiendaConRelaciones');
 Route::get('descuento/obtenerCategoriasSinDescuentoDeTienda/{idTienda}', 'DescuentoController@obtenerCategoriasSinDescuentoDeTienda');
 
-
 Route::post('solicitudCompra/efectuarCompra','SolicitudCompraController@efectuarCompra');
 Route::get('solicitudCompra/lineasCompraHistorial','SolicitudCompraController@listarLineasComprasEfectuadas');
+Route::get('movimiento/listarPorTienda/{idTienda}','MovimientoController@listarPorTienda');
+
+
