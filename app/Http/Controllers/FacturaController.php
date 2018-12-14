@@ -19,6 +19,7 @@ use App\Models\LineaDeVenta;
 use App\Repositories\FacturaRepository;
 use App\Repositories\ComprobantePagoRepository;
 use App\Repositories\PersonaJuridicaRepository;
+use App\Repositories\MovimientoTipoStockRepository;
 use App\Repositories\LineaDeVentaRepository;
 use App\Repositories\ProductoRepository;
 use App\Repositories\TiendaRepository;
@@ -34,14 +35,16 @@ class FacturaController extends Controller
     protected $facturaRepository;
     protected $comprobantePagoRepository; //no tiene equi
     // protected $lineasDeVenta;
+    protected $movimientoTipoStockRepository;
 
-    public function __construct(FacturaRepository $facturaRepository, ComprobantePagoRepository $comprobantePagoRepository, LineaDeVentaRepository $lineaDeVentaRepository, TiendaRepository $tiendaRepository, ProductoRepository $productoRepository){
+    public function __construct(FacturaRepository $facturaRepository, ComprobantePagoRepository $comprobantePagoRepository, LineaDeVentaRepository $lineaDeVentaRepository, TiendaRepository $tiendaRepository, ProductoRepository $productoRepository, MovimientoTipoStockRepository $movimientoTipoStockRepository=null){
         FacturaResource::withoutWrapping();
         $this->facturaRepository = $facturaRepository;
         $this->comprobantePagoRepository = $comprobantePagoRepository; //no tiene equi
         $this->tiendaRepository = $tiendaRepository;
         $this->productoRepository = $productoRepository;
         $this->lineaDeVentaRepository = $lineaDeVentaRepository;
+        $this->movimientoTipoStockRepository = $movimientoTipoStockRepository;
     }
 
     /**
@@ -120,46 +123,71 @@ class FacturaController extends Controller
             $idAlmacen=$this->tiendaRepository->obtenerIdAlmacenConIdTienda($idTienda);
             if($entregaInmediata){ //solo se tiene que restar del Almacen Principal
                foreach ($list_collection as $key => $elem) {  
-                    $idProducto=$elem['idProducto'];
-                    $cantidad= $elem['cantidad'];
-                    $idTipoStock= 1;
-                    $producto = $this->productoRepository->obtenerPorId($idProducto);
-                    $this->productoRepository->setModel($producto);
-                    $stockAnterior= $this->productoRepository->consultarStock($idProducto,$idAlmacen,$idTipoStock);
-                    $nuevoStock=$stockAnterior - $cantidad;
-                    if($nuevoStock < 0){
-                        $errorResource =  new ErrorResource (null);
-                        $errorResource->title("Error de stock");
-                        $errorResource->message("No hay stock suficiente para concretar la venta");
-                        return $errorResource;
-                    }
-                    $this->productoRepository->setModel($producto);
-                    $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $nuevoStock);                   
+                    $this->movimientoTipoStockRepository->crear(['idAlmacen' => $idAlmacen,
+                                                                'idProducto' => $elem['idProducto'],
+                                                                'idTipoStock'=>1,
+                                                                'idUsuario'=> array_key_exists('idCajero', $facturaDataArray)? $facturaDataArray['idCajero']:5,
+                                                                'cantidad' => $elem['cantidad'],
+                                                                'signo' => '-',
+                                                                'tipo' => 'venta_inmediata',
+                                                                'deleted' => false]);
+                    // $idProducto=$elem['idProducto'];
+                    // $cantidad= $elem['cantidad'];
+                    // $idTipoStock= 1;
+                    // $producto = $this->productoRepository->obtenerPorId($idProducto);
+                    // $this->productoRepository->setModel($producto);
+                    // $stockAnterior= $this->productoRepository->consultarStock($idProducto,$idAlmacen,$idTipoStock);
+                    // $nuevoStock=$stockAnterior - $cantidad;
+                    // if($nuevoStock < 0){
+                    //     $errorResource =  new ErrorResource (null);
+                    //     $errorResource->title("Error de stock");
+                    //     $errorResource->message("No hay stock suficiente para concretar la venta");
+                    //     return $errorResource;
+                    // }
+                    // $this->productoRepository->setModel($producto);
+                    // $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $nuevoStock);                   
                 }
             }
             elseif (!$entregaInmediata){ // se tiene que restar del Almacen Principal y añadir al Almacen de Recojos
                 foreach ($list_collection as $key => $elem) {
-                    $idProducto=$elem['idProducto'];
-                    $cantidad= $elem['cantidad'];
-                    $idTipoStock= 1;
-                    $producto = $this->productoRepository->obtenerPorId($idProducto);
-                    $this->productoRepository->setModel($producto);
-                    $stockAnteriorPrincipal= $this->productoRepository->consultarStock($idProducto,$idAlmacen,$idTipoStock);
-                    $nuevoStockPrincipal=$stockAnteriorPrincipal - $cantidad;
-                    if($nuevoStockPrincipal < 0){
-                        $errorResource =  new ErrorResource (null);
-                        $errorResource->title("Error de stock");
-                        $errorResource->message("No hay stock suficiente para concretar la venta");
-                        return $errorResource;
-                    }
-                    $this->productoRepository->setModel($producto);
-                    $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $nuevoStockPrincipal); 
-                    //Almacen de Recojo
-                    $idTipoStock= 3;
-                    $stockAnteriorRecojo= $this->productoRepository->consultarStock($idProducto,$idAlmacen,$idTipoStock);
-                    $nuevoStockRecojo=$stockAnteriorRecojo + $cantidad;
-                    $this->productoRepository->setModel($producto);
-                    $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $nuevoStockRecojo); 
+                    $this->movimientoTipoStockRepository->crear(['idAlmacen' => $idAlmacen,
+                                                                 'idProducto'=>$elem['idProducto'],
+                                                                 'idTipoStock'=>1,
+                                                                 'idUsuario'=>array_key_exists('idCajero', $facturaDataArray)? $facturaDataArray['idCajero']:5,
+                                                                 'cantidad'=>$elem['cantidad'],
+                                                                 'signo'=> '-',
+                                                                 'tipo'=> 'venta_entrega',
+                                                                 'deleted'=>false]);
+
+                    $this->movimientoTipoStockRepository->crear(['idAlmacen' => $idAlmacen,
+                                                                 'idProducto'=>$elem['idProducto'],
+                                                                 'idTipoStock'=>3,
+                                                                 'idUsuario'=>array_key_exists('idCajero', $facturaDataArray)? $facturaDataArray['idCajero']:5,
+                                                                 'cantidad'=>$elem['cantidad'],
+                                                                 'signo'=> '+',
+                                                                 'tipo'=> 'venta_entrega',
+                                                                 'deleted'=>false]);
+                    // $idProducto=$elem['idProducto'];
+                    // $cantidad= $elem['cantidad'];
+                    // $idTipoStock= 1;
+                    // $producto = $this->productoRepository->obtenerPorId($idProducto);
+                    // $this->productoRepository->setModel($producto);
+                    // $stockAnteriorPrincipal= $this->productoRepository->consultarStock($idProducto,$idAlmacen,$idTipoStock);
+                    // $nuevoStockPrincipal=$stockAnteriorPrincipal - $cantidad;
+                    // if($nuevoStockPrincipal < 0){
+                    //     $errorResource =  new ErrorResource (null);
+                    //     $errorResource->title("Error de stock");
+                    //     $errorResource->message("No hay stock suficiente para concretar la venta");
+                    //     return $errorResource;
+                    // }
+                    // $this->productoRepository->setModel($producto);
+                    // $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $nuevoStockPrincipal); 
+                    // //Almacen de Recojo
+                    // $idTipoStock= 3;
+                    // $stockAnteriorRecojo= $this->productoRepository->consultarStock($idProducto,$idAlmacen,$idTipoStock);
+                    // $nuevoStockRecojo=$stockAnteriorRecojo + $cantidad;
+                    // $this->productoRepository->setModel($producto);
+                    // $this->productoRepository->updateStock( $idTipoStock, $idAlmacen, $nuevoStockRecojo); 
                 }
             }
             DB::commit();
