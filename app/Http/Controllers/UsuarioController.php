@@ -480,6 +480,12 @@ class UsuarioController extends Controller
                 case 6:
                     $usuarios = $this->usuarioRepository->listarAlmaceneros();
                     $responseResource->title('Listado por rol - Almaceneros');
+                    foreach ($usuarios as $key => $usuario) {
+                    
+
+                        $this->usuarioRepository->loadTiendasCargoTrabajadorRelationship($usuario);
+                        
+                    }
                     
                     break;
 
@@ -793,7 +799,9 @@ class UsuarioController extends Controller
             
             foreach ($usuarios as $key => $usuario) {
                 $this->usuarioRepository->loadTipoUsuarioRelationship($usuario);
-                //$this->usuarioRepository->loadTiendasCargoJefeTiendaRelationship($usuario);
+                //$usuario->tiendas;
+                $this->usuarioRepository->loadTiendasCargoTrabajadorRelationship($usuario);
+                
             }
             $usuariosResource =  new UsuariosResource($usuarios); 
             $responseResourse = new ResponseResource(null);
